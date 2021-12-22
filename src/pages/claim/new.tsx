@@ -1,7 +1,7 @@
 import type { NextPage } from "next";
 
-const HostNewClaim: NextPage = () => {
+const NewClaim: NextPage = () => {
   return <>Host new claim</>;
 };
 
-export default HostNewClaim;
+export default NewClaim;

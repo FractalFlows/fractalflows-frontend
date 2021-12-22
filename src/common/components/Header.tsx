@@ -1,7 +1,7 @@
 import { FC } from "react";
 import Button from "@mui/material/Button";
 
-import styles from "styles/Header.module.css";
+import styles from "./Header.module.css";
 
 const Header: FC = () => {
   return (
