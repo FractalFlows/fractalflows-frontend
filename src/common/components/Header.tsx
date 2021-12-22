@@ -171,12 +171,12 @@ export default function PrimarySearchAppBar() {
           <Box sx={{ flexGrow: 1 }} />
           <Box sx={{ display: { xs: "none", md: "flex" } }}>
             <Stack direction="row" spacing={2}>
-              <Button variant="text" color="inherit">
-                How new claim
+              <Button variant="outlined" color="primaryContrast">
+                Host new claim
               </Button>
               <Button
-                variant="outlined"
-                color="inherit"
+                variant="contained"
+                color="primaryContrast"
                 startIcon={<i className="fab fa-ethereum"></i>}
               >
                 Sign in with Ethereum

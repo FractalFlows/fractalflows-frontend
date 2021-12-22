@@ -1,12 +1,19 @@
+.container {
+  padding-right: var(--fractalflows-gutter-page-sm);
+  padding-left: var(--fractalflows-gutter-page-sm);
+}
+
 @media screen and (min-width: 992px) {
-  .MuiToolbar-gutters {
+  .MuiToolbar-gutters,
+  .container {
     padding-right: var(--fractalflows-gutter-page-lg);
     padding-left: var(--fractalflows-gutter-page-lg);
   }
 }
 
 @media screen and (min-width: 1200px) {
-  .MuiToolbar-gutters {
+  .MuiToolbar-gutters,
+  .container {
     padding-right: var(--fractalflows-gutter-page-xl);
     padding-left: var(--fractalflows-gutter-page-xl);
   }
