@@ -1,4 +1,5 @@
 import Head from "next/head";
+import Script from "next/script";
 import { ThemeProvider } from "@mui/material/styles";
 import CssBaseline from "@mui/material/CssBaseline";
 import { CacheProvider } from "@emotion/react";
@@ -7,7 +8,9 @@ import type { AppProps } from "next/app";
 import theme from "common/config/theme";
 import createEmotionCache from "common/utils/createEmotionCache";
 import Header from "common/components/Header";
+import Footer from "common/components/Footer";
 import "common/styles/globals.css";
+import "common/styles/overrides.css";
 
 const clientSideEmotionCache = createEmotionCache();
 
@@ -36,12 +39,18 @@ const MyApp = ({
         ></script>
       </Head>
 
+      <Script
+        src="https://kit.fontawesome.com/22d4d6561c.js"
+        crossOrigin="anonymous"
+      ></Script>
+
       <ThemeProvider theme={theme}>
         <CssBaseline />
         <Header />
         <main>
           <Component {...pageProps} />
         </main>
+        <Footer />
       </ThemeProvider>
     </CacheProvider>
   );

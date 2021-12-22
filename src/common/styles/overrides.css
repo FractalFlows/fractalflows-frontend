@@ -1,0 +1,13 @@
+@media screen and (min-width: 992px) {
+  .MuiToolbar-gutters {
+    padding-right: var(--fractalflows-gutter-page-lg);
+    padding-left: var(--fractalflows-gutter-page-lg);
+  }
+}
+
+@media screen and (min-width: 1200px) {
+  .MuiToolbar-gutters {
+    padding-right: var(--fractalflows-gutter-page-xl);
+    padding-left: var(--fractalflows-gutter-page-xl);
+  }
+}

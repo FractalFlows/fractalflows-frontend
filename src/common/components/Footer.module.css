@@ -1,0 +1,37 @@
+.container {
+  padding: 0 20px 40px;
+  text-align: center;
+}
+
+.footer__icons {
+  text-align: center;
+  margin-bottom: 35px;
+}
+
+.footer__icons__item {
+  height: 35px;
+  width: 35px;
+  color: #fff;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  opacity: 0.8;
+  text-decoration: none;
+  font-size: 16px;
+  background-color: var(--fractalflows-colors-background);
+}
+
+.footer__icons__item:hover {
+  opacity: 1;
+  text-decoration: none;
+}
+
+.footer__icons__item:not(:last-child) {
+  margin-right: 15px;
+}
+
+.footer__copyright {
+  color: var(--fractalflows-colors-textsecondary);
+  font-size: 13px;
+}

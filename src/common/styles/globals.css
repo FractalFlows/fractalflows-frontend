@@ -1,4 +1,4 @@
-@import url(//cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css);
+/* @import url(//cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css); */
 @import url(https://fonts.googleapis.com/css?family=Roboto:300,400,500,700&display=swap);
 
 :root {
@@ -7,12 +7,14 @@
   --fractalflows-breakpoints-lg: 992px;
   --fractalflows-breakpoints-xl: 1200px;
 
-  --fractalflows-pagemargin-sm: 10px;
-  --fractalflows-pagemargin-md: 10px;
-  --fractalflows-pagemargin-lg: 8%;
-  --fractalflows-pagemargin-xl: 12%;
+  --fractalflows-gutter-page-sm: 10px;
+  --fractalflows-gutter-page-md: 10px;
+  --fractalflows-gutter-page-lg: 8%;
+  --fractalflows-gutter-page-xl: 12%;
 
   --fractalflows-colors-background: white;
+  --fractalflows-colors-textprimary: #757575;
+  --fractalflows-colors-textsecondary: #757575;
 
   --fractalflows-border-default: 1px solid #ddd;
 }
