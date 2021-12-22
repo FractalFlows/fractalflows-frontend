@@ -1,0 +1,35 @@
+:root {
+  --fractalflows-breakpoints-sm: 576px;
+  --fractalflows-breakpoints-md: 768px;
+  --fractalflows-breakpoints-lg: 992px;
+  --fractalflows-breakpoints-xl: 1200px;
+
+  --fractalflows-gutter-page-sm: 16px;
+  --fractalflows-gutter-page-md: 16px;
+  --fractalflows-gutter-page-lg: 8%;
+  --fractalflows-gutter-page-xl: 12%;
+
+  --fractalflows-colors-background: white;
+  --fractalflows-colors-textprimary: #757575;
+  --fractalflows-colors-textsecondary: #757575;
+
+  --fractalflows-border-default: 1px solid #ddd;
+}
+
+html,
+body {
+  padding: 0;
+  margin: 0;
+  font-family: -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen,
+    Ubuntu, Cantarell, Fira Sans, Droid Sans, Helvetica Neue, sans-serif;
+  background-color: rgb(231, 235, 240);
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+* {
+  box-sizing: border-box;
+}
