@@ -1,8 +1,10 @@
+import PropTypes from "prop-types";
 import Head from "next/head";
 import Script from "next/script";
 import { ThemeProvider } from "@mui/material/styles";
 import CssBaseline from "@mui/material/CssBaseline";
 import { CacheProvider } from "@emotion/react";
+import { EmotionCache } from "@emotion/cache";
 import type { AppProps } from "next/app";
 
 import theme from "common/config/theme";
@@ -14,11 +16,15 @@ import "common/styles/overrides.css";
 
 const clientSideEmotionCache = createEmotionCache();
 
+type CustomAppProps = {
+  emotionCache: EmotionCache;
+} & AppProps;
+
 const MyApp = ({
   Component,
   pageProps,
   emotionCache = clientSideEmotionCache,
-}: AppProps & { emotionCache: any }) => {
+}: CustomAppProps) => {
   return (
     <CacheProvider value={emotionCache}>
       <Head>

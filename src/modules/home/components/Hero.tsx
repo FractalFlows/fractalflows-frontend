@@ -12,7 +12,7 @@ const Hero: FC = () => (
       <Stack alignItems="center" spacing={2} justifyContent="center">
         <Typography
           variant="h2"
-          as="h1"
+          component="h1"
           fontWeight={700}
           color="primary.contrastText"
         >
@@ -20,7 +20,7 @@ const Hero: FC = () => (
         </Typography>
         <Typography
           variant="h5"
-          as="h2"
+          component="h2"
           color="primary.contrastText"
           align="center"
         >

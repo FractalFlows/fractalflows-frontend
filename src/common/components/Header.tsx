@@ -171,8 +171,11 @@ export default function PrimarySearchAppBar() {
           <Box sx={{ flexGrow: 1 }} />
           <Box sx={{ display: { xs: "none", md: "flex" } }}>
             <Stack direction="row" spacing={2}>
-              <Button variant="outlined" color="primaryContrast">
+              <Button variant="text" color="primaryContrast">
                 Host new claim
+              </Button>
+              <Button variant="text" color="primaryContrast">
+                Become a validator
               </Button>
               <Button
                 variant="contained"

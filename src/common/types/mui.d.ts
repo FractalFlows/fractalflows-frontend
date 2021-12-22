@@ -1,26 +1,17 @@
-declare module "@mui/material/styles" {
-  interface Theme {
-    status: {
-      danger: React.CSSProperties["color"];
-    };
-  }
+import "@mui/material/styles";
+import "@mui/material/Button";
 
+declare module "@mui/material/styles" {
   interface Palette {
     primaryContrast: Palette["primary"];
   }
   interface PaletteOptions {
     primaryContrast: PaletteOptions["primary"];
   }
+}
 
-  interface PaletteColor {
-    darker?: string;
-  }
-  interface SimplePaletteColorOptions {
-    darker?: string;
-  }
-  interface ThemeOptions {
-    status: {
-      danger: React.CSSProperties["color"];
-    };
+declare module "@mui/material/Button" {
+  interface ButtonPropsColorOverrides {
+    primaryContrast: true;
   }
 }
