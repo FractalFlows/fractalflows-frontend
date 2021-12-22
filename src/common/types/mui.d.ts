@@ -6,10 +6,10 @@ declare module "@mui/material/styles" {
   }
 
   interface Palette {
-    contrast: Palette["primary"];
+    primaryContrast: Palette["primary"];
   }
   interface PaletteOptions {
-    neutral: PaletteOptions["primary"];
+    primaryContrast: PaletteOptions["primary"];
   }
 
   interface PaletteColor {
