@@ -16,6 +16,8 @@ import AddIcon from "@mui/icons-material/Add";
 import CampaignIcon from "@mui/icons-material/Campaign";
 import MoreIcon from "@mui/icons-material/MoreVert";
 
+import { useAuth } from "modules/auth/hooks/useAuth";
+
 const Search = styled("div")(({ theme }) => ({
   position: "relative",
   borderRadius: theme.shape.borderRadius,
@@ -63,6 +65,8 @@ export default function PrimarySearchAppBar() {
 
   const isMenuOpen = Boolean(anchorEl);
   const isMobileMenuOpen = Boolean(mobileMoreAnchorEl);
+
+  const { signin } = useAuth();
 
   const handleProfileMenuOpen = (event: React.MouseEvent<HTMLElement>) => {
     setAnchorEl(event.currentTarget);
@@ -181,6 +185,7 @@ export default function PrimarySearchAppBar() {
                 variant="contained"
                 color="primaryContrast"
                 startIcon={<i className="fab fa-ethereum"></i>}
+                onClick={signin}
               >
                 Sign in with Ethereum
               </Button>
