@@ -5,6 +5,7 @@ import Stack from "@mui/material/Stack";
 import Button from "@mui/material/Button";
 
 import styles from "./Hero.module.css";
+import { connectWallet } from "modules/auth/auth";
 
 const Hero: FC = () => (
   <Box className={`container ${styles.hero}`}>
@@ -35,6 +36,7 @@ const Hero: FC = () => (
           variant="contained"
           color="primaryContrast"
           startIcon={<i className="fab fa-ethereum"></i>}
+          onClick={connectWallet}
         >
           Sign in with Ethereum
         </Button>
