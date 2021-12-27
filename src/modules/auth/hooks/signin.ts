@@ -4,6 +4,7 @@ import WalletConnect from "@walletconnect/web3-provider";
 import { SignatureType, SiweMessage } from "siwe";
 
 import { AuthService } from "../services/auth";
+import { AuthCache } from "../cache";
 
 export const signin = async () => {
   const providerOptions = {
@@ -29,11 +30,11 @@ export const signin = async () => {
     throw new Error("Ethereum address not found.");
   }
 
-  const {
-    data: { nonce },
-  } = await AuthService.getNonce();
+  const ens = (await ethersProvider.lookupAddress(address)) ?? undefined;
+  const avatar = (await ethersProvider.getAvatar(address)) ?? undefined;
+  const nonce = await AuthService.getNonce();
 
-  const message = new SiweMessage({
+  const siweMessage = new SiweMessage({
     domain: document.location.host,
     address,
     chainId: `${await ethersProvider
@@ -48,12 +49,15 @@ export const signin = async () => {
 
   const signature = await ethersProvider
     .getSigner()
-    .signMessage(message.signMessage());
-  message.signature = signature;
+    .signMessage(siweMessage.signMessage());
+  siweMessage.signature = signature;
 
-  await AuthService.signin();
+  await AuthService.signin({ siweMessage, ens });
 
-  console.log(ethersProvider);
-  console.log(nonce);
-  console.log(message);
+  AuthCache.sessionVar({
+    siweMessage,
+    ens,
+    avatar,
+  });
+  AuthCache.isSignedInVar(true);
 };

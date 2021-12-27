@@ -1,4 +1,4 @@
-import PropTypes from "prop-types";
+import { useEffect } from "react";
 import Head from "next/head";
 import Script from "next/script";
 import { ThemeProvider } from "@mui/material/styles";
@@ -8,11 +8,12 @@ import { EmotionCache } from "@emotion/cache";
 import { ApolloProvider } from "@apollo/client";
 import type { AppProps } from "next/app";
 
-import theme from "common/config/theme";
-import apolloClient from "common/apollo-client";
-import createEmotionCache from "common/utils/createEmotionCache";
-import Header from "common/components/Header";
-import Footer from "common/components/Footer";
+import { muiTheme } from "common/config/muiTheme";
+import { apolloClient } from "common/apollo/client";
+import { createEmotionCache } from "common/utils/createEmotionCache";
+import { useAuth } from "modules/auth/hooks/useAuth";
+import { Header } from "common/components/Header";
+import { Footer } from "common/components/Footer";
 import "common/styles/globals.css";
 import "common/styles/overrides.css";
 
@@ -27,6 +28,14 @@ const MyApp = ({
   pageProps,
   emotionCache = clientSideEmotionCache,
 }: CustomAppProps) => {
+  const { getSession, session } = useAuth();
+
+  useEffect(() => {
+    getSession();
+  });
+
+  console.log("sesss", session);
+
   return (
     <ApolloProvider client={apolloClient}>
       <CacheProvider value={emotionCache}>
@@ -54,7 +63,7 @@ const MyApp = ({
           crossOrigin="anonymous"
         ></Script>
 
-        <ThemeProvider theme={theme}>
+        <ThemeProvider theme={muiTheme}>
           <CssBaseline />
           <Header />
           <main>

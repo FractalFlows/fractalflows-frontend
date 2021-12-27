@@ -1,13 +1,22 @@
-import { gql } from "@apollo/client";
+import { gql, useQuery } from "@apollo/client";
 import type { NextPage } from "next";
 
 import Hero from "modules/home/components/Hero";
 import Board from "modules/home/components/Board";
 
-import client from "common/apollo-client";
+import { apolloClient } from "common/apollo/client";
 
 const Home: NextPage<{ users: any }> = ({ users }) => {
-  console.log(users);
+  // const {
+  //   loading,
+  //   error,
+  //   data: session,
+  // } = useQuery(GET_SESSION, {
+  //   fetchPolicy: "cache-and-network",
+  // });
+
+  // console.log(loading, error, session?.getSession);
+
   return (
     <>
       <Hero />
@@ -17,7 +26,7 @@ const Home: NextPage<{ users: any }> = ({ users }) => {
 };
 
 export async function getServerSideProps() {
-  const { data } = await client.query({
+  const { data } = await apolloClient.query({
     query: gql`
       query Users {
         users {

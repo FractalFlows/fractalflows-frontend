@@ -24,7 +24,7 @@ const FooterIconsItem: FC<{
   </a>
 );
 
-const Footer: FC = () => (
+export const Footer: FC = () => (
   <footer className={styles.footer}>
     <Stack spacing={2}>
       <Stack direction="row" spacing={1} justifyContent="center">
@@ -65,5 +65,3 @@ const Footer: FC = () => (
     </Stack>
   </footer>
 );
-
-export default Footer;

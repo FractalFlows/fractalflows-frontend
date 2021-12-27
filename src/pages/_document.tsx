@@ -2,8 +2,8 @@ import * as React from "react";
 import Document, { Html, Head, Main, NextScript } from "next/document";
 import createEmotionServer from "@emotion/server/create-instance";
 
-import theme from "common/config/theme";
-import createEmotionCache from "common/utils/createEmotionCache";
+import { muiTheme } from "common/config/muiTheme";
+import { createEmotionCache } from "common/utils/createEmotionCache";
 
 export default class MyDocument extends Document {
   render() {
@@ -11,7 +11,7 @@ export default class MyDocument extends Document {
       <Html lang="en">
         <Head>
           {/* PWA primary color */}
-          <meta name="theme-color" content={theme.palette.primary.main} />
+          <meta name="theme-color" content={muiTheme.palette.primary.main} />
           <link
             rel="stylesheet"
             href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700&display=swap"
