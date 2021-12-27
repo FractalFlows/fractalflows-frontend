@@ -2,6 +2,8 @@ import * as React from "react";
 import { styled, alpha } from "@mui/material/styles";
 import AppBar from "@mui/material/AppBar";
 import Box from "@mui/material/Box";
+import Avatar from "@mui/material/Avatar";
+import Divider from "@mui/material/Divider";
 import Toolbar from "@mui/material/Toolbar";
 import IconButton from "@mui/material/IconButton";
 import Button from "@mui/material/Button";
@@ -15,6 +17,9 @@ import AccountCircle from "@mui/icons-material/AccountCircle";
 import AddIcon from "@mui/icons-material/Add";
 import CampaignIcon from "@mui/icons-material/Campaign";
 import MoreIcon from "@mui/icons-material/MoreVert";
+
+import { useAuth } from "modules/auth/hooks/useAuth";
+import { muiTheme } from "common/config/muiTheme";
 
 const Search = styled("div")(({ theme }) => ({
   position: "relative",
@@ -56,13 +61,15 @@ const StyledInputBase = styled(InputBase)(({ theme }) => ({
   },
 }));
 
-export default function PrimarySearchAppBar() {
+export const Header = () => {
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
   const [mobileMoreAnchorEl, setMobileMoreAnchorEl] =
     React.useState<null | HTMLElement>(null);
 
   const isMenuOpen = Boolean(anchorEl);
   const isMobileMenuOpen = Boolean(mobileMoreAnchorEl);
+
+  const { signin, signout, session, isSignedIn } = useAuth();
 
   const handleProfileMenuOpen = (event: React.MouseEvent<HTMLElement>) => {
     setAnchorEl(event.currentTarget);
@@ -99,7 +106,14 @@ export default function PrimarySearchAppBar() {
       onClose={handleMenuClose}
     >
       <MenuItem onClick={handleMenuClose}>My claims</MenuItem>
-      <MenuItem onClick={handleMenuClose}>Logout</MenuItem>
+      <MenuItem
+        onClick={() => {
+          signout();
+          handleMenuClose();
+        }}
+      >
+        Sign out
+      </MenuItem>
     </Menu>
   );
 
@@ -177,24 +191,53 @@ export default function PrimarySearchAppBar() {
               <Button variant="text" color="primaryContrast">
                 Become a validator
               </Button>
-              <Button
-                variant="contained"
-                color="primaryContrast"
-                startIcon={<i className="fab fa-ethereum"></i>}
-              >
-                Sign in with Ethereum
-              </Button>
-              {/* <IconButton
-                size="large"
-                edge="end"
-                aria-label="account of current user"
-                aria-controls={menuId}
-                aria-haspopup="true"
-                onClick={handleProfileMenuOpen}
-                color="inherit"
-              >
-                <AccountCircle />
-              </IconButton> */}
+              {isSignedIn ? (
+                <>
+                  <Divider orientation="vertical" flexItem />
+                  <Button
+                    variant="text"
+                    onClick={handleProfileMenuOpen}
+                    color="primaryContrast"
+                    aria-label="account of current user"
+                    aria-controls={menuId}
+                    aria-haspopup="true"
+                  >
+                    <Stack direction="row" spacing={1} alignItems="center">
+                      {session.avatar ? (
+                        <Avatar src={session.avatar} />
+                      ) : (
+                        <Avatar
+                          sx={{
+                            bgcolor: alpha(muiTheme.palette.common.white, 0.15),
+                          }}
+                        >
+                          <AccountCircle />
+                        </Avatar>
+                      )}
+                      <Typography
+                        variant="body1"
+                        noWrap
+                        sx={{
+                          fontWeight: 800,
+                          textTransform: "initial",
+                          maxWidth: 150,
+                        }}
+                      >
+                        {session.ens ?? session.siweMessage.address}
+                      </Typography>
+                    </Stack>
+                  </Button>
+                </>
+              ) : (
+                <Button
+                  variant="contained"
+                  color="primaryContrast"
+                  startIcon={<i className="fab fa-ethereum"></i>}
+                  onClick={signin}
+                >
+                  Sign in with Ethereum
+                </Button>
+              )}
             </Stack>
           </Box>
           <Box sx={{ display: { xs: "flex", md: "none" } }}>
@@ -215,4 +258,4 @@ export default function PrimarySearchAppBar() {
       {renderMenu}
     </Box>
   );
-}
+};

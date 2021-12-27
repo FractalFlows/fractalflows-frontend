@@ -30,13 +30,8 @@ const Hero: FC = () => (
       </Stack>
 
       <Stack direction="row" spacing={2}>
-        <Button
-          size="large"
-          variant="contained"
-          color="primaryContrast"
-          startIcon={<i className="fab fa-ethereum"></i>}
-        >
-          Sign in with Ethereum
+        <Button size="large" variant="contained" color="primaryContrast">
+          Host new claim
         </Button>
         <Button
           variant="outlined"
