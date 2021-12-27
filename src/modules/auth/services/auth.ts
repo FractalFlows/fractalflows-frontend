@@ -2,13 +2,14 @@ import type { SiweMessage } from "siwe";
 
 import { apolloClient } from "common/apollo/client";
 import { GET_NONCE, GET_SESSION } from "../queries";
-import { SIGN_IN } from "../mutations";
+import { SIGN_IN, SIGN_OUT } from "../mutations";
 
 export const AuthService = {
   async getNonce(): Promise<string> {
     return (
       await apolloClient.query({
         query: GET_NONCE,
+        fetchPolicy: "network-only",
       })
     )?.data?.nonce;
   },
@@ -40,5 +41,13 @@ export const AuthService = {
     });
 
     return data.signIn;
+  },
+
+  async signout(): Promise<Boolean> {
+    const { data } = await apolloClient.mutate({
+      mutation: SIGN_OUT,
+    });
+
+    return data.signOut;
   },
 };

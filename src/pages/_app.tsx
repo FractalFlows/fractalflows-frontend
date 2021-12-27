@@ -28,13 +28,11 @@ const MyApp = ({
   pageProps,
   emotionCache = clientSideEmotionCache,
 }: CustomAppProps) => {
-  const { getSession, session } = useAuth();
+  const { getSession } = useAuth();
 
   useEffect(() => {
     getSession();
-  });
-
-  console.log("sesss", session);
+  }, []);
 
   return (
     <ApolloProvider client={apolloClient}>

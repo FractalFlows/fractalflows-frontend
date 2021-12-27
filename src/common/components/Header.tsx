@@ -69,7 +69,7 @@ export const Header = () => {
   const isMenuOpen = Boolean(anchorEl);
   const isMobileMenuOpen = Boolean(mobileMoreAnchorEl);
 
-  const { signin, session, isSignedIn } = useAuth();
+  const { signin, signout, session, isSignedIn } = useAuth();
 
   const handleProfileMenuOpen = (event: React.MouseEvent<HTMLElement>) => {
     setAnchorEl(event.currentTarget);
@@ -106,7 +106,14 @@ export const Header = () => {
       onClose={handleMenuClose}
     >
       <MenuItem onClick={handleMenuClose}>My claims</MenuItem>
-      <MenuItem onClick={handleMenuClose}>Logout</MenuItem>
+      <MenuItem
+        onClick={() => {
+          signout();
+          handleMenuClose();
+        }}
+      >
+        Sign out
+      </MenuItem>
     </Menu>
   );
 

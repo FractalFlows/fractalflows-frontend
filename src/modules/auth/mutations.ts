@@ -5,3 +5,9 @@ export const SIGN_IN = gql`
     signIn(signInInput: $signInInput)
   }
 `;
+
+export const SIGN_OUT = gql`
+  mutation SignOut {
+    signOut
+  }
+`;

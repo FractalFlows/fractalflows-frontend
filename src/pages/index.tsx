@@ -7,16 +7,6 @@ import Board from "modules/home/components/Board";
 import { apolloClient } from "common/apollo/client";
 
 const Home: NextPage<{ users: any }> = ({ users }) => {
-  // const {
-  //   loading,
-  //   error,
-  //   data: session,
-  // } = useQuery(GET_SESSION, {
-  //   fetchPolicy: "cache-and-network",
-  // });
-
-  // console.log(loading, error, session?.getSession);
-
   return (
     <>
       <Hero />

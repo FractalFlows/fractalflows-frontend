@@ -2,7 +2,6 @@ import type { SiweMessage } from "siwe";
 
 import { AuthService } from "../services/auth";
 import { AuthCache } from "../cache";
-import { useQuery } from "@apollo/client";
 
 export const getSession = async () => {
   const siweMessage = (await AuthService.getSession()) as SiweMessage;
@@ -11,8 +10,4 @@ export const getSession = async () => {
     AuthCache.sessionVar({ siweMessage });
     AuthCache.isSignedInVar(true);
   }
-};
-
-export const session = () => {
-  useQuery();
 };
