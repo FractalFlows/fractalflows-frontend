@@ -11,19 +11,38 @@ export const signin = async () => {
     walletconnect: {
       package: WalletConnect,
       options: {
-        infuraId: process.env.NEXT_PUBLIC_INFURA_ID,
+        infuraId: process.env.NEXT_PUBLIC_INFURA_PROJECT_ID,
       },
     },
   };
 
   const web3Modal = new Web3Modal({
     network: "mainnet",
-    // cacheProvider: true,
     providerOptions,
   });
 
   const provider = await web3Modal.connect();
-  const ethersProvider = new ethers.providers.Web3Provider(provider);
+  const ethersProvider = new ethers.providers.Web3Provider(provider, "any");
+
+  const chainId = await ethersProvider
+    .getNetwork()
+    .then(({ chainId }) => chainId);
+
+  if (ethersProvider.connection.url === "metamask") {
+    await ethersProvider.provider.request({
+      method: "wallet_switchEthereumChain",
+      params: [
+        {
+          chainId: "0x1",
+        },
+      ],
+    });
+  } else if (chainId !== 1) {
+    await ethersProvider.provider.close();
+    return alert(
+      "Unsupported network. Please, switch to Ethereum mainnet and try again."
+    );
+  }
 
   const [address] = await ethersProvider.listAccounts();
   if (!address) {

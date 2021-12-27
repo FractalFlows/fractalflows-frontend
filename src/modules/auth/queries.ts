@@ -14,6 +14,7 @@ export const GET_SESSION = gql`
         chainId
       }
       ens
+      avatar
     }
   }
 `;
