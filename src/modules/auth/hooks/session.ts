@@ -1,13 +1,11 @@
-import type { SiweMessage } from "siwe";
-
 import { AuthService } from "../services/auth";
 import { AuthCache } from "../cache";
 
 export const getSession = async () => {
-  const siweMessage = (await AuthService.getSession()) as SiweMessage;
+  const session = await AuthService.getSession();
 
-  if (siweMessage) {
-    AuthCache.sessionVar({ siweMessage });
+  if (session) {
+    AuthCache.sessionVar(session);
     AuthCache.isSignedInVar(true);
   }
 };

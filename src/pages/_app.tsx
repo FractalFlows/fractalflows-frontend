@@ -9,7 +9,7 @@ import { ApolloProvider } from "@apollo/client";
 import type { AppProps } from "next/app";
 
 import { muiTheme } from "common/config/muiTheme";
-import { apolloClient } from "common/apollo/client";
+import { apolloClient } from "common/services/apollo/client";
 import { createEmotionCache } from "common/utils/createEmotionCache";
 import { useAuth } from "modules/auth/hooks/useAuth";
 import { Header } from "common/components/Header";
@@ -32,7 +32,7 @@ const MyApp = ({
 
   useEffect(() => {
     getSession();
-  }, []);
+  }, [getSession]);
 
   return (
     <ApolloProvider client={apolloClient}>

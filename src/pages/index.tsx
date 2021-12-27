@@ -4,7 +4,7 @@ import type { NextPage } from "next";
 import Hero from "modules/home/components/Hero";
 import Board from "modules/home/components/Board";
 
-import { apolloClient } from "common/apollo/client";
+import { apolloClient } from "common/services/apollo/client";
 
 const Home: NextPage<{ users: any }> = ({ users }) => {
   return (

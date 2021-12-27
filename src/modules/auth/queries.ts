@@ -9,7 +9,11 @@ export const GET_NONCE = gql`
 export const GET_SESSION = gql`
   query Session {
     session {
-      address
+      siweMessage {
+        address
+        chainId
+      }
+      ens
     }
   }
 `;

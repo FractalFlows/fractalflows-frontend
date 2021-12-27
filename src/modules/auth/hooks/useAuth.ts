@@ -1,6 +1,6 @@
 import { useQuery } from "@apollo/client";
 
-import { apolloClient } from "common/apollo/client";
+import { apolloClient } from "common/services/apollo/client";
 import { signin } from "./signin";
 import { signout } from "./signout";
 import { getSession } from "./session";

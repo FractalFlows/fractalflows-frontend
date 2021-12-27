@@ -1,8 +1,9 @@
 import type { SiweMessage } from "siwe";
 
-import { apolloClient } from "common/apollo/client";
+import { apolloClient } from "common/services/apollo/client";
 import { GET_NONCE, GET_SESSION } from "../queries";
 import { SIGN_IN, SIGN_OUT } from "../mutations";
+import { Session } from "../interfaces";
 
 export const AuthService = {
   async getNonce(): Promise<string> {
@@ -14,7 +15,7 @@ export const AuthService = {
     )?.data?.nonce;
   },
 
-  async getSession(): Promise<{ address: string }> {
+  async getSession(): Promise<Session> {
     return (
       await apolloClient.query({
         query: GET_SESSION,
