@@ -28,7 +28,10 @@ export const signin = async () => {
     .getNetwork()
     .then(({ chainId }) => chainId);
 
-  if (ethersProvider.connection.url === "metamask") {
+  if (
+    ethersProvider.connection.url === "metamask" &&
+    ethersProvider.provider.request
+  ) {
     await ethersProvider.provider.request({
       method: "wallet_switchEthereumChain",
       params: [
@@ -38,7 +41,9 @@ export const signin = async () => {
       ],
     });
   } else if (chainId !== 1) {
-    await ethersProvider.provider.close();
+    const closeWallet = (ethersProvider.provider as any).close();
+    if (closeWallet) await closeWallet();
+
     return alert(
       "Unsupported network. Please, switch to Ethereum mainnet and try again."
     );
