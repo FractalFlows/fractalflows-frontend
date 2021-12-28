@@ -18,6 +18,7 @@ import MoreIcon from "@mui/icons-material/MoreVert";
 
 import { useAuth } from "modules/auth/hooks/useAuth";
 import { muiTheme } from "common/config/muiTheme";
+import { Link } from "common/components/Link";
 
 const Search = styled("div")(({ theme }) => ({
   position: "relative",
@@ -116,9 +117,13 @@ export const Header = () => {
       >
         Sign out
       </MenuItem>
-      <Divider sx={{ my: 0.5 }} />
-      <MenuItem sx={{ ...renderMenuOnlyOnMobile }}>Host new claim</MenuItem>
-      <MenuItem sx={{ ...renderMenuOnlyOnMobile }}>Become a validator</MenuItem>
+      <Box sx={{ ...renderMenuOnlyOnMobile }}>
+        <Divider sx={{ my: 0.5 }} />
+        <Link href="/claim/new" passHref>
+          <MenuItem>Host new claim</MenuItem>
+        </Link>
+        <MenuItem>Become a validator</MenuItem>
+      </Box>
     </Menu>
   );
 
@@ -139,26 +144,28 @@ export const Header = () => {
       open={isMobileMenuOpen}
       onClose={handleMobileMenuClose}
     >
-      <MenuItem>Host new claim</MenuItem>
+      <Link href="/claim/new" passHref>
+        <MenuItem>Host new claim</MenuItem>
+      </Link>
       <MenuItem>Become a validator</MenuItem>
-      {isSignedIn ? null : (
-        <>
-          <Divider sx={{ my: 0.5 }} />
-          <MenuItem>
-            <Button
-              variant="contained"
-              color="primary"
-              startIcon={<i className="fab fa-ethereum"></i>}
-              onClick={() => {
-                signin();
-                handleMobileMenuClose();
-              }}
-            >
-              Sign in with Ethereum
-            </Button>
-          </MenuItem>
-        </>
-      )}
+      {isSignedIn
+        ? null
+        : [
+            <Divider key={0} sx={{ my: 0.5 }} />,
+            <MenuItem key={1}>
+              <Button
+                variant="contained"
+                color="primary"
+                startIcon={<i className="fab fa-ethereum"></i>}
+                onClick={() => {
+                  signin();
+                  handleMobileMenuClose();
+                }}
+              >
+                Sign in with Ethereum
+              </Button>
+            </MenuItem>,
+          ]}
     </Menu>
   );
 
@@ -178,14 +185,16 @@ export const Header = () => {
     <Box sx={{ flexGrow: 1 }}>
       <AppBar position="sticky">
         <Toolbar>
-          <Typography
-            variant="h6"
-            noWrap
-            component="div"
-            sx={{ display: { xs: "none", sm: "block" } }}
-          >
-            Fractal Flows
-          </Typography>
+          <Link href="/" passHref>
+            <Typography
+              variant="h6"
+              noWrap
+              component="div"
+              sx={{ display: { xs: "none", sm: "block" } }}
+            >
+              Fractal Flows
+            </Typography>
+          </Link>
           <Search>
             <SearchIconWrapper>
               <SearchIcon />
@@ -198,9 +207,11 @@ export const Header = () => {
           <Box sx={{ flexGrow: 1 }} />
           <Box sx={{ display: { xs: "none", md: "flex" } }}>
             <Stack direction="row" spacing={2}>
-              <Button variant="text" color="primaryContrast">
-                Host new claim
-              </Button>
+              <Link href="/claim/new" passHref>
+                <Button variant="text" color="primaryContrast">
+                  Host new claim
+                </Button>
+              </Link>
               <Button variant="text" color="primaryContrast">
                 Become a validator
               </Button>

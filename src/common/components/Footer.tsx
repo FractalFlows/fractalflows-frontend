@@ -25,7 +25,7 @@ const FooterIconsItem: FC<{
 );
 
 export const Footer: FC = () => (
-  <footer className={styles.footer}>
+  <footer className={styles.container}>
     <Stack spacing={2}>
       <Stack direction="row" spacing={1} justifyContent="center">
         <FooterIconsItem
