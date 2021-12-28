@@ -9,12 +9,13 @@ import styles from "./Hero.module.css";
 const Hero: FC = () => (
   <Box className={`container ${styles.hero}`}>
     <Stack spacing={8} alignItems="center">
-      <Stack alignItems="center" spacing={2} justifyContent="center">
+      <Stack spacing={2}>
         <Typography
           variant="h2"
           component="h1"
           fontWeight={700}
           color="primary.contrastText"
+          align="center"
         >
           Fractal Flows
         </Typography>
@@ -29,7 +30,7 @@ const Hero: FC = () => (
         </Typography>
       </Stack>
 
-      <Stack direction="row" spacing={2}>
+      <Stack direction={{ xs: "column", sm: "row" }} spacing={{ xs: 2, sm: 2 }}>
         <Button size="large" variant="contained" color="primaryContrast">
           Host new claim
         </Button>

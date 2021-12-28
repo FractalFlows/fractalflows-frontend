@@ -14,8 +14,6 @@ import MenuItem from "@mui/material/MenuItem";
 import Menu from "@mui/material/Menu";
 import SearchIcon from "@mui/icons-material/Search";
 import AccountCircle from "@mui/icons-material/AccountCircle";
-import AddIcon from "@mui/icons-material/Add";
-import CampaignIcon from "@mui/icons-material/Campaign";
 import MoreIcon from "@mui/icons-material/MoreVert";
 
 import { useAuth } from "modules/auth/hooks/useAuth";
@@ -89,6 +87,7 @@ export const Header = () => {
   };
 
   const menuId = "primary-search-account-menu";
+  const renderMenuOnlyOnMobile = { display: { xs: "block", sm: "none" } };
   const renderMenu = (
     <Menu
       anchorEl={anchorEl}
@@ -105,6 +104,9 @@ export const Header = () => {
       open={isMenuOpen}
       onClose={handleMenuClose}
     >
+      <MenuItem disabled sx={{ ...renderMenuOnlyOnMobile, fontWeight: 800 }}>
+        {session.username}
+      </MenuItem>
       <MenuItem onClick={handleMenuClose}>My claims</MenuItem>
       <MenuItem
         onClick={() => {
@@ -114,6 +116,9 @@ export const Header = () => {
       >
         Sign out
       </MenuItem>
+      <Divider sx={{ my: 0.5 }} />
+      <MenuItem sx={{ ...renderMenuOnlyOnMobile }}>Host new claim</MenuItem>
+      <MenuItem sx={{ ...renderMenuOnlyOnMobile }}>Become a validator</MenuItem>
     </Menu>
   );
 
@@ -134,31 +139,39 @@ export const Header = () => {
       open={isMobileMenuOpen}
       onClose={handleMobileMenuClose}
     >
-      <MenuItem>
-        <IconButton size="large" aria-label="user claims" color="inherit">
-          <AddIcon />
-        </IconButton>
-        <p>Host new claim</p>
-      </MenuItem>
-      <MenuItem>
-        <IconButton size="large" aria-label="user claims" color="inherit">
-          <CampaignIcon />
-        </IconButton>
-        <p>My claims</p>
-      </MenuItem>
-      <MenuItem onClick={handleProfileMenuOpen}>
-        <IconButton
-          size="large"
-          aria-label="account of current user"
-          aria-controls="primary-search-account-menu"
-          aria-haspopup="true"
-          color="inherit"
-        >
-          <AccountCircle />
-        </IconButton>
-        <p>Profile</p>
-      </MenuItem>
+      <MenuItem>Host new claim</MenuItem>
+      <MenuItem>Become a validator</MenuItem>
+      {isSignedIn ? null : (
+        <>
+          <Divider sx={{ my: 0.5 }} />
+          <MenuItem>
+            <Button
+              variant="contained"
+              color="primary"
+              startIcon={<i className="fab fa-ethereum"></i>}
+              onClick={() => {
+                signin();
+                handleMobileMenuClose();
+              }}
+            >
+              Sign in with Ethereum
+            </Button>
+          </MenuItem>
+        </>
+      )}
     </Menu>
+  );
+
+  const userAvatar = session.avatar ? (
+    <Avatar src={session.avatar} />
+  ) : (
+    <Avatar
+      sx={{
+        bgcolor: alpha(muiTheme.palette.common.white, 0.15),
+      }}
+    >
+      <AccountCircle />
+    </Avatar>
   );
 
   return (
@@ -203,17 +216,7 @@ export const Header = () => {
                     aria-haspopup="true"
                   >
                     <Stack direction="row" spacing={1} alignItems="center">
-                      {session.avatar ? (
-                        <Avatar src={session.avatar} />
-                      ) : (
-                        <Avatar
-                          sx={{
-                            bgcolor: alpha(muiTheme.palette.common.white, 0.15),
-                          }}
-                        >
-                          <AccountCircle />
-                        </Avatar>
-                      )}
+                      {userAvatar}
                       <Typography
                         variant="body1"
                         noWrap
@@ -223,7 +226,7 @@ export const Header = () => {
                           maxWidth: 150,
                         }}
                       >
-                        {session.ens ?? session.siweMessage.address}
+                        {session.username}
                       </Typography>
                     </Stack>
                   </Button>
@@ -241,16 +244,28 @@ export const Header = () => {
             </Stack>
           </Box>
           <Box sx={{ display: { xs: "flex", md: "none" } }}>
-            <IconButton
-              size="large"
-              aria-label="show more"
-              aria-controls={mobileMenuId}
-              aria-haspopup="true"
-              onClick={handleMobileMenuOpen}
-              color="inherit"
-            >
-              <MoreIcon />
-            </IconButton>
+            {isSignedIn ? (
+              <>
+                <IconButton
+                  onClick={handleProfileMenuOpen}
+                  aria-label="account of current user"
+                  aria-controls={menuId}
+                  aria-haspopup="true"
+                >
+                  {userAvatar}
+                </IconButton>
+              </>
+            ) : (
+              <IconButton
+                aria-label="show more"
+                aria-controls={mobileMenuId}
+                aria-haspopup="true"
+                onClick={handleMobileMenuOpen}
+                color="inherit"
+              >
+                <MoreIcon />
+              </IconButton>
+            )}
           </Box>
         </Toolbar>
       </AppBar>
