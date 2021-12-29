@@ -119,7 +119,7 @@ export const Header = () => {
       </MenuItem>
       <Box sx={{ ...renderMenuOnlyOnMobile }}>
         <Divider sx={{ my: 0.5 }} />
-        <Link href="/claim/new" passHref>
+        <Link href="/claim/new">
           <MenuItem>Host new claim</MenuItem>
         </Link>
         <MenuItem>Become a validator</MenuItem>
@@ -144,7 +144,7 @@ export const Header = () => {
       open={isMobileMenuOpen}
       onClose={handleMobileMenuClose}
     >
-      <Link href="/claim/new" passHref>
+      <Link href="/claim/new">
         <MenuItem>Host new claim</MenuItem>
       </Link>
       <MenuItem>Become a validator</MenuItem>
@@ -185,12 +185,12 @@ export const Header = () => {
     <Box sx={{ flexGrow: 1 }}>
       <AppBar position="sticky">
         <Toolbar>
-          <Link href="/" passHref>
+          <Link href="/">
             <Typography
               variant="h6"
               noWrap
               component="div"
-              sx={{ display: { xs: "none", sm: "block" } }}
+              sx={{ display: { xs: "none", sm: "block" }, fontWeight: 800 }}
             >
               Fractal Flows
             </Typography>
@@ -207,7 +207,7 @@ export const Header = () => {
           <Box sx={{ flexGrow: 1 }} />
           <Box sx={{ display: { xs: "none", md: "flex" } }}>
             <Stack direction="row" spacing={2}>
-              <Link href="/claim/new" passHref>
+              <Link href="/claim/new">
                 <Button variant="text" color="primaryContrast">
                   Host new claim
                 </Button>

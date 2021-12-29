@@ -2,7 +2,10 @@ import type { NextPage } from "next";
 import Image from "next/image";
 import {
   Box,
+  FormControl,
+  InputLabel,
   Autocomplete,
+  IconButton,
   Select,
   MenuItem,
   Button,
@@ -10,48 +13,104 @@ import {
   Typography,
   TextField,
 } from "@mui/material";
+import DeleteIcon from "@mui/icons-material/Delete";
 import { useForm, useFieldArray } from "react-hook-form";
 
 import SocialIdeasIllustration from "../../../public/illustrations/social_ideas.svg";
+import { useFormErrorMessage } from "common/hooks/useFormErrorMessage";
+import { registerMui } from "common/utils/registerMui";
 
 const NewClaim: NextPage = () => {
-  const { control, register } = useForm();
-  const { fields, append, prepend, remove, swap, move, insert } = useFieldArray(
-    {
-      control, // control props comes from useForm (optional: if you are using FormContext)
-      name: "sources", // unique name for your Field Array
-      // keyName: "id", default to "id", you can change the key name
-    }
-  );
+  const {
+    control,
+    register,
+    formState: { errors },
+    handleSubmit,
+  } = useForm();
+  const {
+    fields: sourcesFields,
+    append: appendSource,
+    remove: removeSource,
+  } = useFieldArray({
+    control,
+    name: "sources",
+  });
+  const {
+    fields: attributionsFields,
+    append: appendAttribution,
+    remove: removeAttribution,
+  } = useFieldArray({
+    control,
+    name: "attributions",
+  });
+
+  const sourcesOriginOptions = [
+    { value: "facebook", label: "Facebook" },
+    { value: "twitter", label: "Twitter" },
+    { value: "reddit", label: "Reddit" },
+    { value: "linkedIn", label: "LinkedIn" },
+    { value: "quora", label: "Quora" },
+    { value: "doi", label: "DOI" },
+    { value: "website", label: "Website" },
+    { value: "other", label: "Other" },
+  ];
+  const attributionsOriginOptions = [
+    { value: "twitter", label: "Twitter" },
+    { value: "email", label: "Email" },
+  ];
+
   return (
     <Box className="container page">
-      <Stack direction="row" spacing={20}>
+      <Stack direction="row" spacing={15}>
         <Box>
           <Image src={SocialIdeasIllustration} alt="Social ideas" />
         </Box>
         <Stack
           direction="column"
-          spacing={5}
-          sx={{ width: "600px" }}
+          spacing={6}
+          sx={{ maxWidth: "550px" }}
           justifySelf="flexEnd"
         >
-          <Typography variant="h3" component="h1">
+          <Typography
+            variant="h3"
+            component="h1"
+            sx={{ fontWeight: 700 }}
+            align="center"
+          >
             Host new claim
           </Typography>
-          <form>
+          <form onSubmit={handleSubmit((data) => console.log(data))}>
             <Stack spacing={3}>
-              <TextField label="Title" variant="standard" fullWidth></TextField>
+              <TextField
+                label="Title"
+                fullWidth
+                {...registerMui({
+                  register,
+                  name: "title",
+                  props: {
+                    required: true,
+                  },
+                  errors,
+                })}
+              ></TextField>
               <TextField
                 label="Summary"
-                variant="standard"
-                rows={4}
-                maxRows={Infinity}
                 multiline
+                minRows={4}
+                maxRows={Infinity}
                 fullWidth
+                {...registerMui({
+                  register,
+                  name: "summary",
+                  props: {
+                    required: true,
+                  },
+                  errors,
+                })}
               ></TextField>
               <Stack spacing={3}>
                 <Box>
-                  <Typography variant="body1" sx={{ fontWeight: "800" }}>
+                  <Typography variant="body1" sx={{ fontWeight: 800 }}>
                     Sources
                   </Typography>
                   <Typography variant="body2">
@@ -60,26 +119,70 @@ const NewClaim: NextPage = () => {
                     types.
                   </Typography>
                 </Box>
-                {fields.map((field, index) => (
-                  <Box key={field.id}>
-                    <Select
-                      labelId="demo-simple-select-label"
-                      id="demo-simple-select"
-                      value={10}
-                      label="Age"
+
+                {sourcesFields.map((sourceField, sourceFieldIndex) => (
+                  <Stack
+                    direction="row"
+                    spacing={2}
+                    key={sourceField.id}
+                    alignItems="flexEnd"
+                  >
+                    <FormControl>
+                      <InputLabel id="sources-origin-select-label">
+                        Origin
+                      </InputLabel>
+                      <Select
+                        labelId="sources-origin-select-label"
+                        // value={10}
+                        label="Origin"
+                        sx={{ width: 150 }}
+                        {...registerMui({
+                          register,
+                          name: `sources.${sourceFieldIndex}.origin`,
+                          props: {
+                            required: true,
+                          },
+                          errors,
+                        })}
+                      >
+                        {sourcesOriginOptions.map((sourcesOriginOption) => (
+                          <MenuItem
+                            value={sourcesOriginOption.value}
+                            key={sourcesOriginOption.value}
+                          >
+                            {sourcesOriginOption.label}
+                          </MenuItem>
+                        ))}
+                      </Select>
+                    </FormControl>
+                    <TextField
+                      label="URL"
+                      sx={{ flexGrow: 1 }}
+                      {...registerMui({
+                        register,
+                        name: `sources.${sourceFieldIndex}.url`,
+                        props: {
+                          required: true,
+                        },
+                        errors,
+                      })}
+                    ></TextField>
+                    <IconButton
+                      size="medium"
+                      aria-label="Delete source"
+                      component="span"
+                      onClick={() => removeSource(sourceFieldIndex)}
                     >
-                      <MenuItem value={10}>Ten</MenuItem>
-                      <MenuItem value={20}>Twenty</MenuItem>
-                      <MenuItem value={30}>Thirty</MenuItem>
-                    </Select>
-                    {/* <input {...register(`test.${index}.value`)} /> */}
-                  </Box>
+                      <DeleteIcon></DeleteIcon>
+                    </IconButton>
+                  </Stack>
                 ))}
                 <Button
                   variant="contained"
                   color="secondary"
                   size="small"
                   fullWidth
+                  onClick={() => appendSource({})}
                 >
                   Add source
                 </Button>
@@ -100,11 +203,7 @@ const NewClaim: NextPage = () => {
                   options={[{ title: "Test", id: 123 }]}
                   getOptionLabel={(option) => option.title}
                   renderInput={(params) => (
-                    <TextField
-                      {...params}
-                      variant="standard"
-                      placeholder="Add tag"
-                    />
+                    <TextField {...params} placeholder="Add tag" />
                   )}
                 />
               </Stack>
@@ -114,27 +213,83 @@ const NewClaim: NextPage = () => {
                     Attributions
                   </Typography>
                   <Typography variant="body2">
-                    Lorem ipsum dolor sit amet consectetur adipisicing elit.
-                    Sequi a illo temporibus possimus iure deserunt, voluptas,
-                    dolorum.
+                    An e-mail or Twitter handle profile link to the original
+                    claimant.
                   </Typography>
                 </Box>
-                {fields.map((field, index) => (
-                  <input
-                    key={field.id} // important to include key with field's id
-                    {...register(`test.${index}.value`)}
-                  />
-                ))}
+                {attributionsFields.map(
+                  (attributionsField, attributionsFieldIndex) => (
+                    <Stack
+                      direction="row"
+                      spacing={2}
+                      key={attributionsField.id}
+                      alignItems="flexEnd"
+                    >
+                      <FormControl>
+                        <InputLabel id="attributions-origin-select-label">
+                          Origin
+                        </InputLabel>
+                        <Select
+                          labelId="attributions-origin-select-label"
+                          label="Origin"
+                          sx={{ width: 150 }}
+                          {...registerMui({
+                            register,
+                            name: `attributions.${attributionsFieldIndex}.origin`,
+                            props: {
+                              required: true,
+                            },
+                            errors,
+                          })}
+                        >
+                          {attributionsOriginOptions.map(
+                            (attributionsOriginOption) => (
+                              <MenuItem
+                                value={attributionsOriginOption.value}
+                                key={attributionsOriginOption.value}
+                              >
+                                {attributionsOriginOption.label}
+                              </MenuItem>
+                            )
+                          )}
+                        </Select>
+                      </FormControl>
+                      <TextField
+                        label="URL"
+                        sx={{ flexGrow: 1 }}
+                        {...registerMui({
+                          register,
+                          name: `attributions.${attributionsFieldIndex}.identifier`,
+                          props: {
+                            required: true,
+                          },
+                          errors,
+                        })}
+                      ></TextField>
+                      <IconButton
+                        size="medium"
+                        aria-label="Delete attribution"
+                        component="span"
+                        onClick={() =>
+                          removeAttribution(attributionsFieldIndex)
+                        }
+                      >
+                        <DeleteIcon></DeleteIcon>
+                      </IconButton>
+                    </Stack>
+                  )
+                )}
                 <Button
                   variant="contained"
                   color="secondary"
                   size="small"
                   fullWidth
+                  onClick={() => appendAttribution({})}
                 >
                   Add attribution
                 </Button>
               </Stack>
-              <Button variant="contained" size="large">
+              <Button type="submit" variant="contained" size="large">
                 Host claim
               </Button>
             </Stack>
