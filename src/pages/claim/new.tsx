@@ -4,7 +4,6 @@ import {
   Box,
   FormControl,
   InputLabel,
-  Autocomplete,
   IconButton,
   Select,
   MenuItem,
@@ -17,7 +16,7 @@ import DeleteIcon from "@mui/icons-material/Delete";
 import { useForm, useFieldArray } from "react-hook-form";
 
 import SocialIdeasIllustration from "../../../public/illustrations/social_ideas.svg";
-import { useFormErrorMessage } from "common/hooks/useFormErrorMessage";
+import { Autocomplete } from "common/components/Autocomplete";
 import { registerMui } from "common/utils/registerMui";
 
 const NewClaim: NextPage = () => {
@@ -199,12 +198,13 @@ const NewClaim: NextPage = () => {
                   </Typography>
                 </Box>
                 <Autocomplete
+                  control={control}
                   multiple
-                  options={[{ title: "Test", id: 123 }]}
-                  getOptionLabel={(option) => option.title}
-                  renderInput={(params) => (
-                    <TextField {...params} placeholder="Add tag" />
-                  )}
+                  options={[{ label: "Test", value: 123 }]}
+                  label="Add tags"
+                  name="tags"
+                  maxTags={4}
+                  freeSolo
                 />
               </Stack>
               <Stack spacing={3}>
