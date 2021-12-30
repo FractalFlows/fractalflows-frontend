@@ -6,6 +6,7 @@ import CssBaseline from "@mui/material/CssBaseline";
 import { CacheProvider } from "@emotion/react";
 import { EmotionCache } from "@emotion/cache";
 import { ApolloProvider } from "@apollo/client";
+import { SnackbarProvider } from "notistack";
 import type { AppProps } from "next/app";
 
 import { muiTheme } from "common/config/muiTheme";
@@ -63,11 +64,13 @@ const MyApp = ({
 
         <ThemeProvider theme={muiTheme}>
           <CssBaseline />
-          <Header />
-          <main>
-            <Component {...pageProps} />
-          </main>
-          <Footer />
+          <SnackbarProvider maxSnack={3}>
+            <Header />
+            <main>
+              <Component {...pageProps} />
+            </main>
+            <Footer />
+          </SnackbarProvider>
         </ThemeProvider>
       </CacheProvider>
     </ApolloProvider>

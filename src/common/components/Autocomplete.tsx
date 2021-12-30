@@ -24,7 +24,6 @@ export const Autocomplete = ({
             if (typeof data[data.length - 1] === "string") {
               data[data.length - 1] = {
                 label: data[data.length - 1],
-                id: "new",
               };
             }
             if (

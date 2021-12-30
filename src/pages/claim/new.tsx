@@ -14,12 +14,17 @@ import {
 } from "@mui/material";
 import DeleteIcon from "@mui/icons-material/Delete";
 import { useForm, useFieldArray } from "react-hook-form";
+import { useSnackbar } from "notistack";
 
 import SocialIdeasIllustration from "../../../public/illustrations/social_ideas.svg";
 import { Autocomplete } from "common/components/Autocomplete";
 import { registerMui } from "common/utils/registerMui";
+import { useClaims } from "modules/claims/hooks/useClaims";
+import { Claim } from "modules/claims/interfaces";
 
 const NewClaim: NextPage = () => {
+  const { createClaim } = useClaims();
+  const { enqueueSnackbar } = useSnackbar();
   const {
     control,
     register,
@@ -58,6 +63,22 @@ const NewClaim: NextPage = () => {
     { value: "email", label: "Email" },
   ];
 
+  const onSubmit = async (claim: Claim) => {
+    try {
+      await createClaim({ claim });
+    } catch (e) {
+      console.log(
+        Object.getOwnPropertyNames(e),
+        e.graphQLErrors,
+        e.clientErrors
+      );
+      enqueueSnackbar(e.message, {
+        variant: "error",
+      });
+    }
+    console.log(claim);
+  };
+
   return (
     <Box className="container page">
       <Stack direction="row" spacing={15}>
@@ -78,7 +99,7 @@ const NewClaim: NextPage = () => {
           >
             Host new claim
           </Typography>
-          <form onSubmit={handleSubmit((data) => console.log(data))}>
+          <form onSubmit={handleSubmit(onSubmit)}>
             <Stack spacing={3}>
               <TextField
                 label="Title"
@@ -114,25 +135,18 @@ const NewClaim: NextPage = () => {
                   </Typography>
                   <Typography variant="body2">
                     It is important to point out all the relevant sources of
-                    your claim. Click on the icons to add different source
-                    types.
+                    your claim.
                   </Typography>
                 </Box>
 
                 {sourcesFields.map((sourceField, sourceFieldIndex) => (
-                  <Stack
-                    direction="row"
-                    spacing={2}
-                    key={sourceField.id}
-                    alignItems="flexEnd"
-                  >
+                  <Stack direction="row" spacing={2} key={sourceField.id}>
                     <FormControl>
                       <InputLabel id="sources-origin-select-label">
                         Origin
                       </InputLabel>
                       <Select
                         labelId="sources-origin-select-label"
-                        // value={10}
                         label="Origin"
                         sx={{ width: 150 }}
                         {...registerMui({
@@ -200,8 +214,8 @@ const NewClaim: NextPage = () => {
                 <Autocomplete
                   control={control}
                   multiple
-                  options={[{ label: "Test", value: 123 }]}
-                  label="Add tags"
+                  options={[]}
+                  label="Tags"
                   name="tags"
                   maxTags={4}
                   freeSolo
@@ -223,7 +237,6 @@ const NewClaim: NextPage = () => {
                       direction="row"
                       spacing={2}
                       key={attributionsField.id}
-                      alignItems="flexEnd"
                     >
                       <FormControl>
                         <InputLabel id="attributions-origin-select-label">
