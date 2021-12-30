@@ -12,6 +12,7 @@ import {
   Typography,
   TextField,
 } from "@mui/material";
+import { LoadingButton } from "@mui/lab";
 import DeleteIcon from "@mui/icons-material/Delete";
 import { useForm, useFieldArray } from "react-hook-form";
 import { useSnackbar } from "notistack";
@@ -32,9 +33,13 @@ const NewClaim: NextPage = () => {
   const {
     control,
     register,
-    formState: { errors },
+    formState: { errors, isSubmitting },
     handleSubmit: handleSubmitHook,
-  } = useForm();
+  } = useForm({
+    defaultValues: {
+      tags: [],
+    },
+  });
   const {
     fields: sourcesFields,
     append: appendSource,
@@ -72,6 +77,7 @@ const NewClaim: NextPage = () => {
 
   const handleSubmit = async (claim: Claim) => {
     try {
+      console.log(claim);
       const { slug } = await createClaim({ claim });
       enqueueSnackbar("Your new claim has been succesfully added!", {
         variant: "success",
@@ -336,9 +342,14 @@ const NewClaim: NextPage = () => {
                   Add attribution
                 </Button>
               </Stack>
-              <Button type="submit" variant="contained" size="large">
+              <LoadingButton
+                type="submit"
+                loading={isSubmitting}
+                variant="contained"
+                size="large"
+              >
                 Host claim
-              </Button>
+              </LoadingButton>
             </Stack>
           </form>
         </Stack>
