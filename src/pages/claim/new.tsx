@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import type { NextPage } from "next";
 import {
   Box,
@@ -16,6 +16,7 @@ import { LoadingButton } from "@mui/lab";
 import DeleteIcon from "@mui/icons-material/Delete";
 import { useForm, useFieldArray } from "react-hook-form";
 import { useSnackbar } from "notistack";
+import { useRouter } from "next/router";
 import { get } from "lodash-es";
 
 import { Autocomplete } from "common/components/Autocomplete";
@@ -29,6 +30,7 @@ import { getFormErrorHelperText } from "common/utils/getFormErrorHelperText";
 const NewClaim: NextPage = () => {
   const { createClaim } = useClaims();
   const { searchTags } = useTags();
+  const router = useRouter();
   const { enqueueSnackbar } = useSnackbar();
   const {
     control,
@@ -77,11 +79,11 @@ const NewClaim: NextPage = () => {
 
   const handleSubmit = async (claim: Claim) => {
     try {
-      console.log(claim);
       const { slug } = await createClaim({ claim });
       enqueueSnackbar("Your new claim has been succesfully added!", {
         variant: "success",
       });
+      router.push(`/claim/${slug}`);
     } catch (e) {
       enqueueSnackbar(e.message, {
         variant: "error",
@@ -89,20 +91,27 @@ const NewClaim: NextPage = () => {
     }
   };
 
-  const handleTagsSearch = async (term: string) => {
-    setTagsOptionsLoading(true);
+  const handleTagsSearch = useCallback(
+    async (term?: string) => {
+      setTagsOptionsLoading(true);
 
-    try {
-      const tags = await searchTags({ term });
-      setTagsOptions(tags.map(({ id, label }: Tag) => ({ id, label })));
-    } catch (e) {
-      enqueueSnackbar(e.message, {
-        variant: "error",
-      });
-    } finally {
-      setTagsOptionsLoading(false);
-    }
-  };
+      try {
+        const tags = await searchTags({ term });
+        setTagsOptions(tags.map(({ id, label }: Tag) => ({ id, label })));
+      } catch (e) {
+        enqueueSnackbar(e.message, {
+          variant: "error",
+        });
+      } finally {
+        setTagsOptionsLoading(false);
+      }
+    },
+    [enqueueSnackbar, searchTags]
+  );
+
+  useEffect(() => {
+    handleTagsSearch();
+  }, []);
 
   return (
     <Box className="container page">
