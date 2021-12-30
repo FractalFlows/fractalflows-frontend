@@ -1,13 +1,13 @@
-const FORM_ERRORS = {
-  required: "This field is required",
-};
+import { get } from "lodash-es";
+
+import { FORM_ERRORS } from "common/config/formErrors";
 
 export const registerMui = ({ register, name, props, errors }) => ({
   ...register(name, props),
-  ...(errors[name]
+  ...(get(errors, name)
     ? {
         error: true,
-        helperText: FORM_ERRORS[errors[name].type],
+        helperText: FORM_ERRORS[get(errors, `${name}.type`)],
       }
     : {}),
 });

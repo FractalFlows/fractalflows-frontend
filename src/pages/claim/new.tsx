@@ -15,6 +15,7 @@ import {
 import DeleteIcon from "@mui/icons-material/Delete";
 import { useForm, useFieldArray } from "react-hook-form";
 import { useSnackbar } from "notistack";
+import { get } from "lodash-es";
 
 import { Autocomplete } from "common/components/Autocomplete";
 import { registerMui } from "common/utils/registerMui";
@@ -22,6 +23,7 @@ import { useClaims } from "modules/claims/hooks/useClaims";
 import { useTags } from "modules/tags/hooks/useTags";
 import { Claim } from "modules/claims/interfaces";
 import { Tag } from "modules/tags/interfaces";
+import { getFormErrorHelperText } from "common/utils/getFormErrorHelperText";
 
 const NewClaim: NextPage = () => {
   const { createClaim } = useClaims();
@@ -151,7 +153,13 @@ const NewClaim: NextPage = () => {
                 {sourcesFields.map((sourceField, sourceFieldIndex) => (
                   <Stack direction="row" spacing={2} key={sourceField.id}>
                     <FormControl>
-                      <InputLabel id="sources-origin-select-label">
+                      <InputLabel
+                        id="sources-origin-select-label"
+                        error={get(
+                          errors,
+                          `sources.${sourceFieldIndex}.origin`
+                        )}
+                      >
                         Origin
                       </InputLabel>
                       <Select
@@ -176,6 +184,10 @@ const NewClaim: NextPage = () => {
                           </MenuItem>
                         ))}
                       </Select>
+                      {getFormErrorHelperText(
+                        errors,
+                        `sources.${sourceFieldIndex}.origin`
+                      )}
                     </FormControl>
                     <TextField
                       label="URL"
@@ -251,7 +263,13 @@ const NewClaim: NextPage = () => {
                       key={attributionsField.id}
                     >
                       <FormControl>
-                        <InputLabel id="attributions-origin-select-label">
+                        <InputLabel
+                          id="attributions-origin-select-label"
+                          error={get(
+                            errors,
+                            `attributions.${attributionsFieldIndex}.origin`
+                          )}
+                        >
                           Origin
                         </InputLabel>
                         <Select
@@ -278,6 +296,10 @@ const NewClaim: NextPage = () => {
                             )
                           )}
                         </Select>
+                        {getFormErrorHelperText(
+                          errors,
+                          `attributions.${attributionsFieldIndex}.origin`
+                        )}
                       </FormControl>
                       <TextField
                         label="URL"
