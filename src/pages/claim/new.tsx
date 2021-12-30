@@ -177,74 +177,8 @@ const NewClaim: NextPage = () => {
                   const origin: string = getValues(
                     `sources.${sourceFieldIndex}.origin`
                   );
-
-                  return (
-                    <Stack direction="row" spacing={2} key={sourceField.id}>
-                      <FormControl>
-                        <InputLabel
-                          id="sources-origin-select-label"
-                          error={get(
-                            errors,
-                            `sources.${sourceFieldIndex}.origin`
-                          )}
-                        >
-                          Origin
-                        </InputLabel>
-                        <Select
-                          labelId="sources-origin-select-label"
-                          label="Origin"
-                          sx={{ width: 150 }}
-                          {...registerMui({
-                            register,
-                            name: `sources.${sourceFieldIndex}.origin`,
-                            props: {
-                              required: true,
-                            },
-                            errors,
-                          })}
-                        >
-                          {sourcesOriginOptions.map((sourcesOriginOption) => (
-                            <MenuItem
-                              value={sourcesOriginOption.value}
-                              key={sourcesOriginOption.value}
-                            >
-                              {sourcesOriginOption.label}
-                            </MenuItem>
-                          ))}
-                        </Select>
-                        {getFormErrorHelperText(
-                          errors,
-                          `sources.${sourceFieldIndex}.origin`
-                        )}
-                      </FormControl>
-                      <TextField
-                        label={origin === "doi" ? "DOI" : "URL"}
-                        sx={{ flexGrow: 1 }}
-                        {...registerMui({
-                          register,
-                          name: `sources.${sourceFieldIndex}.url`,
-                          props: {
-                            required: true,
-                            validate: {
-                              url: (url: string) => {
-                                if (
-                                  origin === "other" ||
-                                  origin === "website"
-                                ) {
-                                  return validateURL(url);
-                                } else if (origin !== "doi") {
-                                  return validateURLWithHostname(url, origin);
-                                } else {
-                                  return true;
-                                }
-                              },
-                              doi: (doi: string) =>
-                                origin === "doi" ? validateDOI(doi) : true,
-                            },
-                          },
-                          errors,
-                        })}
-                      ></TextField>
+                  const DeleteSourceButton = ({ display }) => (
+                    <Box sx={{ display }}>
                       <IconButton
                         size="medium"
                         aria-label="Delete source"
@@ -253,6 +187,94 @@ const NewClaim: NextPage = () => {
                       >
                         <DeleteIcon></DeleteIcon>
                       </IconButton>
+                    </Box>
+                  );
+
+                  return (
+                    <Stack
+                      direction="row"
+                      alignItems="center"
+                      spacing={2}
+                      key={sourceField.id}
+                    >
+                      <Stack
+                        direction={{ xs: "column", sm: "row" }}
+                        spacing={2}
+                        flexGrow={1}
+                      >
+                        <FormControl>
+                          <InputLabel
+                            id="sources-origin-select-label"
+                            error={get(
+                              errors,
+                              `sources.${sourceFieldIndex}.origin`
+                            )}
+                          >
+                            Origin
+                          </InputLabel>
+                          <Select
+                            labelId="sources-origin-select-label"
+                            label="Origin"
+                            fullWidth
+                            sx={{ width: { xs: "unset", sm: 150 } }}
+                            {...registerMui({
+                              register,
+                              name: `sources.${sourceFieldIndex}.origin`,
+                              props: {
+                                required: true,
+                              },
+                              errors,
+                            })}
+                          >
+                            {sourcesOriginOptions.map((sourcesOriginOption) => (
+                              <MenuItem
+                                value={sourcesOriginOption.value}
+                                key={sourcesOriginOption.value}
+                              >
+                                {sourcesOriginOption.label}
+                              </MenuItem>
+                            ))}
+                          </Select>
+                          {getFormErrorHelperText(
+                            errors,
+                            `sources.${sourceFieldIndex}.origin`
+                          )}
+                        </FormControl>
+                        <TextField
+                          label={origin === "doi" ? "DOI" : "URL"}
+                          sx={{ flexGrow: 1 }}
+                          {...registerMui({
+                            register,
+                            name: `sources.${sourceFieldIndex}.url`,
+                            props: {
+                              required: true,
+                              validate: {
+                                url: (url: string) => {
+                                  if (
+                                    origin === "other" ||
+                                    origin === "website"
+                                  ) {
+                                    return validateURL(url);
+                                  } else if (origin !== "doi") {
+                                    return validateURLWithHostname(url, origin);
+                                  } else {
+                                    return true;
+                                  }
+                                },
+                                doi: (doi: string) =>
+                                  origin === "doi" ? validateDOI(doi) : true,
+                              },
+                            },
+                            errors,
+                          })}
+                        ></TextField>
+                        <DeleteSourceButton
+                          display={{ xs: "none", sm: "flex" }}
+                        />
+                      </Stack>
+                      <DeleteSourceButton
+                        display={{ xs: "flex", sm: "none" }}
+                      />
                     </Stack>
                   );
                 })}
@@ -305,77 +327,8 @@ const NewClaim: NextPage = () => {
                     const origin: string = getValues(
                       `attributions.${attributionsFieldIndex}.origin`
                     );
-
-                    return (
-                      <Stack
-                        direction="row"
-                        spacing={2}
-                        key={attributionsField.id}
-                      >
-                        <FormControl>
-                          <InputLabel
-                            id="attributions-origin-select-label"
-                            error={get(
-                              errors,
-                              `attributions.${attributionsFieldIndex}.origin`
-                            )}
-                          >
-                            Origin
-                          </InputLabel>
-                          <Select
-                            labelId="attributions-origin-select-label"
-                            label="Origin"
-                            sx={{ width: 150 }}
-                            {...registerMui({
-                              register,
-                              name: `attributions.${attributionsFieldIndex}.origin`,
-                              props: {
-                                required: true,
-                                deps: [
-                                  `attributions.${attributionsFieldIndex}.url`,
-                                ],
-                              },
-                              errors,
-                            })}
-                          >
-                            {attributionsOriginOptions.map(
-                              (attributionsOriginOption) => (
-                                <MenuItem
-                                  value={attributionsOriginOption.value}
-                                  key={attributionsOriginOption.value}
-                                >
-                                  {attributionsOriginOption.label}
-                                </MenuItem>
-                              )
-                            )}
-                          </Select>
-                          {getFormErrorHelperText(
-                            errors,
-                            `attributions.${attributionsFieldIndex}.origin`
-                          )}
-                        </FormControl>
-                        <TextField
-                          label={origin === "twitter" ? "Handle" : "Email"}
-                          sx={{ flexGrow: 1 }}
-                          {...registerMui({
-                            register,
-                            name: `attributions.${attributionsFieldIndex}.identifier`,
-                            props: {
-                              required: true,
-                              validate: {
-                                email: (identifier: string) =>
-                                  origin === "email"
-                                    ? validateEmail(identifier)
-                                    : true,
-                                twitterHandle: (identifier: string) =>
-                                  origin === "twitter"
-                                    ? validateTwitterHandle(identifier)
-                                    : true,
-                              },
-                            },
-                            errors,
-                          })}
-                        ></TextField>
+                    const DeleteAttributionButton = ({ display }) => (
+                      <Box sx={{ display }}>
                         <IconButton
                           size="medium"
                           aria-label="Delete attribution"
@@ -386,6 +339,93 @@ const NewClaim: NextPage = () => {
                         >
                           <DeleteIcon></DeleteIcon>
                         </IconButton>
+                      </Box>
+                    );
+
+                    return (
+                      <Stack
+                        direction="row"
+                        alignItems="center"
+                        spacing={2}
+                        key={attributionsField.id}
+                      >
+                        <Stack
+                          direction={{ xs: "column", sm: "row" }}
+                          spacing={2}
+                          flexGrow={1}
+                        >
+                          <FormControl>
+                            <InputLabel
+                              id="attributions-origin-select-label"
+                              error={get(
+                                errors,
+                                `attributions.${attributionsFieldIndex}.origin`
+                              )}
+                            >
+                              Origin
+                            </InputLabel>
+                            <Select
+                              labelId="attributions-origin-select-label"
+                              label="Origin"
+                              fullWidth
+                              sx={{ width: { xs: "unset", sm: 150 } }}
+                              {...registerMui({
+                                register,
+                                name: `attributions.${attributionsFieldIndex}.origin`,
+                                props: {
+                                  required: true,
+                                  deps: [
+                                    `attributions.${attributionsFieldIndex}.url`,
+                                  ],
+                                },
+                                errors,
+                              })}
+                            >
+                              {attributionsOriginOptions.map(
+                                (attributionsOriginOption) => (
+                                  <MenuItem
+                                    value={attributionsOriginOption.value}
+                                    key={attributionsOriginOption.value}
+                                  >
+                                    {attributionsOriginOption.label}
+                                  </MenuItem>
+                                )
+                              )}
+                            </Select>
+                            {getFormErrorHelperText(
+                              errors,
+                              `attributions.${attributionsFieldIndex}.origin`
+                            )}
+                          </FormControl>
+                          <TextField
+                            label={origin === "twitter" ? "Handle" : "Email"}
+                            sx={{ flexGrow: 1 }}
+                            {...registerMui({
+                              register,
+                              name: `attributions.${attributionsFieldIndex}.identifier`,
+                              props: {
+                                required: true,
+                                validate: {
+                                  email: (identifier: string) =>
+                                    origin === "email"
+                                      ? validateEmail(identifier)
+                                      : true,
+                                  twitterHandle: (identifier: string) =>
+                                    origin === "twitter"
+                                      ? validateTwitterHandle(identifier)
+                                      : true,
+                                },
+                              },
+                              errors,
+                            })}
+                          ></TextField>
+                          <DeleteAttributionButton
+                            display={{ xs: "none", sm: "flex" }}
+                          />
+                        </Stack>
+                        <DeleteAttributionButton
+                          display={{ xs: "flex", sm: "none" }}
+                        />
                       </Stack>
                     );
                   }
