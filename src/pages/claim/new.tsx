@@ -1,5 +1,5 @@
+import { useState } from "react";
 import type { NextPage } from "next";
-import Image from "next/image";
 import {
   Box,
   FormControl,
@@ -16,20 +16,22 @@ import DeleteIcon from "@mui/icons-material/Delete";
 import { useForm, useFieldArray } from "react-hook-form";
 import { useSnackbar } from "notistack";
 
-import SocialIdeasIllustration from "../../../public/illustrations/social_ideas.svg";
 import { Autocomplete } from "common/components/Autocomplete";
 import { registerMui } from "common/utils/registerMui";
 import { useClaims } from "modules/claims/hooks/useClaims";
+import { useTags } from "modules/tags/hooks/useTags";
 import { Claim } from "modules/claims/interfaces";
+import { Tag } from "modules/tags/interfaces";
 
 const NewClaim: NextPage = () => {
   const { createClaim } = useClaims();
+  const { searchTags } = useTags();
   const { enqueueSnackbar } = useSnackbar();
   const {
     control,
     register,
     formState: { errors },
-    handleSubmit,
+    handleSubmit: handleSubmitHook,
   } = useForm();
   const {
     fields: sourcesFields,
@@ -48,6 +50,9 @@ const NewClaim: NextPage = () => {
     name: "attributions",
   });
 
+  const [tagsOptions, setTagsOptions] = useState([]);
+  const [tagsOptionsLoading, setTagsOptionsLoading] = useState(false);
+
   const sourcesOriginOptions = [
     { value: "facebook", label: "Facebook" },
     { value: "twitter", label: "Twitter" },
@@ -63,34 +68,38 @@ const NewClaim: NextPage = () => {
     { value: "email", label: "Email" },
   ];
 
-  const onSubmit = async (claim: Claim) => {
+  const handleSubmit = async (claim: Claim) => {
     try {
-      await createClaim({ claim });
+      const { slug } = await createClaim({ claim });
+      enqueueSnackbar("Your new claim has been succesfully added!", {
+        variant: "success",
+      });
     } catch (e) {
-      console.log(
-        Object.getOwnPropertyNames(e),
-        e.graphQLErrors,
-        e.clientErrors
-      );
       enqueueSnackbar(e.message, {
         variant: "error",
       });
     }
-    console.log(claim);
+  };
+
+  const handleTagsSearch = async (term: string) => {
+    setTagsOptionsLoading(true);
+
+    try {
+      const tags = await searchTags({ term });
+      setTagsOptions(tags.map(({ id, label }: Tag) => ({ id, label })));
+    } catch (e) {
+      enqueueSnackbar(e.message, {
+        variant: "error",
+      });
+    } finally {
+      setTagsOptionsLoading(false);
+    }
   };
 
   return (
     <Box className="container page">
-      <Stack direction="row" spacing={15}>
-        <Box>
-          <Image src={SocialIdeasIllustration} alt="Social ideas" />
-        </Box>
-        <Stack
-          direction="column"
-          spacing={6}
-          sx={{ maxWidth: "550px" }}
-          justifySelf="flexEnd"
-        >
+      <Stack alignItems="center">
+        <Stack spacing={6} sx={{ maxWidth: "550px" }}>
           <Typography
             variant="h3"
             component="h1"
@@ -99,7 +108,7 @@ const NewClaim: NextPage = () => {
           >
             Host new claim
           </Typography>
-          <form onSubmit={handleSubmit(onSubmit)}>
+          <form onSubmit={handleSubmitHook(handleSubmit)}>
             <Stack spacing={3}>
               <TextField
                 label="Title"
@@ -214,11 +223,14 @@ const NewClaim: NextPage = () => {
                 <Autocomplete
                   control={control}
                   multiple
-                  options={[]}
+                  options={tagsOptions}
+                  loading={tagsOptionsLoading}
                   label="Tags"
                   name="tags"
                   maxTags={4}
                   freeSolo
+                  filterOptions={(x) => x}
+                  onSearch={handleTagsSearch}
                 />
               </Stack>
               <Stack spacing={3}>

@@ -4,7 +4,7 @@ import { CREATE_CLAIM } from "../mutations";
 import { Claim } from "../interfaces";
 
 export const ClaimsService = {
-  async createClaim({ claim }: { claim: Claim }): Promise<Boolean> {
+  async createClaim({ claim }: { claim: Claim }): Promise<Claim> {
     const { data } = await apolloClient.mutate({
       mutation: CREATE_CLAIM,
       variables: {

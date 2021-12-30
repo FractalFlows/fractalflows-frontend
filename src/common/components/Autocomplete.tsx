@@ -1,6 +1,12 @@
 import { useState } from "react";
 import { Controller } from "react-hook-form";
-import { Autocomplete as MuiAutocomplete, TextField } from "@mui/material";
+import { debounce } from "lodash-es";
+import {
+  Autocomplete as MuiAutocomplete,
+  TextField,
+  Box,
+  CircularProgress,
+} from "@mui/material";
 
 export const Autocomplete = ({
   control,
@@ -9,6 +15,8 @@ export const Autocomplete = ({
   defaultValue,
   maxTags,
   name,
+  loading,
+  onSearch,
   ...autocompleteProps
 }) => {
   const [value, setValue] = useState([]);
@@ -18,8 +26,32 @@ export const Autocomplete = ({
       render={({ field: { onChange, ...controllerProps } }) => (
         <MuiAutocomplete
           options={options}
-          getOptionLabel={(option) => option.label}
-          renderInput={(params) => <TextField {...params} label={label} />}
+          loading={loading}
+          renderOption={(props, option) => (
+            <Box {...props} component="li" key={option.id}>
+              {option.label}
+            </Box>
+          )}
+          renderInput={(params) => (
+            <TextField
+              {...params}
+              onChange={debounce((ev) => {
+                onSearch(ev.target.value);
+              }, 300)}
+              label={label}
+              InputProps={{
+                ...params.InputProps,
+                endAdornment: (
+                  <>
+                    {loading ? (
+                      <CircularProgress color="inherit" size={20} />
+                    ) : null}
+                    {params.InputProps.endAdornment}
+                  </>
+                ),
+              }}
+            />
+          )}
           onChange={(e, data) => {
             if (typeof data[data.length - 1] === "string") {
               data[data.length - 1] = {
