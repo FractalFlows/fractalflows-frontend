@@ -1,12 +1,31 @@
 import { useState } from "react";
 import { Controller } from "react-hook-form";
-import { debounce } from "lodash-es";
+import { debounce, last } from "lodash-es";
 import {
   Autocomplete as MuiAutocomplete,
+  AutocompleteProps as MuiAutocompleteProps,
   TextField,
   Box,
   CircularProgress,
 } from "@mui/material";
+
+export interface AutocompleteOptionProps {
+  id?: string;
+  label: string;
+}
+
+export interface AutocompleteProps {
+  control: any;
+  options: AutocompleteOptionProps[];
+  label: string;
+  defaultValue?: string;
+  maxTags?: number;
+  name: string;
+  loading?: boolean;
+  onSearch: (p: any) => any;
+  multiple?: boolean;
+  freeSolo?: boolean;
+}
 
 export const Autocomplete = ({
   control,
@@ -18,8 +37,8 @@ export const Autocomplete = ({
   loading,
   onSearch,
   ...autocompleteProps
-}) => {
-  const [value, setValue] = useState([]);
+}: AutocompleteProps) => {
+  const [value, setValue] = useState<AutocompleteOptionProps[]>([]);
 
   return (
     <Controller
@@ -53,9 +72,11 @@ export const Autocomplete = ({
             />
           )}
           onChange={(e, data) => {
-            if (typeof data[data.length - 1] === "string") {
+            const value = last(data);
+
+            if (typeof value === "string" && typeof data === "object") {
               data[data.length - 1] = {
-                label: data[data.length - 1],
+                label: value,
               };
             }
             if (

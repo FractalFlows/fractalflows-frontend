@@ -17,7 +17,7 @@ import DeleteIcon from "@mui/icons-material/Delete";
 import { useForm, useFieldArray } from "react-hook-form";
 import { useSnackbar } from "notistack";
 import { useRouter } from "next/router";
-import { get } from "lodash-es";
+import { get, isEmpty } from "lodash-es";
 
 import { Autocomplete } from "common/components/Autocomplete";
 import { registerMui } from "common/utils/registerMui";
@@ -33,10 +33,13 @@ import {
   validateURL,
   validateURLWithHostname,
 } from "common/utils/validate";
+import { useAuth } from "modules/auth/hooks/useAuth";
+import { AuthWall } from "common/components/AuthWall";
 
 const NewClaim: NextPage = () => {
   const { createClaim } = useClaims();
   const { searchTags } = useTags();
+  const { session } = useAuth();
   const router = useRouter();
   const { enqueueSnackbar } = useSnackbar();
   const {
@@ -117,9 +120,13 @@ const NewClaim: NextPage = () => {
     [enqueueSnackbar, searchTags]
   );
 
+  console.log("ses", session);
+
   useEffect(() => {
     handleTagsSearch();
   }, []);
+
+  if (isEmpty(session)) return <AuthWall />;
 
   return (
     <Box className="container page">
