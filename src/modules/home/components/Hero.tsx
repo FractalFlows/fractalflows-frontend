@@ -4,6 +4,8 @@ import Typography from "@mui/material/Typography";
 import Stack from "@mui/material/Stack";
 import Button from "@mui/material/Button";
 
+import { Link } from "common/components/Link";
+
 import styles from "./Hero.module.css";
 
 const Hero: FC = () => (
@@ -35,9 +37,11 @@ const Hero: FC = () => (
           direction={{ xs: "column", sm: "row" }}
           spacing={{ xs: 2, sm: 2 }}
         >
-          <Button size="large" variant="contained" color="primaryContrast">
-            Host new claim
-          </Button>
+          <Link href="/claim/new">
+            <Button size="large" variant="contained" color="primaryContrast">
+              Host new claim
+            </Button>
+          </Link>
           <Button
             variant="outlined"
             color="primaryContrast"

@@ -1,13 +1,13 @@
-.container {
-  padding-right: var(--fractalflows-gutter-page-sm);
-  padding-left: var(--fractalflows-gutter-page-sm);
-}
-
 @media screen and (min-width: 992px) {
   .MuiToolbar-gutters,
   .container {
     padding-right: var(--fractalflows-gutter-page-lg);
     padding-left: var(--fractalflows-gutter-page-lg);
+  }
+
+  .page {
+    padding-top: 90px;
+    padding-bottom: 140px;
   }
 }
 
