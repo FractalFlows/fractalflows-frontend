@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Controller } from "react-hook-form";
-import { debounce, last } from "lodash-es";
+import { debounce, last, get } from "lodash-es";
 import {
   Autocomplete as MuiAutocomplete,
   AutocompleteProps as MuiAutocompleteProps,
@@ -25,6 +25,7 @@ export interface AutocompleteProps {
   onSearch: (p: any) => any;
   multiple?: boolean;
   freeSolo?: boolean;
+  filterOptions?: (option: any) => any;
 }
 
 export const Autocomplete = ({
@@ -38,7 +39,12 @@ export const Autocomplete = ({
   onSearch,
   ...autocompleteProps
 }: AutocompleteProps) => {
-  const [value, setValue] = useState<AutocompleteOptionProps[]>([]);
+  const [value, setValue] = useState<
+    | string
+    | AutocompleteOptionProps
+    | (string | AutocompleteOptionProps)[]
+    | null
+  >([]);
 
   return (
     <Controller
@@ -47,8 +53,8 @@ export const Autocomplete = ({
           options={options}
           loading={loading}
           renderOption={(props, option) => (
-            <Box {...props} component="li" key={option.id}>
-              {option.label}
+            <Box {...props} component="li" key={get(option, "id", option)}>
+              {get(option, "label", option)}
             </Box>
           )}
           renderInput={(params) => (
@@ -72,19 +78,20 @@ export const Autocomplete = ({
             />
           )}
           onChange={(e, data) => {
-            const value = last(data);
+            if (autocompleteProps.multiple && Array.isArray(data)) {
+              const value = last(data);
 
-            if (typeof value === "string" && typeof data === "object") {
-              data[data.length - 1] = {
-                label: value,
-              };
-            }
-            if (
-              (autocompleteProps.multiple &&
-                maxTags &&
-                data.length <= maxTags) ||
-              !autocompleteProps.multiple
-            ) {
+              if (typeof value === "string") {
+                data[data.length - 1] = {
+                  label: value,
+                };
+              }
+
+              if ((maxTags && data.length <= maxTags) || !maxTags) {
+                onChange(data);
+                setValue(data);
+              }
+            } else {
               onChange(data);
               setValue(data);
             }
@@ -94,7 +101,6 @@ export const Autocomplete = ({
           value={value}
         />
       )}
-      onChange={([, data]) => data}
       defaultValue={defaultValue}
       name={name}
       control={control}

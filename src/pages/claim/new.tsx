@@ -14,12 +14,15 @@ import {
 } from "@mui/material";
 import { LoadingButton } from "@mui/lab";
 import DeleteIcon from "@mui/icons-material/Delete";
-import { useForm, useFieldArray } from "react-hook-form";
+import { useForm, useFieldArray, NestedValue } from "react-hook-form";
 import { useSnackbar } from "notistack";
 import { useRouter } from "next/router";
 import { get, isEmpty } from "lodash-es";
 
-import { Autocomplete } from "common/components/Autocomplete";
+import {
+  Autocomplete,
+  AutocompleteOptionProps,
+} from "common/components/Autocomplete";
 import { registerMui } from "common/utils/registerMui";
 import { useClaims } from "modules/claims/hooks/useClaims";
 import { useTags } from "modules/tags/hooks/useTags";
@@ -48,9 +51,19 @@ const NewClaim: NextPage = () => {
     formState: { errors, isSubmitting },
     getValues,
     handleSubmit: handleSubmitHook,
-  } = useForm({
+  } = useForm<{
+    title: string;
+    summary: string;
+    tags: NestedValue<any[]>;
+    sources: NestedValue<any[]>;
+    attributions: NestedValue<any[]>;
+  }>({
     defaultValues: {
+      title: "",
+      summary: "",
       tags: [],
+      sources: [],
+      attributions: [],
     },
   });
   const {
@@ -70,7 +83,7 @@ const NewClaim: NextPage = () => {
     name: "attributions",
   });
 
-  const [tagsOptions, setTagsOptions] = useState([]);
+  const [tagsOptions, setTagsOptions] = useState<AutocompleteOptionProps[]>([]);
   const [tagsOptionsLoading, setTagsOptionsLoading] = useState(false);
 
   const sourcesOriginOptions = [
@@ -95,7 +108,7 @@ const NewClaim: NextPage = () => {
         variant: "success",
       });
       router.push(`/claim/${slug}`);
-    } catch (e) {
+    } catch (e: any) {
       enqueueSnackbar(e.message, {
         variant: "error",
       });
@@ -109,7 +122,7 @@ const NewClaim: NextPage = () => {
       try {
         const tags = await searchTags({ term });
         setTagsOptions(tags.map(({ id, label }: Tag) => ({ id, label })));
-      } catch (e) {
+      } catch (e: any) {
         enqueueSnackbar(e.message, {
           variant: "error",
         });
@@ -184,7 +197,7 @@ const NewClaim: NextPage = () => {
                   const origin: string = getValues(
                     `sources.${sourceFieldIndex}.origin`
                   );
-                  const DeleteSourceButton = ({ display }) => (
+                  const DeleteSourceButton = ({ display }: any) => (
                     <Box sx={{ display }}>
                       <IconButton
                         size="medium"
@@ -315,7 +328,7 @@ const NewClaim: NextPage = () => {
                   name="tags"
                   maxTags={4}
                   freeSolo
-                  filterOptions={(x) => x}
+                  filterOptions={(option) => option}
                   onSearch={handleTagsSearch}
                 />
               </Stack>
@@ -325,7 +338,7 @@ const NewClaim: NextPage = () => {
                     Attributions
                   </Typography>
                   <Typography variant="body2">
-                    An e-mail or Twitter handle profile link to the original
+                    Add an e-mail or Twitter handle profile link to the original
                     claimant.
                   </Typography>
                 </Box>
@@ -334,7 +347,7 @@ const NewClaim: NextPage = () => {
                     const origin: string = getValues(
                       `attributions.${attributionsFieldIndex}.origin`
                     );
-                    const DeleteAttributionButton = ({ display }) => (
+                    const DeleteAttributionButton = ({ display }: any) => (
                       <Box sx={{ display }}>
                         <IconButton
                           size="medium"

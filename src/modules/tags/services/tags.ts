@@ -4,7 +4,7 @@ import { SEARCH_TAGS } from "../queries";
 import { Tag } from "../interfaces";
 
 export const TagsService = {
-  async searchTags({ term }: { term: string }): Promise<Tag[]> {
+  async searchTags({ term }: { term?: string }): Promise<Tag[]> {
     const { data } = await apolloClient.query({
       query: SEARCH_TAGS,
       variables: {

@@ -4,18 +4,19 @@ import { Typography, Box } from "@mui/material";
 import type { NextPage } from "next";
 
 import { useClaims } from "modules/claims/hooks/useClaims";
+import { Claim } from "modules/claims/interfaces";
 
 const Claim: NextPage = () => {
   const { loadClaim } = useClaims();
-  const [claim, setClaim] = useState<Claim>({});
+  const [claim, setClaim] = useState<Claim>({} as Claim);
   const router = useRouter();
-  const { slug } = router.query;
+  const { slug }: { slug?: string } = router.query;
 
   useEffect(() => {
     if (slug) {
       loadClaim({ slug }).then((claim) => setClaim(claim));
     }
-  }, [slug]);
+  }, [slug, loadClaim]);
 
   return (
     <Box className="container page">
