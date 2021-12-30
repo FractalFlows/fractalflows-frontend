@@ -26,6 +26,7 @@ import { useTags } from "modules/tags/hooks/useTags";
 import { Claim } from "modules/claims/interfaces";
 import { Tag } from "modules/tags/interfaces";
 import { getFormErrorHelperText } from "common/utils/getFormErrorHelperText";
+import { validateEmail, validateTwitterHandle } from "common/utils/validate";
 
 const NewClaim: NextPage = () => {
   const { createClaim } = useClaims();
@@ -36,6 +37,7 @@ const NewClaim: NextPage = () => {
     control,
     register,
     formState: { errors, isSubmitting },
+    getValues,
     handleSubmit: handleSubmitHook,
   } = useForm({
     defaultValues: {
@@ -271,75 +273,94 @@ const NewClaim: NextPage = () => {
                   </Typography>
                 </Box>
                 {attributionsFields.map(
-                  (attributionsField, attributionsFieldIndex) => (
-                    <Stack
-                      direction="row"
-                      spacing={2}
-                      key={attributionsField.id}
-                    >
-                      <FormControl>
-                        <InputLabel
-                          id="attributions-origin-select-label"
-                          error={get(
+                  (attributionsField, attributionsFieldIndex) => {
+                    const origin: string = getValues(
+                      `attributions.${attributionsFieldIndex}.origin`
+                    );
+
+                    return (
+                      <Stack
+                        direction="row"
+                        spacing={2}
+                        key={attributionsField.id}
+                      >
+                        <FormControl>
+                          <InputLabel
+                            id="attributions-origin-select-label"
+                            error={get(
+                              errors,
+                              `attributions.${attributionsFieldIndex}.origin`
+                            )}
+                          >
+                            Origin
+                          </InputLabel>
+                          <Select
+                            labelId="attributions-origin-select-label"
+                            label="Origin"
+                            sx={{ width: 150 }}
+                            {...registerMui({
+                              register,
+                              name: `attributions.${attributionsFieldIndex}.origin`,
+                              props: {
+                                required: true,
+                                deps: [
+                                  `attributions.${attributionsFieldIndex}.url`,
+                                ],
+                              },
+                              errors,
+                            })}
+                          >
+                            {attributionsOriginOptions.map(
+                              (attributionsOriginOption) => (
+                                <MenuItem
+                                  value={attributionsOriginOption.value}
+                                  key={attributionsOriginOption.value}
+                                >
+                                  {attributionsOriginOption.label}
+                                </MenuItem>
+                              )
+                            )}
+                          </Select>
+                          {getFormErrorHelperText(
                             errors,
                             `attributions.${attributionsFieldIndex}.origin`
                           )}
-                        >
-                          Origin
-                        </InputLabel>
-                        <Select
-                          labelId="attributions-origin-select-label"
-                          label="Origin"
-                          sx={{ width: 150 }}
+                        </FormControl>
+                        <TextField
+                          label={origin === "twitter" ? "Handle" : "Email"}
+                          sx={{ flexGrow: 1 }}
                           {...registerMui({
                             register,
-                            name: `attributions.${attributionsFieldIndex}.origin`,
+                            name: `attributions.${attributionsFieldIndex}.identifier`,
                             props: {
                               required: true,
+                              validate: {
+                                email: (identifier: string) =>
+                                  origin === "email"
+                                    ? validateEmail(identifier)
+                                    : true,
+                                twitterHandle: (identifier: string) =>
+                                  origin === "twitter"
+                                    ? validateTwitterHandle(identifier)
+                                    : true,
+                              },
                             },
                             errors,
                           })}
+                        ></TextField>
+                        <IconButton
+                          size="medium"
+                          aria-label="Delete attribution"
+                          component="span"
+                          onClick={() =>
+                            removeAttribution(attributionsFieldIndex)
+                          }
                         >
-                          {attributionsOriginOptions.map(
-                            (attributionsOriginOption) => (
-                              <MenuItem
-                                value={attributionsOriginOption.value}
-                                key={attributionsOriginOption.value}
-                              >
-                                {attributionsOriginOption.label}
-                              </MenuItem>
-                            )
-                          )}
-                        </Select>
-                        {getFormErrorHelperText(
-                          errors,
-                          `attributions.${attributionsFieldIndex}.origin`
-                        )}
-                      </FormControl>
-                      <TextField
-                        label="URL"
-                        sx={{ flexGrow: 1 }}
-                        {...registerMui({
-                          register,
-                          name: `attributions.${attributionsFieldIndex}.identifier`,
-                          props: {
-                            required: true,
-                          },
-                          errors,
-                        })}
-                      ></TextField>
-                      <IconButton
-                        size="medium"
-                        aria-label="Delete attribution"
-                        component="span"
-                        onClick={() =>
-                          removeAttribution(attributionsFieldIndex)
-                        }
-                      >
-                        <DeleteIcon></DeleteIcon>
-                      </IconButton>
-                    </Stack>
-                  )
+                          <DeleteIcon></DeleteIcon>
+                        </IconButton>
+                      </Stack>
+                    );
+                  }
                 )}
                 <Button
                   variant="contained"
