@@ -26,7 +26,13 @@ import { useTags } from "modules/tags/hooks/useTags";
 import { Claim } from "modules/claims/interfaces";
 import { Tag } from "modules/tags/interfaces";
 import { getFormErrorHelperText } from "common/utils/getFormErrorHelperText";
-import { validateEmail, validateTwitterHandle } from "common/utils/validate";
+import {
+  validateDOI,
+  validateEmail,
+  validateTwitterHandle,
+  validateURL,
+  validateURLWithHostname,
+} from "common/utils/validate";
 
 const NewClaim: NextPage = () => {
   const { createClaim } = useClaims();
@@ -167,67 +173,89 @@ const NewClaim: NextPage = () => {
                   </Typography>
                 </Box>
 
-                {sourcesFields.map((sourceField, sourceFieldIndex) => (
-                  <Stack direction="row" spacing={2} key={sourceField.id}>
-                    <FormControl>
-                      <InputLabel
-                        id="sources-origin-select-label"
-                        error={get(
+                {sourcesFields.map((sourceField, sourceFieldIndex) => {
+                  const origin: string = getValues(
+                    `sources.${sourceFieldIndex}.origin`
+                  );
+
+                  return (
+                    <Stack direction="row" spacing={2} key={sourceField.id}>
+                      <FormControl>
+                        <InputLabel
+                          id="sources-origin-select-label"
+                          error={get(
+                            errors,
+                            `sources.${sourceFieldIndex}.origin`
+                          )}
+                        >
+                          Origin
+                        </InputLabel>
+                        <Select
+                          labelId="sources-origin-select-label"
+                          label="Origin"
+                          sx={{ width: 150 }}
+                          {...registerMui({
+                            register,
+                            name: `sources.${sourceFieldIndex}.origin`,
+                            props: {
+                              required: true,
+                            },
+                            errors,
+                          })}
+                        >
+                          {sourcesOriginOptions.map((sourcesOriginOption) => (
+                            <MenuItem
+                              value={sourcesOriginOption.value}
+                              key={sourcesOriginOption.value}
+                            >
+                              {sourcesOriginOption.label}
+                            </MenuItem>
+                          ))}
+                        </Select>
+                        {getFormErrorHelperText(
                           errors,
                           `sources.${sourceFieldIndex}.origin`
                         )}
-                      >
-                        Origin
-                      </InputLabel>
-                      <Select
-                        labelId="sources-origin-select-label"
-                        label="Origin"
-                        sx={{ width: 150 }}
+                      </FormControl>
+                      <TextField
+                        label={origin === "doi" ? "DOI" : "URL"}
+                        sx={{ flexGrow: 1 }}
                         {...registerMui({
                           register,
-                          name: `sources.${sourceFieldIndex}.origin`,
+                          name: `sources.${sourceFieldIndex}.url`,
                           props: {
                             required: true,
+                            validate: {
+                              url: (url: string) => {
+                                if (
+                                  origin === "other" ||
+                                  origin === "website"
+                                ) {
+                                  return validateURL(url);
+                                } else if (origin !== "doi") {
+                                  return validateURLWithHostname(url, origin);
+                                } else {
+                                  return true;
+                                }
+                              },
+                              doi: (doi: string) =>
+                                origin === "doi" ? validateDOI(doi) : true,
+                            },
                           },
                           errors,
                         })}
+                      ></TextField>
+                      <IconButton
+                        size="medium"
+                        aria-label="Delete source"
+                        component="span"
+                        onClick={() => removeSource(sourceFieldIndex)}
                       >
-                        {sourcesOriginOptions.map((sourcesOriginOption) => (
-                          <MenuItem
-                            value={sourcesOriginOption.value}
-                            key={sourcesOriginOption.value}
-                          >
-                            {sourcesOriginOption.label}
-                          </MenuItem>
-                        ))}
-                      </Select>
-                      {getFormErrorHelperText(
-                        errors,
-                        `sources.${sourceFieldIndex}.origin`
-                      )}
-                    </FormControl>
-                    <TextField
-                      label="URL"
-                      sx={{ flexGrow: 1 }}
-                      {...registerMui({
-                        register,
-                        name: `sources.${sourceFieldIndex}.url`,
-                        props: {
-                          required: true,
-                        },
-                        errors,
-                      })}
-                    ></TextField>
-                    <IconButton
-                      size="medium"
-                      aria-label="Delete source"
-                      component="span"
-                      onClick={() => removeSource(sourceFieldIndex)}
-                    >
-                      <DeleteIcon></DeleteIcon>
-                    </IconButton>
-                  </Stack>
-                ))}
+                        <DeleteIcon></DeleteIcon>
+                      </IconButton>
+                    </Stack>
+                  );
+                })}
                 <Button
                   variant="contained"
                   color="secondary"
