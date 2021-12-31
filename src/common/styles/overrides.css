@@ -2,6 +2,11 @@ form {
   max-width: 500px;
 }
 
+.MuiTabPanel-root {
+  flex-grow: 1;
+  padding: 24px 0;
+}
+
 @media screen and (min-width: 900px) {
   .MuiToolbar-gutters,
   .container {
@@ -15,8 +20,7 @@ form {
   }
 
   .MuiTabPanel-root {
-    padding-top: 0;
-    flex-grow: 1;
+    padding: 0 24px;
   }
 }
 

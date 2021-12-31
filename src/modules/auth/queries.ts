@@ -15,6 +15,9 @@ export const GET_SESSION = gql`
       }
       ens
       avatar
+      user {
+        email
+      }
     }
   }
 `;

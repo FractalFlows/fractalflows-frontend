@@ -1,36 +1,40 @@
-import { Stack, Typography, Divider, TextField } from "@mui/material";
+import { Stack, TextField } from "@mui/material";
 import { useSnackbar } from "notistack";
 import { useForm } from "react-hook-form";
 import { LoadingButton } from "@mui/lab";
 
 import { registerMui } from "common/utils/registerMui";
+import { useSettings } from "../hooks/useSettings";
 import { TabPanel } from "./TabPanel";
+import { validateEmail } from "common/utils/validate";
+import { useAuth } from "modules/auth/hooks/useAuth";
+
+interface EmailFormProps {
+  email: string;
+}
 
 export const Email = () => {
-  // const { createClaim } = useClaims();
+  const { session } = useAuth();
+  const { updateEmail } = useSettings();
   const { enqueueSnackbar } = useSnackbar();
 
   const {
     control,
     register,
-    watch,
     formState: { errors, isSubmitting },
     handleSubmit: handleSubmitHook,
-  } = useForm<{
-    email: string;
-  }>({
+  } = useForm<EmailFormProps>({
     defaultValues: {
-      email: "",
+      email: session.user?.email,
     },
   });
 
-  const handleSubmit = async (claim) => {
+  const handleSubmit = async ({ email }: EmailFormProps) => {
     try {
-      // const { slug } = await createClaim({ claim });
-      // enqueueSnackbar("Your new claim has been succesfully added!", {
-      //   variant: "success",
-      // });
-      // router.push(`/claim/${slug}`);
+      await updateEmail({ email });
+      enqueueSnackbar("Your email has been succesfully updated!", {
+        variant: "success",
+      });
     } catch (e: any) {
       enqueueSnackbar(e.message, {
         variant: "error",
@@ -53,6 +57,9 @@ export const Email = () => {
               name: "email",
               props: {
                 required: true,
+                validate: {
+                  email: (email: string) => validateEmail(email),
+                },
               },
               errors,
             })}

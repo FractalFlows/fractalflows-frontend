@@ -3,10 +3,13 @@ import { TabContext, TabList, TabPanel } from "@mui/lab";
 import { Box, Stack, Tab, Paper, Typography } from "@mui/material";
 import useMediaQuery from "@mui/material/useMediaQuery";
 import { useTheme } from "@mui/system";
+import { isEmpty } from "lodash-es";
 
 import { Email } from "modules/settings/components/Email";
 import { Web3Connection } from "modules/settings/components/Web3Connection";
 import { APIKeys } from "modules/settings/components/APIKeys";
+import { useAuth } from "modules/auth/hooks/useAuth";
+import { AuthWall } from "common/components/AuthWall";
 
 const tabs = [
   { label: "Email", value: "email" },
@@ -16,8 +19,11 @@ const tabs = [
 
 const Settings = () => {
   const [activeTab, setActiveTab] = useState("email");
+  const { session } = useAuth();
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("md"));
+
+  if (isEmpty(session)) return <AuthWall />;
 
   return (
     <Box className="container page">
