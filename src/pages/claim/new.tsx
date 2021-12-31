@@ -2,10 +2,7 @@ import { useCallback, useEffect, useState } from "react";
 import type { NextPage } from "next";
 import {
   Box,
-  FormControl,
-  InputLabel,
   IconButton,
-  MenuItem,
   Button,
   Stack,
   Typography,
@@ -16,7 +13,7 @@ import DeleteIcon from "@mui/icons-material/Delete";
 import { useForm, useFieldArray, NestedValue } from "react-hook-form";
 import { useSnackbar } from "notistack";
 import { useRouter } from "next/router";
-import { get, isEmpty } from "lodash-es";
+import { isEmpty } from "lodash-es";
 
 import {
   Autocomplete,

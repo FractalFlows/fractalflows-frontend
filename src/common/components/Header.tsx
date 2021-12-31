@@ -109,6 +109,9 @@ export const Header = () => {
         {session.username}
       </MenuItem>
       <MenuItem onClick={handleMenuClose}>My claims</MenuItem>
+      <Link href="/settings">
+        <MenuItem onClick={handleMenuClose}>Settings</MenuItem>
+      </Link>
       <MenuItem
         onClick={() => {
           signout();
