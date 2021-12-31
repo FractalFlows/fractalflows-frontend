@@ -11,7 +11,6 @@ const cacheOptions = {
         session: {
           read: () => {
             const sessionVar = AuthCache.sessionVar();
-            console.log(sessionVar);
 
             if (isEmpty(sessionVar)) {
               return {};

@@ -5,7 +5,6 @@ import {
   FormControl,
   InputLabel,
   IconButton,
-  Select,
   MenuItem,
   Button,
   Stack,
@@ -23,12 +22,12 @@ import {
   Autocomplete,
   AutocompleteOptionProps,
 } from "common/components/Autocomplete";
+import { Select } from "common/components/Select";
 import { registerMui } from "common/utils/registerMui";
 import { useClaims } from "modules/claims/hooks/useClaims";
 import { useTags } from "modules/tags/hooks/useTags";
 import { Claim } from "modules/claims/interfaces";
 import { Tag } from "modules/tags/interfaces";
-import { getFormErrorHelperText } from "common/utils/getFormErrorHelperText";
 import {
   validateDOI,
   validateEmail,
@@ -48,8 +47,8 @@ const NewClaim: NextPage = () => {
   const {
     control,
     register,
+    watch,
     formState: { errors, isSubmitting },
-    getValues,
     handleSubmit: handleSubmitHook,
   } = useForm<{
     title: string;
@@ -133,8 +132,6 @@ const NewClaim: NextPage = () => {
     [enqueueSnackbar, searchTags]
   );
 
-  console.log("ses", session);
-
   useEffect(() => {
     handleTagsSearch();
   }, []);
@@ -194,9 +191,13 @@ const NewClaim: NextPage = () => {
                 </Box>
 
                 {sourcesFields.map((sourceField, sourceFieldIndex) => {
-                  const origin: string = getValues(
+                  const origin: string = watch(
                     `sources.${sourceFieldIndex}.origin`
                   );
+                  const urlLabels: Record<string, string> = {
+                    doi: "DOI",
+                    other: "Source",
+                  };
                   const DeleteSourceButton = ({ display }: any) => (
                     <Box sx={{ display }}>
                       <IconButton
@@ -222,46 +223,21 @@ const NewClaim: NextPage = () => {
                         spacing={2}
                         flexGrow={1}
                       >
-                        <FormControl>
-                          <InputLabel
-                            id="sources-origin-select-label"
-                            error={get(
-                              errors,
-                              `sources.${sourceFieldIndex}.origin`
-                            )}
-                          >
-                            Origin
-                          </InputLabel>
-                          <Select
-                            labelId="sources-origin-select-label"
-                            label="Origin"
-                            fullWidth
-                            sx={{ width: { xs: "unset", sm: 150 } }}
-                            {...registerMui({
-                              register,
-                              name: `sources.${sourceFieldIndex}.origin`,
-                              props: {
-                                required: true,
-                              },
-                              errors,
-                            })}
-                          >
-                            {sourcesOriginOptions.map((sourcesOriginOption) => (
-                              <MenuItem
-                                value={sourcesOriginOption.value}
-                                key={sourcesOriginOption.value}
-                              >
-                                {sourcesOriginOption.label}
-                              </MenuItem>
-                            ))}
-                          </Select>
-                          {getFormErrorHelperText(
-                            errors,
-                            `sources.${sourceFieldIndex}.origin`
-                          )}
-                        </FormControl>
+                        <Select
+                          label="Origin"
+                          name={`sources.${sourceFieldIndex}.origin`}
+                          fullWidth
+                          sx={{ width: { xs: "unset", sm: 150 } }}
+                          options={sourcesOriginOptions}
+                          control={control}
+                          errors={errors}
+                          rules={{
+                            required: true,
+                            deps: [`sources.${sourceFieldIndex}.url`],
+                          }}
+                        />
                         <TextField
-                          label={origin === "doi" ? "DOI" : "URL"}
+                          label={urlLabels[origin] || "URL"}
                           sx={{ flexGrow: 1 }}
                           {...registerMui({
                             register,
@@ -270,12 +246,12 @@ const NewClaim: NextPage = () => {
                               required: true,
                               validate: {
                                 url: (url: string) => {
-                                  if (
-                                    origin === "other" ||
-                                    origin === "website"
-                                  ) {
+                                  if (origin === "website") {
                                     return validateURL(url);
-                                  } else if (origin !== "doi") {
+                                  } else if (
+                                    origin !== "doi" &&
+                                    origin !== "other"
+                                  ) {
                                     return validateURLWithHostname(url, origin);
                                   } else {
                                     return true;
@@ -303,7 +279,7 @@ const NewClaim: NextPage = () => {
                   color="secondary"
                   size="small"
                   fullWidth
-                  onClick={() => appendSource({})}
+                  onClick={() => appendSource({ origin: "facebook", url: "" })}
                 >
                   Add source
                 </Button>
@@ -344,7 +320,7 @@ const NewClaim: NextPage = () => {
                 </Box>
                 {attributionsFields.map(
                   (attributionsField, attributionsFieldIndex) => {
-                    const origin: string = getValues(
+                    const origin: string = watch(
                       `attributions.${attributionsFieldIndex}.origin`
                     );
                     const DeleteAttributionButton = ({ display }: any) => (
@@ -374,49 +350,22 @@ const NewClaim: NextPage = () => {
                           spacing={2}
                           flexGrow={1}
                         >
-                          <FormControl>
-                            <InputLabel
-                              id="attributions-origin-select-label"
-                              error={get(
-                                errors,
-                                `attributions.${attributionsFieldIndex}.origin`
-                              )}
-                            >
-                              Origin
-                            </InputLabel>
-                            <Select
-                              labelId="attributions-origin-select-label"
-                              label="Origin"
-                              fullWidth
-                              sx={{ width: { xs: "unset", sm: 150 } }}
-                              {...registerMui({
-                                register,
-                                name: `attributions.${attributionsFieldIndex}.origin`,
-                                props: {
-                                  required: true,
-                                  deps: [
-                                    `attributions.${attributionsFieldIndex}.url`,
-                                  ],
-                                },
-                                errors,
-                              })}
-                            >
-                              {attributionsOriginOptions.map(
-                                (attributionsOriginOption) => (
-                                  <MenuItem
-                                    value={attributionsOriginOption.value}
-                                    key={attributionsOriginOption.value}
-                                  >
-                                    {attributionsOriginOption.label}
-                                  </MenuItem>
-                                )
-                              )}
-                            </Select>
-                            {getFormErrorHelperText(
-                              errors,
-                              `attributions.${attributionsFieldIndex}.origin`
-                            )}
-                          </FormControl>
+                          <Select
+                            label="Origin"
+                            name={`attributions.${attributionsFieldIndex}.origin`}
+                            fullWidth
+                            sx={{ width: { xs: "unset", sm: 150 } }}
+                            options={attributionsOriginOptions}
+                            control={control}
+                            errors={errors}
+                            rules={{
+                              required: true,
+                              deps: [
+                                `attributions.${attributionsFieldIndex}.identifier`,
+                              ],
+                            }}
+                          />
+
                           <TextField
                             label={origin === "twitter" ? "Handle" : "Email"}
                             sx={{ flexGrow: 1 }}
@@ -455,7 +404,9 @@ const NewClaim: NextPage = () => {
                   color="secondary"
                   size="small"
                   fullWidth
-                  onClick={() => appendAttribution({})}
+                  onClick={() =>
+                    appendAttribution({ origin: "twitter", identifier: "" })
+                  }
                 >
                   Add attribution
                 </Button>
