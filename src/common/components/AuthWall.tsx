@@ -9,12 +9,7 @@ export const AuthWall = () => {
     <Box className="container page">
       <Stack spacing={5}>
         <Stack spacing={2}>
-          <Typography
-            variant="h3"
-            component="h1"
-            align="center"
-            fontWeight={700}
-          >
+          <Typography variant="h3" component="h1" align="center">
             Sign in
           </Typography>
           <Typography variant="body1" align="center">

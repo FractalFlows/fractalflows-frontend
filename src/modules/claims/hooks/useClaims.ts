@@ -1,9 +1,10 @@
-import { createClaim } from "./createClaim";
-import { loadClaim } from "./loadClaim";
+import { createClaim } from "./create";
+import { getClaim, getUserClaims } from "./get";
 
 export const useClaims = () => {
   return {
     createClaim,
-    loadClaim,
+    getClaim,
+    getUserClaims,
   };
 };

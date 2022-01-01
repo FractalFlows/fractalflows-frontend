@@ -16,7 +16,6 @@ const Hero: FC = () => (
           <Typography
             variant="h2"
             component="h1"
-            fontWeight={700}
             color="primary.contrastText"
             align="center"
           >

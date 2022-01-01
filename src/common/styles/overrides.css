@@ -4,7 +4,7 @@ form {
 
 .MuiTabPanel-root {
   flex-grow: 1;
-  padding: 24px 0;
+  padding: 0;
 }
 
 @media screen and (min-width: 900px) {
@@ -19,9 +19,9 @@ form {
     padding-bottom: 140px;
   }
 
-  .MuiTabPanel-root {
+  /* .horizontal-tabs .MuiTabPanel-root {
     padding: 0 36px;
-  }
+  } */
 }
 
 @media screen and (min-width: 1200px) {

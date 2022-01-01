@@ -1,7 +1,19 @@
 import { createTheme } from "@mui/material/styles";
 import { red } from "@mui/material/colors";
 
+const fontWeightBold = {
+  fontWeight: 700,
+};
+
 export const muiTheme = createTheme({
+  typography: {
+    h1: fontWeightBold,
+    h2: fontWeightBold,
+    h3: fontWeightBold,
+    h4: fontWeightBold,
+    h5: fontWeightBold,
+    h6: fontWeightBold,
+  },
   palette: {
     primary: {
       main: "#204E5F",
@@ -14,7 +26,9 @@ export const muiTheme = createTheme({
       main: "#fff",
       contrastText: "#204E5F",
     },
-    textSecondary: "#757575",
+    textSecondary: {
+      main: "#757575",
+    },
     error: {
       main: red.A400,
     },

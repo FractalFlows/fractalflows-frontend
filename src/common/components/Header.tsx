@@ -105,7 +105,7 @@ export const Header = () => {
       open={isMenuOpen}
       onClose={handleMenuClose}
     >
-      <MenuItem disabled sx={{ ...renderMenuOnlyOnMobile, fontWeight: 800 }}>
+      <MenuItem disabled sx={{ ...renderMenuOnlyOnMobile, fontWeight: 700 }}>
         {session.username}
       </MenuItem>
       <Link href="/profile">
@@ -195,7 +195,7 @@ export const Header = () => {
               variant="h6"
               noWrap
               component="div"
-              sx={{ display: { xs: "none", sm: "block" }, fontWeight: 800 }}
+              sx={{ display: { xs: "none", sm: "block" }, fontWeight: 700 }}
             >
               Fractal Flows
             </Typography>
@@ -237,7 +237,7 @@ export const Header = () => {
                         variant="body1"
                         noWrap
                         sx={{
-                          fontWeight: 800,
+                          fontWeight: 700,
                           textTransform: "initial",
                           maxWidth: 150,
                         }}

@@ -13,7 +13,7 @@ export const TabPanel: FC<TabPanelProps> = ({
 }) => (
   <>
     <Stack spacing={1}>
-      <Typography variant="h5" component="h2" fontWeight={500}>
+      <Typography variant="h5" component="h2">
         {title}
       </Typography>
       <Typography variant="body1">{description}</Typography>

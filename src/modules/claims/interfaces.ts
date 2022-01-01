@@ -23,3 +23,9 @@ export interface Claim {
   tags?: Tag[];
   attributions?: Attributions[];
 }
+
+export enum UserClaimRelation {
+  OWN = "OWN",
+  CONTRIBUTED = "CONTRIBUTED",
+  FOLLOWING = "FOLLOWING",
+}

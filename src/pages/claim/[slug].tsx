@@ -7,16 +7,16 @@ import { useClaims } from "modules/claims/hooks/useClaims";
 import { Claim } from "modules/claims/interfaces";
 
 const Claim: NextPage = () => {
-  const { loadClaim } = useClaims();
+  const { getClaim } = useClaims();
   const [claim, setClaim] = useState<Claim>({} as Claim);
   const router = useRouter();
   const { slug }: { slug?: string } = router.query;
 
   useEffect(() => {
     if (slug) {
-      loadClaim({ slug }).then((claim) => setClaim(claim));
+      getClaim({ slug }).then((claim) => setClaim(claim));
     }
-  }, [slug, loadClaim]);
+  }, [slug, getClaim]);
 
   return (
     <Box className="container page">

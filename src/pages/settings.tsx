@@ -11,7 +11,7 @@ import { APIKeys } from "modules/settings/components/APIKeys";
 import { useAuth } from "modules/auth/hooks/useAuth";
 import { AuthWall } from "common/components/AuthWall";
 
-const tabs = [
+const settingsTabs = [
   { label: "Email", value: "email" },
   { label: "Web3 connection", value: "web3connection" },
   { label: "API Keys", value: "apiKeys" },
@@ -28,10 +28,14 @@ const Settings = () => {
   return (
     <Box className="container page">
       <Stack spacing={5}>
-        <Typography variant="h3" component="h1" sx={{ fontWeight: 700 }}>
+        <Typography variant="h3" component="h1">
           Settings
         </Typography>
-        <Stack direction={{ xs: "column", md: "row" }}>
+        <Stack
+          direction={{ xs: "column", md: "row" }}
+          spacing={{ xs: 3, md: 4 }}
+          className="horizontal-tabs"
+        >
           <TabContext value={activeTab}>
             <Paper variant="outlined" sx={{ alignSelf: "start" }}>
               <TabList
@@ -39,9 +43,8 @@ const Settings = () => {
                 orientation={isMobile ? "horizontal" : "vertical"}
                 variant="scrollable"
                 scrollButtons="auto"
-                allowScrollButtonsMobile
               >
-                {tabs.map(({ label, value }) => (
+                {settingsTabs.map(({ label, value }) => (
                   <Tab label={label} value={value} key={value} />
                 ))}
               </TabList>
