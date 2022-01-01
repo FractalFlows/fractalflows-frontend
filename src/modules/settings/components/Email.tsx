@@ -17,6 +17,7 @@ export const Email = () => {
   const { session } = useAuth();
   const { updateEmail } = useSettings();
   const { enqueueSnackbar } = useSnackbar();
+  const currentEmail = session.user?.email;
 
   const {
     control,
@@ -25,7 +26,7 @@ export const Email = () => {
     handleSubmit: handleSubmitHook,
   } = useForm<EmailFormProps>({
     defaultValues: {
-      email: session.user?.email,
+      email: currentEmail,
     },
   });
 
@@ -71,7 +72,7 @@ export const Email = () => {
             size="large"
             sx={{ alignSelf: "start" }}
           >
-            Save
+            {currentEmail ? "Save" : "Add"}
           </LoadingButton>
         </Stack>
       </form>

@@ -7,6 +7,7 @@ declare module "@mui/material/styles" {
   }
   interface PaletteOptions {
     primaryContrast: PaletteOptions["primary"];
+    textSecondary: PaletteOptions["primary"];
   }
 }
 

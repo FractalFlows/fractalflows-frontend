@@ -14,6 +14,7 @@ export const muiTheme = createTheme({
       main: "#fff",
       contrastText: "#204E5F",
     },
+    textSecondary: "#757575",
     error: {
       main: red.A400,
     },

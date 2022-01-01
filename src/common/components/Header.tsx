@@ -108,7 +108,9 @@ export const Header = () => {
       <MenuItem disabled sx={{ ...renderMenuOnlyOnMobile, fontWeight: 800 }}>
         {session.username}
       </MenuItem>
-      <MenuItem onClick={handleMenuClose}>My claims</MenuItem>
+      <Link href="/profile">
+        <MenuItem onClick={handleMenuClose}>Profile</MenuItem>
+      </Link>
       <Link href="/settings">
         <MenuItem onClick={handleMenuClose}>Settings</MenuItem>
       </Link>
