@@ -1,7 +1,8 @@
 import { useQuery } from "@apollo/client";
 
 import { apolloClient } from "common/services/apollo/client";
-import { signin } from "./signin";
+import { signInWithEthereum } from "./siwe";
+import { sendMagicLink } from "./magic-link";
 import { signout } from "./signout";
 import { getSession } from "./session";
 import { GET_SESSION_FROM_CACHE } from "../queries";
@@ -14,7 +15,8 @@ export const useAuth = () => {
   });
 
   return {
-    signin,
+    signInWithEthereum,
+    sendMagicLink,
     signout,
     getSession,
     session,

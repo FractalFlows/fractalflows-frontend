@@ -1,9 +1,49 @@
-import { Box, Button, Stack, Typography } from "@mui/material";
+import { useState } from "react";
+import { LoadingButton } from "@mui/lab";
+import { useSnackbar } from "notistack";
+import { Box, Button, Stack, TextField, Typography } from "@mui/material";
+import { useRouter } from "next/router";
+import { useForm } from "react-hook-form";
 
+import { registerMui } from "common/utils/registerMui";
+import { validateEmail } from "common/utils/validate";
 import { useAuth } from "modules/auth/hooks/useAuth";
+import { SignInMethod } from "modules/auth/interfaces";
+
+interface MagicLinkFormProps {
+  email: string;
+}
 
 export const AuthWall = () => {
-  const { signin } = useAuth();
+  const { signInWithEthereum, sendMagicLink } = useAuth();
+  const [chosenSignInMethod, setChosenSignInMethod] = useState<SignInMethod>();
+  const {
+    control,
+    register,
+    formState: { errors, isSubmitting },
+    handleSubmit: handleSubmitHook,
+  } = useForm<MagicLinkFormProps>({
+    defaultValues: {
+      email: "",
+    },
+  });
+  const { enqueueSnackbar } = useSnackbar();
+  const router = useRouter();
+
+  const handleSubmit = async ({ email }: MagicLinkFormProps) => {
+    try {
+      await sendMagicLink({ email });
+      signInCallback();
+    } catch (e: any) {
+      enqueueSnackbar(e.message, {
+        variant: "error",
+      });
+    }
+  };
+
+  const signInCallback = () => {
+    if (router.route === "/signin") router.push("/");
+  };
 
   return (
     <Box className="container page">
@@ -13,18 +53,73 @@ export const AuthWall = () => {
             Sign in
           </Typography>
           <Typography variant="body1" align="center">
-            In order to continue, please sign in.
+            {chosenSignInMethod === SignInMethod.MAGICLINK
+              ? "Fill in your email address to receive a magic sign in link."
+              : "In order to continue, please choose one of the following options:"}
           </Typography>
         </Stack>
-        <Button
-          variant="contained"
-          color="primary"
-          startIcon={<i className="fab fa-ethereum"></i>}
-          sx={{ alignSelf: "center" }}
-          onClick={signin}
-        >
-          Sign in with Ethereum
-        </Button>
+        {chosenSignInMethod === SignInMethod.MAGICLINK ? (
+          <Stack sx={{ alignSelf: "center" }}>
+            <form onSubmit={handleSubmitHook(handleSubmit)}>
+              <Stack spacing={3}>
+                <TextField
+                  label="Email"
+                  fullWidth
+                  {...registerMui({
+                    register,
+                    name: "email",
+                    props: {
+                      required: true,
+                      validate: {
+                        email: (email: string) => validateEmail(email),
+                      },
+                    },
+                    errors,
+                  })}
+                />
+                <Stack spacing={2}>
+                  <LoadingButton
+                    type="submit"
+                    size="large"
+                    loading={isSubmitting}
+                    variant="contained"
+                  >
+                    Send magic link
+                  </LoadingButton>
+                  <Button
+                    variant="contained"
+                    color="secondary"
+                    size="large"
+                    onClick={() => setChosenSignInMethod(undefined)}
+                  >
+                    Go back
+                  </Button>
+                </Stack>
+              </Stack>
+            </form>
+          </Stack>
+        ) : (
+          <Stack sx={{ alignSelf: "center" }} spacing={2}>
+            <Button
+              variant="contained"
+              color="primary"
+              size="large"
+              startIcon={<i className="fab fa-ethereum"></i>}
+              onClick={() => signInWithEthereum(signInCallback)}
+            >
+              Sign in with Ethereum
+            </Button>
+
+            <Button
+              variant="contained"
+              color="secondary"
+              size="large"
+              onClick={() => setChosenSignInMethod(SignInMethod.MAGICLINK)}
+            >
+              Continue with email
+            </Button>
+          </Stack>
+        )}
       </Stack>
     </Box>
   );

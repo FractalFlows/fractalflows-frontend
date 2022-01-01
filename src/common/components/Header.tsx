@@ -68,7 +68,7 @@ export const Header = () => {
   const isMenuOpen = Boolean(anchorEl);
   const isMobileMenuOpen = Boolean(mobileMoreAnchorEl);
 
-  const { signin, signout, session, isSignedIn } = useAuth();
+  const { signout, session, isSignedIn } = useAuth();
 
   const handleProfileMenuOpen = (event: React.MouseEvent<HTMLElement>) => {
     setAnchorEl(event.currentTarget);
@@ -157,32 +157,31 @@ export const Header = () => {
         ? null
         : [
             <Divider key={0} sx={{ my: 0.5 }} />,
-            <MenuItem key={1}>
-              <Button
-                variant="contained"
-                color="primary"
-                startIcon={<i className="fab fa-ethereum"></i>}
+            <Link href="/signin" key={1}>
+              <MenuItem
                 onClick={() => {
-                  signin();
                   handleMobileMenuClose();
                 }}
               >
-                Sign in with Ethereum
-              </Button>
-            </MenuItem>,
+                <Button variant="contained" color="primary" fullWidth>
+                  Sign in
+                </Button>
+              </MenuItem>
+            </Link>,
           ]}
     </Menu>
   );
 
-  const userAvatar = session.avatar ? (
-    <Avatar src={session.avatar} />
-  ) : (
+  const userAvatar = (
     <Avatar
+      src={session.avatar}
       sx={{
+        width: 35,
+        height: 35,
         bgcolor: alpha(muiTheme.palette.common.white, 0.15),
       }}
     >
-      <AccountCircle />
+      <AccountCircle sx={{ fontSize: 35 }} />
     </Avatar>
   );
 
@@ -248,14 +247,11 @@ export const Header = () => {
                   </Button>
                 </>
               ) : (
-                <Button
-                  variant="contained"
-                  color="primaryContrast"
-                  startIcon={<i className="fab fa-ethereum"></i>}
-                  onClick={signin}
-                >
-                  Sign in with Ethereum
-                </Button>
+                <Link href="/signin">
+                  <Button variant="contained" color="primaryContrast">
+                    Sign in
+                  </Button>
+                </Link>
               )}
             </Stack>
           </Box>

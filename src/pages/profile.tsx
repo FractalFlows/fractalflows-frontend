@@ -47,8 +47,10 @@ const Profile = () => {
               variant="h3"
               component="h1"
               noWrap
-              sx={{ maxWidth: { xs: 300, sm: "initial" } }}
-              align="center"
+              sx={{
+                maxWidth: { xs: 300, sm: "initial" },
+                textAlign: { xs: "center", md: "start" },
+              }}
             >
               {session.username}
             </Typography>
@@ -57,8 +59,10 @@ const Profile = () => {
                 variant="body1"
                 color="textSecondary"
                 noWrap
-                sx={{ maxWidth: { xs: 200, sm: "initial" } }}
-                align="center"
+                sx={{
+                  maxWidth: { xs: 200, sm: "initial" },
+                  textAlign: { xs: "center", md: "start" },
+                }}
               >
                 {session.siweMessage?.address}
               </Typography>

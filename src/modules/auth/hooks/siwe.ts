@@ -6,7 +6,7 @@ import { SignatureType, SiweMessage } from "siwe";
 import { AuthService } from "../services/auth";
 import { AuthCache } from "../cache";
 
-export const signin = async () => {
+export const signInWithEthereum = async (callback: () => any) => {
   const providerOptions = {
     walletconnect: {
       package: WalletConnect,
@@ -76,7 +76,7 @@ export const signin = async () => {
     .signMessage(siweMessage.signMessage());
   siweMessage.signature = signature;
 
-  await AuthService.signin({ siweMessage, ens });
+  await AuthService.signInWithEthereum({ siweMessage, ens });
 
   AuthCache.sessionVar({
     siweMessage,
@@ -84,4 +84,6 @@ export const signin = async () => {
     avatar,
   });
   AuthCache.isSignedInVar(true);
+
+  callback();
 };

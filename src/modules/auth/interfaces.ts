@@ -11,3 +11,8 @@ export interface Session {
   avatar?: string;
   email: User;
 }
+
+export enum SignInMethod {
+  MAGICLINK = "MAGICLINK",
+  ETHEREUM = "ETHEREUM",
+}
