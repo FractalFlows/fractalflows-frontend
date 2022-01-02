@@ -17,9 +17,11 @@ interface MagicLinkFormProps {
 export const AuthWall = () => {
   const { signInWithEthereum, sendMagicLink } = useAuth();
   const [chosenSignInMethod, setChosenSignInMethod] = useState<SignInMethod>();
+  const [hasMagicLinkBeenSent, setHasMagicLinkBeenSent] =
+    useState<Boolean>(false);
   const {
-    control,
     register,
+    getValues,
     formState: { errors, isSubmitting },
     handleSubmit: handleSubmitHook,
   } = useForm<MagicLinkFormProps>({
@@ -33,7 +35,7 @@ export const AuthWall = () => {
   const handleSubmit = async ({ email }: MagicLinkFormProps) => {
     try {
       await sendMagicLink({ email });
-      signInCallback();
+      setHasMagicLinkBeenSent(true);
     } catch (e: any) {
       enqueueSnackbar(e.message, {
         variant: "error",
@@ -45,6 +47,15 @@ export const AuthWall = () => {
     if (router.route === "/signin") router.push("/");
   };
 
+  const getSubtitle = () => {
+    if (chosenSignInMethod === SignInMethod.MAGIC_LINK) {
+      return hasMagicLinkBeenSent
+        ? null
+        : "Fill in your email address to receive a magic sign in link.";
+    } else
+      return "In order to continue, please choose one of the following options:";
+  };
+
   return (
     <Box className="container page">
       <Stack spacing={5}>
@@ -53,50 +64,55 @@ export const AuthWall = () => {
             Sign in
           </Typography>
           <Typography variant="body1" align="center">
-            {chosenSignInMethod === SignInMethod.MAGICLINK
-              ? "Fill in your email address to receive a magic sign in link."
-              : "In order to continue, please choose one of the following options:"}
+            {getSubtitle()}
           </Typography>
         </Stack>
-        {chosenSignInMethod === SignInMethod.MAGICLINK ? (
+        {chosenSignInMethod === SignInMethod.MAGIC_LINK ? (
           <Stack sx={{ alignSelf: "center" }}>
-            <form onSubmit={handleSubmitHook(handleSubmit)}>
-              <Stack spacing={3}>
-                <TextField
-                  label="Email"
-                  fullWidth
-                  {...registerMui({
-                    register,
-                    name: "email",
-                    props: {
-                      required: true,
-                      validate: {
-                        email: (email: string) => validateEmail(email),
+            {hasMagicLinkBeenSent ? (
+              <Typography variant="body1">
+                We sent an email to you at <b>{getValues("email")}</b>. It has a
+                magic link that'll sign you in.
+              </Typography>
+            ) : (
+              <form onSubmit={handleSubmitHook(handleSubmit)}>
+                <Stack spacing={3}>
+                  <TextField
+                    label="Email"
+                    fullWidth
+                    {...registerMui({
+                      register,
+                      name: "email",
+                      props: {
+                        required: true,
+                        validate: {
+                          email: (email: string) => validateEmail(email),
+                        },
                       },
-                    },
-                    errors,
-                  })}
-                />
-                <Stack spacing={2}>
-                  <LoadingButton
-                    type="submit"
-                    size="large"
-                    loading={isSubmitting}
-                    variant="contained"
-                  >
-                    Send magic link
-                  </LoadingButton>
-                  <Button
-                    variant="contained"
-                    color="secondary"
-                    size="large"
-                    onClick={() => setChosenSignInMethod(undefined)}
-                  >
-                    Go back
-                  </Button>
+                      errors,
+                    })}
+                  />
+                  <Stack spacing={2}>
+                    <LoadingButton
+                      type="submit"
+                      size="large"
+                      loading={isSubmitting}
+                      variant="contained"
+                    >
+                      Send magic link
+                    </LoadingButton>
+                    <Button
+                      variant="contained"
+                      color="secondary"
+                      size="large"
+                      onClick={() => setChosenSignInMethod(undefined)}
+                    >
+                      Go back
+                    </Button>
+                  </Stack>
                 </Stack>
-              </Stack>
-            </form>
+              </form>
+            )}
           </Stack>
         ) : (
           <Stack sx={{ alignSelf: "center" }} spacing={2}>
@@ -114,7 +130,7 @@ export const AuthWall = () => {
               variant="contained"
               color="secondary"
               size="large"
-              onClick={() => setChosenSignInMethod(SignInMethod.MAGICLINK)}
+              onClick={() => setChosenSignInMethod(SignInMethod.MAGIC_LINK)}
             >
               Continue with email
             </Button>

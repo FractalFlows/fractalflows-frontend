@@ -2,7 +2,6 @@ import { InMemoryCache } from "@apollo/client";
 import { isEmpty } from "lodash-es";
 
 import { AuthCache } from "modules/auth/cache";
-import { Session } from "modules/auth/interfaces";
 
 const cacheOptions = {
   typePolicies: {
@@ -17,7 +16,10 @@ const cacheOptions = {
             } else {
               return {
                 ...sessionVar,
-                username: sessionVar.ens ?? sessionVar?.siweMessage?.address,
+                username:
+                  sessionVar.ens ||
+                  sessionVar.user.email ||
+                  sessionVar?.user?.ethAddress,
               };
             }
           },

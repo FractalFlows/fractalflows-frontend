@@ -2,17 +2,18 @@ import type { SiweMessage } from "siwe";
 
 export interface User {
   email: string;
+  ethAddress: string;
 }
 
 export interface Session {
-  siweMessage: SiweMessage;
+  siweMessage?: SiweMessage;
   username?: string;
   ens?: string;
   avatar?: string;
-  email: User;
+  user: User;
 }
 
 export enum SignInMethod {
-  MAGICLINK = "MAGICLINK",
+  MAGIC_LINK = "MAGIC_LINK",
   ETHEREUM = "ETHEREUM",
 }

@@ -76,12 +76,17 @@ export const signInWithEthereum = async (callback: () => any) => {
     .signMessage(siweMessage.signMessage());
   siweMessage.signature = signature;
 
-  await AuthService.signInWithEthereum({ siweMessage, ens });
+  const user = await AuthService.signInWithEthereum({
+    siweMessage,
+    ens,
+    avatar,
+  });
 
   AuthCache.sessionVar({
     siweMessage,
     ens,
     avatar,
+    user,
   });
   AuthCache.isSignedInVar(true);
 

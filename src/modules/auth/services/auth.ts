@@ -2,8 +2,13 @@ import type { SiweMessage } from "siwe";
 
 import { apolloClient } from "common/services/apollo/client";
 import { GET_NONCE, GET_SESSION } from "../queries";
-import { SIGN_IN_WITH_ETHEREUM, SEND_MAGIC_LINK, SIGN_OUT } from "../mutations";
-import { Session } from "../interfaces";
+import {
+  SIGN_IN_WITH_ETHEREUM,
+  SEND_MAGIC_LINK,
+  VERIFY_MAGIC_LINK,
+  SIGN_OUT,
+} from "../mutations";
+import { Session, User } from "../interfaces";
 
 export const AuthService = {
   async getNonce(): Promise<string> {
@@ -27,16 +32,19 @@ export const AuthService = {
   async signInWithEthereum({
     siweMessage,
     ens,
+    avatar,
   }: {
     siweMessage: SiweMessage;
     ens?: string;
-  }): Promise<Boolean> {
+    avatar?: string;
+  }): Promise<User> {
     const { data } = await apolloClient.mutate({
       mutation: SIGN_IN_WITH_ETHEREUM,
       variables: {
-        signInInput: {
+        signInWithEthereumInput: {
           siweMessage,
           ens,
+          avatar,
         },
       },
     });
@@ -53,6 +61,17 @@ export const AuthService = {
     });
 
     return data.sendMagicLink;
+  },
+
+  async verifyMagicLink({ hash }: { hash: string }): Promise<User> {
+    const { data } = await apolloClient.mutate({
+      mutation: VERIFY_MAGIC_LINK,
+      variables: {
+        hash,
+      },
+    });
+
+    return data.verifyMagicLink;
   },
 
   async signout(): Promise<Boolean> {

@@ -42,7 +42,7 @@ const Profile = () => {
           <Avatar src={session.avatar} sx={{ width: "160px", height: "160px" }}>
             <AccountCircle sx={{ fontSize: 160 }} />
           </Avatar>
-          <Stack alignItems={{ xs: "center", md: "initial" }}>
+          <Stack alignItems={{ xs: "center", md: "initial" }} spacing={0.5}>
             <Typography
               variant="h3"
               component="h1"
@@ -54,19 +54,17 @@ const Profile = () => {
             >
               {session.username}
             </Typography>
-            {session.ens ? (
-              <Typography
-                variant="body1"
-                color="textSecondary"
-                noWrap
-                sx={{
-                  maxWidth: { xs: 200, sm: "initial" },
-                  textAlign: { xs: "center", md: "start" },
-                }}
-              >
-                {session.siweMessage?.address}
-              </Typography>
-            ) : null}
+            <Typography
+              variant="body1"
+              color="textSecondary"
+              noWrap
+              sx={{
+                maxWidth: { xs: 200, sm: "initial" },
+                textAlign: { xs: "center", md: "start" },
+              }}
+            >
+              {session.user?.ethAddress}
+            </Typography>
           </Stack>
         </Stack>
         <Stack spacing={3}>
