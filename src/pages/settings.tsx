@@ -12,13 +12,14 @@ import { useAuth } from "modules/auth/hooks/useAuth";
 import { AuthWall } from "common/components/AuthWall";
 
 const settingsTabs = [
+  { label: "Profile", value: "profile" },
   { label: "Email", value: "email" },
   { label: "Web3 connection", value: "web3connection" },
   { label: "API Keys", value: "apiKeys" },
 ];
 
 const Settings = () => {
-  const [activeTab, setActiveTab] = useState("email");
+  const [activeTab, setActiveTab] = useState("profile");
   const { session } = useAuth();
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("md"));

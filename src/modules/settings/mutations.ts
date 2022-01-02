@@ -8,6 +8,14 @@ export const UPDATE_EMAIL = gql`
   }
 `;
 
+export const CONNECT_ETHEREUM_WALLET = gql`
+  mutation ConnectEthereumWallet($address: String!) {
+    connectEthereumWallet(address: $address) {
+      ethAddress
+    }
+  }
+`;
+
 export const GENERATE_NEW_API_KEY = gql`
   mutation GenerateAPIKey {
     generateAPIKey

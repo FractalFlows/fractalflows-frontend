@@ -1,9 +1,9 @@
-import { FC } from "react";
+import { FC, ReactNode } from "react";
 import { Divider, Stack, Typography } from "@mui/material";
 
 export interface TabPanelProps {
-  title: string;
-  description: string;
+  title: string | ReactNode;
+  description: string | ReactNode;
 }
 
 export const TabPanel: FC<TabPanelProps> = ({

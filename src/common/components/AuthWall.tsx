@@ -70,9 +70,9 @@ export const AuthWall = () => {
         {chosenSignInMethod === SignInMethod.MAGIC_LINK ? (
           <Stack sx={{ alignSelf: "center" }}>
             {hasMagicLinkBeenSent ? (
-              <Typography variant="body1">
+              <Typography variant="body1" align="center">
                 We sent an email to you at <b>{getValues("email")}</b>. It has a
-                magic link that'll sign you in.
+                magic link that&apos;ll sign you in.
               </Typography>
             ) : (
               <form onSubmit={handleSubmitHook(handleSubmit)}>
@@ -92,7 +92,7 @@ export const AuthWall = () => {
                       errors,
                     })}
                   />
-                  <Stack spacing={2}>
+                  <Stack spacing={1}>
                     <LoadingButton
                       type="submit"
                       size="large"

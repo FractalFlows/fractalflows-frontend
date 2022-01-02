@@ -46,7 +46,7 @@ export const Email = () => {
   return (
     <TabPanel
       title="Email"
-      description="Use email to login and receive app notifications"
+      description="Use your email address to sign in and receive app notifications"
     >
       <form onSubmit={handleSubmitHook(handleSubmit)}>
         <Stack spacing={3}>

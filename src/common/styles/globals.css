@@ -43,3 +43,10 @@ a {
   padding-right: var(--fractalflows-gutter-page-sm);
   padding-left: var(--fractalflows-gutter-page-sm);
 }
+
+code {
+  display: inline-block;
+  padding: 0px 3px;
+  border-radius: 3px;
+  background-color: #eee;
+}

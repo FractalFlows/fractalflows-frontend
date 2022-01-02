@@ -5,8 +5,13 @@ import {
   Stack,
   TextField,
   Tooltip,
+  Button,
+  Link as MuiLink,
 } from "@mui/material";
-import { ContentCopy } from "@mui/icons-material";
+import {
+  ContentCopy as ContentCopyIcon,
+  Launch as LaunchIcon,
+} from "@mui/icons-material";
 import { useSnackbar } from "notistack";
 import { LoadingButton } from "@mui/lab";
 
@@ -110,13 +115,26 @@ export const APIKeys = () => {
   return (
     <TabPanel
       title="API Keys"
-      description="Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. "
+      description={
+        <>
+          Place your API Key in the <code>fractalflows-api-key</code> HTTP
+          header to authenticate.
+          <br />
+          <MuiLink
+            href="https://server.fractalflows.com/graphql"
+            target="_blank"
+            rel="noreferrer"
+            sx={{ display: "block", mt: 1 }}
+          >
+            Checkout the API documentation <LaunchIcon fontSize="inherit" />
+          </MuiLink>
+        </>
+      }
     >
       <Stack spacing={3}>
         {apiKey ? (
           <form>
             <TextField
-              id="filled-adornment-password"
               value={apiKey}
               fullWidth
               InputProps={{
@@ -132,7 +150,7 @@ export const APIKeys = () => {
                         onClick={handleCopyAPIKeyClick}
                         edge="end"
                       >
-                        <ContentCopy />
+                        <ContentCopyIcon />
                       </IconButton>
                     </Tooltip>
                   </InputAdornment>
@@ -141,13 +159,13 @@ export const APIKeys = () => {
             />
           </form>
         ) : null}
-        <Stack direction="row" spacing={2}>
+        <Stack direction={{ xs: "column", sm: "row" }} spacing={1}>
           <LoadingButton
             loading={apiKeyState === APIKeyState.GENERATING}
             variant="contained"
             size="large"
             onClick={handleGenerateAPIKeyClick}
-            sx={{ alignSelf: "start" }}
+            sx={{ alignSelf: { xs: "initial", sm: "start" } }}
           >
             Generate {apiKey ? "new" : ""} API Key
           </LoadingButton>
@@ -158,7 +176,7 @@ export const APIKeys = () => {
               color="secondary"
               size="large"
               onClick={handleRemoveAPIKeyClick}
-              sx={{ alignSelf: "start" }}
+              sx={{ alignSelf: { xs: "initial", sm: "start" } }}
             >
               Remove API Key
             </LoadingButton>
