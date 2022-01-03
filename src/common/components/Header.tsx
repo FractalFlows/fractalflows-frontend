@@ -219,7 +219,7 @@ export const Header = () => {
           </Search>
           <Box sx={{ flexGrow: 1 }} />
           <Box sx={{ display: { xs: "none", md: "flex" } }}>
-            <Stack direction="row" spacing={2}>
+            <Stack direction="row" alignItems="center" spacing={2}>
               <Link href="/claim/new">
                 <Button variant="text" color="primaryContrast">
                   Host new claim

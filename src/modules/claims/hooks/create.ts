@@ -1,5 +1,5 @@
 import { ClaimsService } from "../services/claims";
-import { Claim } from "../interfaces";
+import type { Claim } from "../interfaces";
 
-export const createClaim = async ({ claim }: { claim: Claim }) =>
+export const createClaim = async ({ claim }: { claim: ClaimProps }) =>
   await ClaimsService.createClaim({ claim });

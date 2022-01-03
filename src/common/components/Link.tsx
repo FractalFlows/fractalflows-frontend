@@ -3,6 +3,6 @@ import NextLink, { LinkProps } from "next/link";
 
 export const Link: FC<LinkProps> = ({ children, ...props }) => (
   <NextLink {...props} passHref>
-    <a style={{ display: "flex" }}>{children}</a>
+    <a style={{ display: "block" }}>{children}</a>
   </NextLink>
 );

@@ -1,13 +1,13 @@
 import { Stack } from "@mui/material";
 
-import { Claim } from "../interfaces";
+import type { ClaimProps } from "../interfaces";
 import { ClaimTile } from "./ClaimTIle";
 
 export interface ClaimsListProps {
-  claims: Claim[];
+  claims: ClaimProps[];
 }
 
-export const ClaimsList = ({ claims }: ClaimsListProps) => {
+export const ClaimsList = ({ claims = [] }: ClaimsListProps) => {
   return (
     <Stack spacing={1}>
       {claims.map((claim) => (

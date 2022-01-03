@@ -4,11 +4,11 @@ import { Typography, Box } from "@mui/material";
 import type { NextPage } from "next";
 
 import { useClaims } from "modules/claims/hooks/useClaims";
-import { Claim } from "modules/claims/interfaces";
+import type { ClaimProps } from "modules/claims/interfaces";
 
 const Claim: NextPage = () => {
   const { getClaim } = useClaims();
-  const [claim, setClaim] = useState<Claim>({} as Claim);
+  const [claim, setClaim] = useState<ClaimProps>({} as ClaimProps);
   const router = useRouter();
   const { slug }: { slug?: string } = router.query;
 

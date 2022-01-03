@@ -13,7 +13,7 @@ export interface Attributions {
   identifier: string;
 }
 
-export interface Claim {
+export interface ClaimProps {
   title: string;
   summary: string;
   slug: string;

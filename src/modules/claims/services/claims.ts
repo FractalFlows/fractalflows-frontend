@@ -1,11 +1,12 @@
 import { apolloClient } from "common/services/apollo/client";
 
 import { CREATE_CLAIM } from "../mutations";
-import { GET_CLAIM } from "../queries";
-import { Claim } from "../interfaces";
+import { GET_CLAIM, GET_CLAIMS, GET_TRENDING_CLAIMS } from "../queries";
+import type { ClaimProps } from "../interfaces";
+import { PaginationProps } from "modules/interfaces";
 
 export const ClaimsService = {
-  async createClaim({ claim }: { claim: Claim }): Promise<Claim> {
+  async createClaim({ claim }: { claim: ClaimProps }): Promise<ClaimProps> {
     const { data } = await apolloClient.mutate({
       mutation: CREATE_CLAIM,
       variables: {
@@ -16,7 +17,7 @@ export const ClaimsService = {
     return data.createClaim;
   },
 
-  async getClaim({ slug }: { slug: string }): Promise<Claim> {
+  async getClaim({ slug }: { slug: string }): Promise<ClaimProps> {
     const { data } = await apolloClient.query({
       query: GET_CLAIM,
       variables: {
@@ -25,5 +26,32 @@ export const ClaimsService = {
     });
 
     return data.claim;
+  },
+
+  async getClaims({ limit, offset }: PaginationProps): Promise<ClaimProps[]> {
+    const { data } = await apolloClient.query({
+      query: GET_CLAIMS,
+      variables: {
+        limit,
+        offset,
+      },
+    });
+
+    return data.claims;
+  },
+
+  async getTrendingClaims({
+    limit,
+    offset,
+  }: PaginationProps): Promise<ClaimProps[]> {
+    const { data } = await apolloClient.query({
+      query: GET_TRENDING_CLAIMS,
+      variables: {
+        limit,
+        offset,
+      },
+    });
+
+    return data.trendingClaims;
   },
 };

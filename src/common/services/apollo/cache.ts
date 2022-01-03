@@ -12,6 +12,12 @@ const cacheOptions = {
         isSignedIn: {
           read: () => AuthCache.isSignedInVar(),
         },
+        trendingClaims: {
+          keyArgs: false,
+          merge(existing = [], incoming = []) {
+            return [...existing, ...incoming];
+          },
+        },
       },
     },
   },
