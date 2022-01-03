@@ -8,11 +8,11 @@ import {
   CREATE_API_KEY,
   REMOVE_API_KEY,
 } from "../mutations";
-import { APIKeyProps, UpdateProfileProps } from "../interfaces";
-import { User } from "modules/users/interfaces";
+import type { APIKeyProps, UpdateProfileProps } from "../interfaces";
+import type { UserProps } from "modules/users/interfaces";
 
 export const SettingsService = {
-  async updateProfile(profile: UpdateProfileProps): Promise<User> {
+  async updateProfile(profile: UpdateProfileProps): Promise<UserProps> {
     const { data } = await apolloClient.mutate({
       mutation: UPDATE_PROFILE,
       variables: {

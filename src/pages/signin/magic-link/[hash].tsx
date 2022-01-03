@@ -19,7 +19,7 @@ const MagicLinkVerification = () => {
       MagicLinkVerificationStatus.VERIFYING
     );
   const [magicLinkVerificationError, setMagicLinkVerificationError] =
-    useState<Error>({});
+    useState<Error>();
 
   useEffect(() => {
     if (hash) {
@@ -62,7 +62,7 @@ const MagicLinkVerification = () => {
           <>
             <ErrorIcon sx={{ fontSize: 70 }} color="error" />
             <Typography variant="body1" align="center">
-              {magicLinkVerificationError.message}
+              {magicLinkVerificationError?.message}
             </Typography>
           </>
         );

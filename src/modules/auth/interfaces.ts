@@ -1,9 +1,9 @@
-import type { User } from "modules/user/interfaces";
+import type { UserProps } from "modules/users/interfaces";
 import type { SiweMessage } from "siwe";
 
 export interface Session {
   siweMessage?: SiweMessage;
-  user: User;
+  user: UserProps;
 }
 
 export enum SignInMethod {

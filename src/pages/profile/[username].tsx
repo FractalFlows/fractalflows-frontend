@@ -25,7 +25,7 @@ const Profile = () => {
   const [activeTab, setActiveTab] = useState<UserClaimRelation>(
     UserClaimRelation.OWN
   );
-  const [profile, setProfile] = useState<ProfileProps>({});
+  const [profile, setProfile] = useState<ProfileProps>();
   const [claims, setClaims] = useState<Claim[]>([]);
 
   useEffect(() => {

@@ -1,9 +1,8 @@
 import { apolloClient } from "common/services/apollo/client";
 
 import { CREATE_CLAIM } from "../mutations";
-import { GET_CLAIM, GET_USER_CLAIMS } from "../queries";
-import { Claim, GetUserClaimsProps, UserClaimRelation } from "../interfaces";
-import { Profile } from "modules/user/interfaces";
+import { GET_CLAIM } from "../queries";
+import { Claim } from "../interfaces";
 
 export const ClaimsService = {
   async createClaim({ claim }: { claim: Claim }): Promise<Claim> {
@@ -26,20 +25,5 @@ export const ClaimsService = {
     });
 
     return data.claim;
-  },
-
-  async getUserClaims({
-    username,
-    relation,
-  }: GetUserClaimsProps): Promise<{ profile: Profile; userClaims: Claim[] }> {
-    const { data } = await apolloClient.query({
-      query: GET_USER_CLAIMS,
-      variables: {
-        username,
-        relation,
-      },
-    });
-
-    return data;
   },
 };

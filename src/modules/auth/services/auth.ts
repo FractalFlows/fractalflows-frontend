@@ -8,7 +8,8 @@ import {
   VERIFY_MAGIC_LINK,
   SIGN_OUT,
 } from "../mutations";
-import { Session, User } from "../interfaces";
+import type { Session } from "../interfaces";
+import type { UserProps } from "../../users/interfaces";
 
 export const AuthService = {
   async getNonce(): Promise<string> {
@@ -37,7 +38,7 @@ export const AuthService = {
     siweMessage: SiweMessage;
     ens?: string;
     avatar?: string;
-  }): Promise<User> {
+  }): Promise<UserProps> {
     const { data } = await apolloClient.mutate({
       mutation: SIGN_IN_WITH_ETHEREUM,
       variables: {
@@ -63,7 +64,7 @@ export const AuthService = {
     return data.sendMagicLink;
   },
 
-  async verifyMagicLink({ hash }: { hash: string }): Promise<User> {
+  async verifyMagicLink({ hash }: { hash: string }): Promise<UserProps> {
     const { data } = await apolloClient.mutate({
       mutation: VERIFY_MAGIC_LINK,
       variables: {

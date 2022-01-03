@@ -48,7 +48,7 @@ export const AuthWall = () => {
 
     try {
       await signInWithEthereum(signInCallback);
-    } catch (e) {
+    } catch (e: any) {
       enqueueSnackbar(e.message || e, {
         variant: "error",
       });

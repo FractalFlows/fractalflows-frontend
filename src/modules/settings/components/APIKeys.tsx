@@ -85,7 +85,7 @@ export const APIKeys = () => {
     }
   };
 
-  const handleCopyAPIKeyClick = (text: string) => {
+  const handleCopyAPIKeyClick = (text: string = "") => {
     navigator.clipboard.writeText(text).then(
       () => {
         setCopyAPIKeyTooltipText(CopyAPIKeyTooltipTextState.COPIED);
@@ -167,7 +167,7 @@ export const APIKeys = () => {
                         >
                           <IconButton
                             aria-label="Copy API Key to clipboard"
-                            onClick={() => handleCopyAPIKeyClick(apiKey.key)}
+                            onClick={() => handleCopyAPIKeyClick(apiKey?.key)}
                             edge="end"
                           >
                             <ContentCopyIcon />
@@ -192,7 +192,9 @@ export const APIKeys = () => {
                         >
                           <IconButton
                             aria-label="Copy API Secret to clipboard"
-                            onClick={() => handleCopyAPIKeyClick(apiKey.secret)}
+                            onClick={() =>
+                              handleCopyAPIKeyClick(apiKey?.secret)
+                            }
                             edge="end"
                           >
                             <ContentCopyIcon />
