@@ -1,5 +1,13 @@
 import { gql } from "@apollo/client";
 
+export const UPDATE_PROFILE = gql`
+  mutation UpdateProfile($updateProfileInput: UpdateProfileInput!) {
+    updateProfile(updateProfileInput: $updateProfileInput) {
+      id
+    }
+  }
+`;
+
 export const UPDATE_EMAIL = gql`
   mutation UpdateEmail($email: String!) {
     updateEmail(email: $email) {

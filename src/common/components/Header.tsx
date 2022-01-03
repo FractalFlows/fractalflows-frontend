@@ -68,7 +68,11 @@ export const Header = () => {
   const isMenuOpen = Boolean(anchorEl);
   const isMobileMenuOpen = Boolean(mobileMoreAnchorEl);
 
-  const { signout, session, isSignedIn } = useAuth();
+  const {
+    signout,
+    session: { user },
+    isSignedIn,
+  } = useAuth();
 
   const handleProfileMenuOpen = (event: React.MouseEvent<HTMLElement>) => {
     setAnchorEl(event.currentTarget);
@@ -104,9 +108,14 @@ export const Header = () => {
       }}
       open={isMenuOpen}
       onClose={handleMenuClose}
+      sx={{
+        maxWidth: "250px",
+      }}
     >
       <MenuItem disabled sx={{ ...renderMenuOnlyOnMobile, fontWeight: 700 }}>
-        {session.username}
+        <span className="text-overflow-ellipsis" title={user?.username}>
+          {user?.username}
+        </span>
       </MenuItem>
       <Link href="/profile">
         <MenuItem onClick={handleMenuClose}>Profile</MenuItem>
@@ -174,7 +183,7 @@ export const Header = () => {
 
   const userAvatar = (
     <Avatar
-      src={session.avatar}
+      src={user?.avatar}
       sx={{
         width: 35,
         height: 35,
@@ -240,8 +249,9 @@ export const Header = () => {
                           textTransform: "initial",
                           maxWidth: 150,
                         }}
+                        title={user?.username}
                       >
-                        {session.username}
+                        {user?.username}
                       </Typography>
                     </Stack>
                   </Button>

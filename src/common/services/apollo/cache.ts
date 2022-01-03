@@ -1,5 +1,4 @@
 import { InMemoryCache } from "@apollo/client";
-import { isEmpty } from "lodash-es";
 
 import { AuthCache } from "modules/auth/cache";
 
@@ -8,21 +7,7 @@ const cacheOptions = {
     Query: {
       fields: {
         session: {
-          read: () => {
-            const sessionVar = AuthCache.sessionVar();
-
-            if (isEmpty(sessionVar)) {
-              return {};
-            } else {
-              return {
-                ...sessionVar,
-                username:
-                  sessionVar.ens ||
-                  sessionVar.user.email ||
-                  sessionVar?.user?.ethAddress,
-              };
-            }
-          },
+          read: () => AuthCache.sessionVar(),
         },
         isSignedIn: {
           read: () => AuthCache.isSignedInVar(),

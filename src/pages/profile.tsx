@@ -18,7 +18,9 @@ const profileTabs: {
 ];
 
 const Profile = () => {
-  const { session } = useAuth();
+  const {
+    session: { user },
+  } = useAuth();
   const { getUserClaims } = useClaims();
   const [activeTab, setActiveTab] = useState<UserClaimRelation>(
     UserClaimRelation.OWN
@@ -39,7 +41,7 @@ const Profile = () => {
           spacing={4}
           alignItems="center"
         >
-          <Avatar src={session.avatar} sx={{ width: "160px", height: "160px" }}>
+          <Avatar src={user?.avatar} sx={{ width: "160px", height: "160px" }}>
             <AccountCircle sx={{ fontSize: 160 }} />
           </Avatar>
           <Stack alignItems={{ xs: "center", md: "initial" }} spacing={0.5}>
@@ -48,23 +50,27 @@ const Profile = () => {
               component="h1"
               noWrap
               sx={{
-                maxWidth: { xs: 300, sm: "initial" },
+                maxWidth: { xs: 300, sm: 600 },
                 textAlign: { xs: "center", md: "start" },
               }}
+              title={user?.username}
             >
-              {session.username}
+              {user?.username}
             </Typography>
-            <Typography
-              variant="body1"
-              color="textSecondary"
-              noWrap
-              sx={{
-                maxWidth: { xs: 200, sm: "initial" },
-                textAlign: { xs: "center", md: "start" },
-              }}
-            >
-              {session.user?.ethAddress}
-            </Typography>
+            {user?.ethAddress && user?.ethAddress !== user?.username ? (
+              <Typography
+                variant="body1"
+                color="textSecondary"
+                noWrap
+                sx={{
+                  maxWidth: { xs: 200, sm: "initial" },
+                  textAlign: { xs: "center", md: "start" },
+                }}
+                title={user?.ethAddress}
+              >
+                {user?.ethAddress}
+              </Typography>
+            ) : null}
           </Stack>
         </Stack>
         <Stack spacing={3}>

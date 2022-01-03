@@ -67,75 +67,82 @@ export const AuthWall = () => {
             {getSubtitle()}
           </Typography>
         </Stack>
-        {chosenSignInMethod === SignInMethod.MAGIC_LINK ? (
-          <Stack sx={{ alignSelf: "center" }}>
-            {hasMagicLinkBeenSent ? (
-              <Typography variant="body1" align="center">
-                We sent an email to you at <b>{getValues("email")}</b>. It has a
-                magic link that&apos;ll sign you in.
-              </Typography>
-            ) : (
-              <form onSubmit={handleSubmitHook(handleSubmit)}>
-                <Stack spacing={3}>
-                  <TextField
-                    label="Email"
-                    fullWidth
-                    {...registerMui({
-                      register,
-                      name: "email",
-                      props: {
-                        required: true,
-                        validate: {
-                          email: (email: string) => validateEmail(email),
+        <Box
+          sx={{
+            alignSelf: { xs: "initial", sm: "center" },
+            width: { xs: "initial", sm: "350px" },
+          }}
+        >
+          {chosenSignInMethod === SignInMethod.MAGIC_LINK ? (
+            <>
+              {hasMagicLinkBeenSent ? (
+                <Typography variant="body1" align="center">
+                  We sent an email to you at <b>{getValues("email")}</b>. It has
+                  a magic link that&apos;ll sign you in.
+                </Typography>
+              ) : (
+                <form onSubmit={handleSubmitHook(handleSubmit)}>
+                  <Stack spacing={3}>
+                    <TextField
+                      label="Email"
+                      fullWidth
+                      {...registerMui({
+                        register,
+                        name: "email",
+                        props: {
+                          required: true,
+                          validate: {
+                            email: (email: string) => validateEmail(email),
+                          },
                         },
-                      },
-                      errors,
-                    })}
-                  />
-                  <Stack spacing={1}>
-                    <LoadingButton
-                      type="submit"
-                      size="large"
-                      loading={isSubmitting}
-                      variant="contained"
-                    >
-                      Send magic link
-                    </LoadingButton>
-                    <Button
-                      variant="contained"
-                      color="secondary"
-                      size="large"
-                      onClick={() => setChosenSignInMethod(undefined)}
-                    >
-                      Go back
-                    </Button>
+                        errors,
+                      })}
+                    />
+                    <Stack spacing={2}>
+                      <LoadingButton
+                        type="submit"
+                        size="large"
+                        loading={isSubmitting}
+                        variant="contained"
+                      >
+                        Send magic link
+                      </LoadingButton>
+                      <Button
+                        variant="contained"
+                        color="secondary"
+                        size="large"
+                        onClick={() => setChosenSignInMethod(undefined)}
+                      >
+                        Go back
+                      </Button>
+                    </Stack>
                   </Stack>
-                </Stack>
-              </form>
-            )}
-          </Stack>
-        ) : (
-          <Stack sx={{ alignSelf: "center" }} spacing={2}>
-            <Button
-              variant="contained"
-              color="primary"
-              size="large"
-              startIcon={<i className="fab fa-ethereum"></i>}
-              onClick={() => signInWithEthereum(signInCallback)}
-            >
-              Sign in with Ethereum
-            </Button>
+                </form>
+              )}
+            </>
+          ) : (
+            <Stack spacing={2}>
+              <Button
+                variant="contained"
+                color="primary"
+                size="large"
+                startIcon={<i className="fab fa-ethereum"></i>}
+                onClick={() => signInWithEthereum(signInCallback)}
+              >
+                Sign in with Ethereum
+              </Button>
 
-            <Button
-              variant="contained"
-              color="secondary"
-              size="large"
-              onClick={() => setChosenSignInMethod(SignInMethod.MAGIC_LINK)}
-            >
-              Continue with email
-            </Button>
-          </Stack>
-        )}
+              <Button
+                variant="contained"
+                color="secondary"
+                size="large"
+                onClick={() => setChosenSignInMethod(SignInMethod.MAGIC_LINK)}
+              >
+                Continue with email
+              </Button>
+            </Stack>
+          )}
+        </Box>
       </Stack>
     </Box>
   );

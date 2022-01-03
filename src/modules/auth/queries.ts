@@ -13,11 +13,13 @@ export const GET_SESSION = gql`
         address
         chainId
       }
-      ens
-      avatar
       user {
         ethAddress
         email
+        username
+        usernameSource
+        avatar
+        avatarSource
       }
     }
   }

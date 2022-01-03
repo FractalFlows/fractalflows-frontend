@@ -1,8 +1,9 @@
 import {
-  Select as MuiSelect,
+  RadioGroup as MuiRadioGroup,
+  Radio,
+  FormControlLabel,
   FormControl,
-  InputLabel,
-  MenuItem,
+  FormLabel,
 } from "@mui/material";
 import { Controller } from "react-hook-form";
 import type { FieldErrors } from "react-hook-form";
@@ -10,52 +11,47 @@ import { get } from "lodash-es";
 
 import { getFormErrorHelperText } from "common/utils/getFormErrorHelperText";
 
-export interface SelectOptionProps {
+export interface RadioGroupOptionsProps {
   label: string;
   value: string;
+  disabled?: boolean;
 }
 
-export interface SelectProps {
+export interface RadioGroupProps {
   name: string;
-  label: string;
+  label?: string;
   control: any;
-  options: SelectOptionProps[];
+  options: RadioGroupOptionsProps[];
   errors: FieldErrors;
   rules?: any;
-  fullWidth?: boolean;
   sx?: any;
 }
 
-export const Select = ({
+export const RadioGroup = ({
   name,
   label,
   errors,
   options,
   rules,
   control,
-  ...selectProps
-}: SelectProps) => (
+  ...radioGroupProps
+}: RadioGroupProps) => (
   <FormControl>
-    <InputLabel id={`${name}-select-label`} error={get(errors, name)}>
-      {label}
-    </InputLabel>
+    {label ? <FormLabel error={get(errors, name)}>{label}</FormLabel> : null}
 
     <Controller
       render={({ field: controllerProps }) => (
-        <MuiSelect
-          labelId={`${name}-select-label`}
-          label={label}
-          fullWidth
-          error={!!get(errors, name)}
-          {...selectProps}
-          {...controllerProps}
-        >
+        <MuiRadioGroup {...radioGroupProps} {...controllerProps}>
           {options.map((option) => (
-            <MenuItem value={option.value} key={option.value}>
-              {option.label}
-            </MenuItem>
+            <FormControlLabel
+              value={option.value}
+              label={option.label}
+              disabled={option.disabled}
+              control={<Radio />}
+              key={option.value}
+            />
           ))}
-        </MuiSelect>
+        </MuiRadioGroup>
       )}
       name={name}
       control={control}

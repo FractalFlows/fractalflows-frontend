@@ -102,7 +102,6 @@ export const APIKeys = () => {
   useEffect(() => {
     getAPIKey()
       .then((apiKey) => {
-        console.log(apiKey);
         setAPIKey(apiKey);
       })
       .catch((e) =>

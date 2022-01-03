@@ -15,7 +15,7 @@ export const AuthService = {
     return (
       await apolloClient.query({
         query: GET_NONCE,
-        fetchPolicy: "network-only",
+        fetchPolicy: "no-cache",
       })
     )?.data?.nonce;
   },
@@ -24,7 +24,7 @@ export const AuthService = {
     return (
       await apolloClient.query({
         query: GET_SESSION,
-        fetchPolicy: "network-only",
+        fetchPolicy: "no-cache",
       })
     )?.data?.session;
   },

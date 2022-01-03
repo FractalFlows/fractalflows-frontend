@@ -23,3 +23,19 @@ export interface Claim {
   tags?: Tag[];
   attributions?: Attributions[];
 }
+
+export enum UsernameSource {
+  ENS = "ENS",
+  CUSTOM = "CUSTOM",
+}
+
+export enum AvatarSource {
+  ENS = "ENS",
+  GRAVATAR = "GRAVATAR",
+}
+
+export interface UpdateProfileProps {
+  usernameSource: UsernameSource;
+  username: string;
+  avatarSource: AvatarSource;
+}

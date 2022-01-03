@@ -20,7 +20,6 @@ export const Email = () => {
   const currentEmail = session.user?.email;
 
   const {
-    control,
     register,
     formState: { errors, isSubmitting },
     handleSubmit: handleSubmitHook,
@@ -70,7 +69,7 @@ export const Email = () => {
             loading={isSubmitting}
             variant="contained"
             size="large"
-            sx={{ alignSelf: "start" }}
+            sx={{ alignSelf: { xs: "initial", sm: "start" } }}
           >
             {currentEmail ? "Save" : "Add"}
           </LoadingButton>

@@ -8,6 +8,7 @@ import { isEmpty } from "lodash-es";
 import { Email } from "modules/settings/components/Email";
 import { Web3Connection } from "modules/settings/components/Web3Connection";
 import { APIKeys } from "modules/settings/components/APIKeys";
+import { Profile } from "modules/settings/components/Profile";
 import { useAuth } from "modules/auth/hooks/useAuth";
 import { AuthWall } from "common/components/AuthWall";
 
@@ -51,6 +52,9 @@ const Settings = () => {
               </TabList>
             </Paper>
 
+            <TabPanel value="profile">
+              <Profile />
+            </TabPanel>
             <TabPanel value="email">
               <Email />
             </TabPanel>
