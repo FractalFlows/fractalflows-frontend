@@ -18,7 +18,7 @@ export const validateTwitterHandle = (handle: string) =>
   /^@(?=.*\w)[\w]{1,15}$/.test(handle);
 
 export const validateCustomUsernameCharacters = (customUsername: string) =>
-  /^(?=.*\w)[\w]*$/.test(customUsername);
+  /^(?=.*\w)[\w\.]*$/.test(customUsername);
 
 export const validateCustomUsernameMinLength = (customUsername: string) =>
   customUsername.length >= 4;

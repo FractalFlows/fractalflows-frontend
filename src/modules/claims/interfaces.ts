@@ -29,3 +29,8 @@ export enum UserClaimRelation {
   CONTRIBUTED = "CONTRIBUTED",
   FOLLOWING = "FOLLOWING",
 }
+
+export interface GetUserClaimsProps {
+  username: string;
+  relation: UserClaimRelation;
+}

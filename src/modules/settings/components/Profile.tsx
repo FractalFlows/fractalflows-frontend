@@ -1,7 +1,8 @@
-import { Box, Stack, TextField, Typography } from "@mui/material";
+import { Box, Stack, TextField } from "@mui/material";
 import { useSnackbar } from "notistack";
 import { useForm } from "react-hook-form";
 import { LoadingButton } from "@mui/lab";
+import { isEmpty } from "lodash-es";
 
 import { registerMui } from "common/utils/registerMui";
 import { useSettings } from "../hooks/useSettings";
@@ -13,7 +14,6 @@ import {
   validateCustomUsernameMinLength,
   validateCustomUsernameMaxLength,
 } from "common/utils/validate";
-import { isEmpty } from "lodash-es";
 import {
   AvatarSource,
   UpdateProfileProps,
@@ -43,7 +43,7 @@ export const Profile = () => {
   const isEthereumWalletConnected = user?.ethAddress ? true : false;
   const usernameSourceOptions = [
     {
-      label: "Use my Primary ENS name (or Ethereum address)",
+      label: "Use my primary ENS name (or Ethereum address)",
       value: UsernameSource.ENS,
       disabled: isEthereumWalletConnected === false,
     },
@@ -55,7 +55,11 @@ export const Profile = () => {
       value: AvatarSource.ENS,
       disabled: isEthereumWalletConnected === false,
     },
-    { label: "Gravatar", value: AvatarSource.GRAVATAR },
+    {
+      label: "Gravatar",
+      value: AvatarSource.GRAVATAR,
+      disabled: isEmpty(user?.email),
+    },
   ];
 
   const handleSubmit = async ({

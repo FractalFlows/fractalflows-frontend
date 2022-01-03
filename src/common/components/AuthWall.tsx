@@ -32,7 +32,7 @@ export const AuthWall = () => {
   const { enqueueSnackbar } = useSnackbar();
   const router = useRouter();
 
-  const handleSubmit = async ({ email }: MagicLinkFormProps) => {
+  const handleMagicLinkFormSubmit = async ({ email }: MagicLinkFormProps) => {
     try {
       await sendMagicLink({ email });
       setHasMagicLinkBeenSent(true);
@@ -40,6 +40,20 @@ export const AuthWall = () => {
       enqueueSnackbar(e.message, {
         variant: "error",
       });
+    }
+  };
+
+  const handleEthereumSignIn = async () => {
+    setChosenSignInMethod(SignInMethod.ETHEREUM);
+
+    try {
+      await signInWithEthereum(signInCallback);
+    } catch (e) {
+      enqueueSnackbar(e.message || e, {
+        variant: "error",
+      });
+    } finally {
+      setChosenSignInMethod(undefined);
     }
   };
 
@@ -81,7 +95,7 @@ export const AuthWall = () => {
                   a magic link that&apos;ll sign you in.
                 </Typography>
               ) : (
-                <form onSubmit={handleSubmitHook(handleSubmit)}>
+                <form onSubmit={handleSubmitHook(handleMagicLinkFormSubmit)}>
                   <Stack spacing={3}>
                     <TextField
                       label="Email"
@@ -122,15 +136,16 @@ export const AuthWall = () => {
             </>
           ) : (
             <Stack spacing={2}>
-              <Button
+              <LoadingButton
                 variant="contained"
                 color="primary"
+                loading={chosenSignInMethod === SignInMethod.ETHEREUM}
                 size="large"
                 startIcon={<i className="fab fa-ethereum"></i>}
-                onClick={() => signInWithEthereum(signInCallback)}
+                onClick={handleEthereumSignIn}
               >
                 Sign in with Ethereum
-              </Button>
+              </LoadingButton>
 
               <Button
                 variant="contained"

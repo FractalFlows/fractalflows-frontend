@@ -2,11 +2,12 @@ import { useEffect, useState } from "react";
 import { AccountCircle } from "@mui/icons-material";
 import { TabContext, TabList, TabPanel } from "@mui/lab";
 import { Avatar, Box, Paper, Stack, Tab, Typography } from "@mui/material";
+import { useRouter } from "next/router";
 
-import { useAuth } from "modules/auth/hooks/useAuth";
 import { useClaims } from "modules/claims/hooks/useClaims";
 import { ClaimsList } from "modules/claims/components/ClaimsList";
 import { Claim, UserClaimRelation } from "modules/claims/interfaces";
+import { Profile } from "modules/user/interfaces";
 
 const profileTabs: {
   label: string;
@@ -18,20 +19,23 @@ const profileTabs: {
 ];
 
 const Profile = () => {
-  const {
-    session: { user },
-  } = useAuth();
+  const router = useRouter();
+  const { username }: { username?: string } = router.query;
   const { getUserClaims } = useClaims();
   const [activeTab, setActiveTab] = useState<UserClaimRelation>(
     UserClaimRelation.OWN
   );
+  const [profile, setProfile] = useState<Profile>({});
   const [claims, setClaims] = useState<Claim[]>([]);
 
   useEffect(() => {
-    getUserClaims({ relation: activeTab }).then((data) => {
-      setClaims(data);
-    });
-  }, [activeTab, getUserClaims]);
+    if (username) {
+      getUserClaims({ username, relation: activeTab }).then((data) => {
+        setProfile(data.profile);
+        setClaims(data.userClaims);
+      });
+    }
+  }, [activeTab, username, getUserClaims]);
 
   return (
     <Box className="container page">
@@ -41,7 +45,10 @@ const Profile = () => {
           spacing={4}
           alignItems="center"
         >
-          <Avatar src={user?.avatar} sx={{ width: "160px", height: "160px" }}>
+          <Avatar
+            src={profile?.avatar}
+            sx={{ width: "160px", height: "160px" }}
+          >
             <AccountCircle sx={{ fontSize: 160 }} />
           </Avatar>
           <Stack alignItems={{ xs: "center", md: "initial" }} spacing={0.5}>
@@ -53,11 +60,12 @@ const Profile = () => {
                 maxWidth: { xs: 300, sm: 600 },
                 textAlign: { xs: "center", md: "start" },
               }}
-              title={user?.username}
+              title={profile?.username}
             >
-              {user?.username}
+              {profile?.username}
             </Typography>
-            {user?.ethAddress && user?.ethAddress !== user?.username ? (
+            {profile?.ethAddress &&
+            profile?.ethAddress !== profile?.username ? (
               <Typography
                 variant="body1"
                 color="textSecondary"
@@ -66,9 +74,9 @@ const Profile = () => {
                   maxWidth: { xs: 200, sm: "initial" },
                   textAlign: { xs: "center", md: "start" },
                 }}
-                title={user?.ethAddress}
+                title={profile?.ethAddress}
               >
-                {user?.ethAddress}
+                {profile?.ethAddress}
               </Typography>
             ) : null}
           </Stack>

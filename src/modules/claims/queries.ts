@@ -12,8 +12,14 @@ export const GET_CLAIM = gql`
 `;
 
 export const GET_USER_CLAIMS = gql`
-  query GetUserClaims($relation: UserClaimRelation!) {
-    userClaims(relation: $relation) {
+  query GetUserClaims($username: String!, $relation: UserClaimRelation!) {
+    profile(username: $username) {
+      username
+      avatar
+      ethAddress
+    }
+
+    userClaims(username: $username, relation: $relation) {
       id
       title
       summary

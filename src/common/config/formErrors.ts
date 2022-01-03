@@ -4,7 +4,7 @@ export enum FORM_ERRORS {
   doi = "Invalid DOI",
   email = "Invalid email",
   twitterHandle = "Invalid Twitter handle",
-  customUsernameCharacters = "You can only use letters, numbers and underlines",
+  customUsernameCharacters = "You can only use letters, numbers, underlines and dots",
   customUsernameMinLength = "Username must have at least 4 characters",
   customUsernameMaxLength = "Username must have at maximum 15 characters",
 }
