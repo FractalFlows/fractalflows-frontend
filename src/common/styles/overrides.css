@@ -1,4 +1,13 @@
-@media screen and (min-width: 992px) {
+form {
+  max-width: 500px;
+}
+
+.MuiTabPanel-root {
+  flex-grow: 1;
+  padding: 0;
+}
+
+@media screen and (min-width: 900px) {
   .MuiToolbar-gutters,
   .container {
     padding-right: var(--fractalflows-gutter-page-lg);
@@ -6,9 +15,13 @@
   }
 
   .page {
-    padding-top: 90px;
+    padding-top: 80px;
     padding-bottom: 140px;
   }
+
+  /* .horizontal-tabs .MuiTabPanel-root {
+    padding: 0 36px;
+  } */
 }
 
 @media screen and (min-width: 1200px) {

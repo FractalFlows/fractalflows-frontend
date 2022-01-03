@@ -2,10 +2,7 @@ import { useCallback, useEffect, useState } from "react";
 import type { NextPage } from "next";
 import {
   Box,
-  FormControl,
-  InputLabel,
   IconButton,
-  MenuItem,
   Button,
   Stack,
   Typography,
@@ -16,7 +13,7 @@ import DeleteIcon from "@mui/icons-material/Delete";
 import { useForm, useFieldArray, NestedValue } from "react-hook-form";
 import { useSnackbar } from "notistack";
 import { useRouter } from "next/router";
-import { get, isEmpty } from "lodash-es";
+import { isEmpty } from "lodash-es";
 
 import {
   Autocomplete,
@@ -142,12 +139,7 @@ const NewClaim: NextPage = () => {
     <Box className="container page">
       <Stack alignItems="center">
         <Stack spacing={6} sx={{ maxWidth: "550px" }}>
-          <Typography
-            variant="h3"
-            component="h1"
-            sx={{ fontWeight: 700 }}
-            align="center"
-          >
+          <Typography variant="h3" component="h1" align="center">
             Host new claim
           </Typography>
           <form onSubmit={handleSubmitHook(handleSubmit)}>
@@ -181,7 +173,7 @@ const NewClaim: NextPage = () => {
               ></TextField>
               <Stack spacing={3}>
                 <Box>
-                  <Typography variant="body1" sx={{ fontWeight: 800 }}>
+                  <Typography variant="body1" sx={{ fontWeight: 700 }}>
                     Sources
                   </Typography>
                   <Typography variant="body2">
@@ -286,7 +278,7 @@ const NewClaim: NextPage = () => {
               </Stack>
               <Stack spacing={3}>
                 <Box>
-                  <Typography variant="body1" sx={{ fontWeight: "800" }}>
+                  <Typography variant="body1" sx={{ fontWeight: 700 }}>
                     Tags
                   </Typography>
                   <Typography variant="body2">
@@ -310,7 +302,7 @@ const NewClaim: NextPage = () => {
               </Stack>
               <Stack spacing={3}>
                 <Box>
-                  <Typography variant="body1" sx={{ fontWeight: "800" }}>
+                  <Typography variant="body1" sx={{ fontWeight: 700 }}>
                     Attributions
                   </Typography>
                   <Typography variant="body2">

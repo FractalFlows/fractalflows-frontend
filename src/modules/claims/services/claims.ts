@@ -1,7 +1,7 @@
 import { apolloClient } from "common/services/apollo/client";
 
 import { CREATE_CLAIM } from "../mutations";
-import { LOAD_CLAIM } from "../queries";
+import { GET_CLAIM } from "../queries";
 import { Claim } from "../interfaces";
 
 export const ClaimsService = {
@@ -16,9 +16,9 @@ export const ClaimsService = {
     return data.createClaim;
   },
 
-  async loadClaim({ slug }: { slug: string }): Promise<Claim> {
+  async getClaim({ slug }: { slug: string }): Promise<Claim> {
     const { data } = await apolloClient.query({
-      query: LOAD_CLAIM,
+      query: GET_CLAIM,
       variables: {
         slug,
       },

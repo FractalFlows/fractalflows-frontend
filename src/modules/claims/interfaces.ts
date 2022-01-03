@@ -1,5 +1,3 @@
-import type { SiweMessage } from "siwe";
-
 export interface Source {
   origin: string;
   url: string;

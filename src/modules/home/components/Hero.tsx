@@ -16,7 +16,6 @@ const Hero: FC = () => (
           <Typography
             variant="h2"
             component="h1"
-            fontWeight={700}
             color="primary.contrastText"
             align="center"
           >
@@ -27,6 +26,7 @@ const Hero: FC = () => (
             component="h2"
             color="primary.contrastText"
             align="center"
+            fontWeight="400"
           >
             Submit a scientific claim and start collecting knowledge bits
             supporting or refuting it

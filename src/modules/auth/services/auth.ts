@@ -2,15 +2,21 @@ import type { SiweMessage } from "siwe";
 
 import { apolloClient } from "common/services/apollo/client";
 import { GET_NONCE, GET_SESSION } from "../queries";
-import { SIGN_IN, SIGN_OUT } from "../mutations";
-import { Session } from "../interfaces";
+import {
+  SIGN_IN_WITH_ETHEREUM,
+  SEND_MAGIC_LINK,
+  VERIFY_MAGIC_LINK,
+  SIGN_OUT,
+} from "../mutations";
+import type { Session } from "../interfaces";
+import type { UserProps } from "../../users/interfaces";
 
 export const AuthService = {
   async getNonce(): Promise<string> {
     return (
       await apolloClient.query({
         query: GET_NONCE,
-        fetchPolicy: "network-only",
+        fetchPolicy: "no-cache",
       })
     )?.data?.nonce;
   },
@@ -19,29 +25,54 @@ export const AuthService = {
     return (
       await apolloClient.query({
         query: GET_SESSION,
-        fetchPolicy: "network-only",
+        fetchPolicy: "no-cache",
       })
     )?.data?.session;
   },
 
-  async signin({
+  async signInWithEthereum({
     siweMessage,
     ens,
+    avatar,
   }: {
     siweMessage: SiweMessage;
     ens?: string;
-  }): Promise<Boolean> {
+    avatar?: string;
+  }): Promise<UserProps> {
     const { data } = await apolloClient.mutate({
-      mutation: SIGN_IN,
+      mutation: SIGN_IN_WITH_ETHEREUM,
       variables: {
-        signInInput: {
+        signInWithEthereumInput: {
           siweMessage,
           ens,
+          avatar,
         },
       },
     });
 
-    return data.signIn;
+    return data.signInWithEthereum;
+  },
+
+  async sendMagicLink({ email }: { email: string }): Promise<Boolean> {
+    const { data } = await apolloClient.mutate({
+      mutation: SEND_MAGIC_LINK,
+      variables: {
+        email,
+      },
+    });
+
+    return data.sendMagicLink;
+  },
+
+  async verifyMagicLink({ hash }: { hash: string }): Promise<UserProps> {
+    const { data } = await apolloClient.mutate({
+      mutation: VERIFY_MAGIC_LINK,
+      variables: {
+        hash,
+      },
+    });
+
+    return data.verifyMagicLink;
   },
 
   async signout(): Promise<Boolean> {

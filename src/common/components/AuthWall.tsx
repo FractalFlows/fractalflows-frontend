@@ -1,35 +1,163 @@
-import { Box, Button, Stack, Typography } from "@mui/material";
+import { useState } from "react";
+import { LoadingButton } from "@mui/lab";
+import { useSnackbar } from "notistack";
+import { Box, Button, Stack, TextField, Typography } from "@mui/material";
+import { useRouter } from "next/router";
+import { useForm } from "react-hook-form";
 
+import { registerMui } from "common/utils/registerMui";
+import { validateEmail } from "common/utils/validate";
 import { useAuth } from "modules/auth/hooks/useAuth";
+import { SignInMethod } from "modules/auth/interfaces";
+
+interface MagicLinkFormProps {
+  email: string;
+}
 
 export const AuthWall = () => {
-  const { signin } = useAuth();
+  const { signInWithEthereum, sendMagicLink } = useAuth();
+  const [chosenSignInMethod, setChosenSignInMethod] = useState<SignInMethod>();
+  const [hasMagicLinkBeenSent, setHasMagicLinkBeenSent] =
+    useState<Boolean>(false);
+  const {
+    register,
+    getValues,
+    formState: { errors, isSubmitting },
+    handleSubmit: handleSubmitHook,
+  } = useForm<MagicLinkFormProps>({
+    defaultValues: {
+      email: "",
+    },
+  });
+  const { enqueueSnackbar } = useSnackbar();
+  const router = useRouter();
+
+  const handleMagicLinkFormSubmit = async ({ email }: MagicLinkFormProps) => {
+    try {
+      await sendMagicLink({ email });
+      setHasMagicLinkBeenSent(true);
+    } catch (e: any) {
+      enqueueSnackbar(e.message, {
+        variant: "error",
+      });
+    }
+  };
+
+  const handleEthereumSignIn = async () => {
+    setChosenSignInMethod(SignInMethod.ETHEREUM);
+
+    try {
+      await signInWithEthereum(signInCallback);
+    } catch (e: any) {
+      enqueueSnackbar(e.message || e, {
+        variant: "error",
+      });
+    } finally {
+      setChosenSignInMethod(undefined);
+    }
+  };
+
+  const signInCallback = () => {
+    if (router.route === "/signin") router.push("/");
+  };
+
+  const getSubtitle = () => {
+    if (chosenSignInMethod === SignInMethod.MAGIC_LINK) {
+      return hasMagicLinkBeenSent
+        ? null
+        : "Fill in your email address to receive a magic sign in link.";
+    } else
+      return "In order to continue, please choose one of the following options:";
+  };
 
   return (
     <Box className="container page">
       <Stack spacing={5}>
         <Stack spacing={2}>
-          <Typography
-            variant="h3"
-            component="h1"
-            align="center"
-            fontWeight={700}
-          >
+          <Typography variant="h3" component="h1" align="center">
             Sign in
           </Typography>
           <Typography variant="body1" align="center">
-            In order to continue, please sign in.
+            {getSubtitle()}
           </Typography>
         </Stack>
-        <Button
-          variant="contained"
-          color="primary"
-          startIcon={<i className="fab fa-ethereum"></i>}
-          sx={{ alignSelf: "center" }}
-          onClick={signin}
+        <Box
+          sx={{
+            alignSelf: { xs: "initial", sm: "center" },
+            width: { xs: "initial", sm: "350px" },
+          }}
         >
-          Sign in with Ethereum
-        </Button>
+          {chosenSignInMethod === SignInMethod.MAGIC_LINK ? (
+            <>
+              {hasMagicLinkBeenSent ? (
+                <Typography variant="body1" align="center">
+                  We sent an email to you at <b>{getValues("email")}</b>. It has
+                  a magic link that&apos;ll sign you in.
+                </Typography>
+              ) : (
+                <form onSubmit={handleSubmitHook(handleMagicLinkFormSubmit)}>
+                  <Stack spacing={3}>
+                    <TextField
+                      label="Email"
+                      fullWidth
+                      {...registerMui({
+                        register,
+                        name: "email",
+                        props: {
+                          required: true,
+                          validate: {
+                            email: (email: string) => validateEmail(email),
+                          },
+                        },
+                        errors,
+                      })}
+                    />
+                    <Stack spacing={2}>
+                      <LoadingButton
+                        type="submit"
+                        size="large"
+                        loading={isSubmitting}
+                        variant="contained"
+                      >
+                        Send magic link
+                      </LoadingButton>
+                      <Button
+                        variant="contained"
+                        color="secondary"
+                        size="large"
+                        onClick={() => setChosenSignInMethod(undefined)}
+                      >
+                        Go back
+                      </Button>
+                    </Stack>
+                  </Stack>
+                </form>
+              )}
+            </>
+          ) : (
+            <Stack spacing={2}>
+              <LoadingButton
+                variant="contained"
+                color="primary"
+                loading={chosenSignInMethod === SignInMethod.ETHEREUM}
+                size="large"
+                startIcon={<i className="fab fa-ethereum"></i>}
+                onClick={handleEthereumSignIn}
+              >
+                Sign in with Ethereum
+              </LoadingButton>
+
+              <Button
+                variant="contained"
+                color="secondary"
+                size="large"
+                onClick={() => setChosenSignInMethod(SignInMethod.MAGIC_LINK)}
+              >
+                Continue with email
+              </Button>
+            </Stack>
+          )}
+        </Box>
       </Stack>
     </Box>
   );
