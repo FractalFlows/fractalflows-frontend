@@ -4,10 +4,10 @@ import { TabContext, TabList, TabPanel } from "@mui/lab";
 import { Avatar, Box, Paper, Stack, Tab, Typography } from "@mui/material";
 import { useRouter } from "next/router";
 
-import { useClaims } from "modules/claims/hooks/useClaims";
+import { useUsers } from "modules/users/hooks/useUsers";
 import { ClaimsList } from "modules/claims/components/ClaimsList";
-import { Claim, UserClaimRelation } from "modules/claims/interfaces";
-import { Profile } from "modules/user/interfaces";
+import { Claim } from "modules/claims/interfaces";
+import { ProfileProps, UserClaimRelation } from "modules/users/interfaces";
 
 const profileTabs: {
   label: string;
@@ -21,21 +21,21 @@ const profileTabs: {
 const Profile = () => {
   const router = useRouter();
   const { username }: { username?: string } = router.query;
-  const { getUserClaims } = useClaims();
+  const { getProfile } = useUsers();
   const [activeTab, setActiveTab] = useState<UserClaimRelation>(
     UserClaimRelation.OWN
   );
-  const [profile, setProfile] = useState<Profile>({});
+  const [profile, setProfile] = useState<ProfileProps>({});
   const [claims, setClaims] = useState<Claim[]>([]);
 
   useEffect(() => {
     if (username) {
-      getUserClaims({ username, relation: activeTab }).then((data) => {
+      getProfile({ username, claimsRelation: activeTab }).then((data) => {
         setProfile(data.profile);
         setClaims(data.userClaims);
       });
     }
-  }, [activeTab, username, getUserClaims]);
+  }, [activeTab, username, getProfile]);
 
   return (
     <Box className="container page">
@@ -46,7 +46,7 @@ const Profile = () => {
           alignItems="center"
         >
           <Avatar
-            src={profile?.avatar}
+            src={`${profile?.avatar}?s=160`}
             sx={{ width: "160px", height: "160px" }}
           >
             <AccountCircle sx={{ fontSize: 160 }} />

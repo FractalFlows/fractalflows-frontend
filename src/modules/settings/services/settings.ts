@@ -5,11 +5,11 @@ import {
   UPDATE_PROFILE,
   UPDATE_EMAIL,
   CONNECT_ETHEREUM_WALLET,
-  GENERATE_NEW_API_KEY,
+  CREATE_API_KEY,
   REMOVE_API_KEY,
 } from "../mutations";
-import { UpdateProfileProps } from "../interfaces";
-import { User } from "modules/auth/interfaces";
+import { APIKeyProps, UpdateProfileProps } from "../interfaces";
+import { User } from "modules/users/interfaces";
 
 export const SettingsService = {
   async updateProfile(profile: UpdateProfileProps): Promise<User> {
@@ -54,12 +54,12 @@ export const SettingsService = {
     return data.apiKey;
   },
 
-  async generateAPIKey(): Promise<string> {
+  async createAPIKey(): Promise<APIKeyProps> {
     const { data } = await apolloClient.mutate({
-      mutation: GENERATE_NEW_API_KEY,
+      mutation: CREATE_API_KEY,
     });
 
-    return data.generateAPIKey;
+    return data.createAPIKey;
   },
 
   async removeAPIKey(): Promise<Boolean> {

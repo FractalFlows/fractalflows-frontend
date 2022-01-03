@@ -1,5 +1,3 @@
-import type { SiweMessage } from "siwe";
-
 export interface Source {
   origin: string;
   url: string;
@@ -22,15 +20,4 @@ export interface Claim {
   sources?: Source[];
   tags?: Tag[];
   attributions?: Attributions[];
-}
-
-export enum UserClaimRelation {
-  OWN = "OWN",
-  CONTRIBUTED = "CONTRIBUTED",
-  FOLLOWING = "FOLLOWING",
-}
-
-export interface GetUserClaimsProps {
-  username: string;
-  relation: UserClaimRelation;
 }

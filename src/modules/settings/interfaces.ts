@@ -39,3 +39,8 @@ export interface UpdateProfileProps {
   username: string;
   avatarSource: AvatarSource;
 }
+
+export interface APIKeyProps {
+  key: string;
+  secret: string;
+}

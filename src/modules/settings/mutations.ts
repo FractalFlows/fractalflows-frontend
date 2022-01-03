@@ -24,9 +24,12 @@ export const CONNECT_ETHEREUM_WALLET = gql`
   }
 `;
 
-export const GENERATE_NEW_API_KEY = gql`
-  mutation GenerateAPIKey {
-    generateAPIKey
+export const CREATE_API_KEY = gql`
+  mutation CreateAPIKey {
+    createAPIKey {
+      key
+      secret
+    }
   }
 `;
 

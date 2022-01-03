@@ -18,6 +18,8 @@ import { LoadingButton } from "@mui/lab";
 
 import { useSettings } from "../hooks/useSettings";
 import { TabPanel } from "./TabPanel";
+import { APIKeyProps } from "../interfaces";
+import { isEmpty } from "lodash-es";
 
 enum APIKeyState {
   GENERATING,
@@ -31,21 +33,21 @@ enum CopyAPIKeyTooltipTextState {
 }
 
 export const APIKeys = () => {
-  const [apiKey, setAPIKey] = useState<string>("");
+  const [apiKey, setAPIKey] = useState<APIKeyProps>();
   const [apiKeyState, setAPIKeyState] = useState<APIKeyState>();
   const [copyAPIKeyTooltipText, setCopyAPIKeyTooltipText] =
     useState<CopyAPIKeyTooltipTextState>(CopyAPIKeyTooltipTextState.COPY);
-  const { getAPIKey, generateAPIKey, removeAPIKey } = useSettings();
+  const { getAPIKey, createAPIKey, removeAPIKey } = useSettings();
   const { enqueueSnackbar } = useSnackbar();
 
-  const handleGenerateAPIKeyClick = async () => {
+  const handleCreateAPIKeyClick = async () => {
     setAPIKeyState(APIKeyState.GENERATING);
     enqueueSnackbar(`Generating ${apiKey ? "new" : ""} API Key...`, {
       variant: "info",
     });
 
     try {
-      const newApiKey = await generateAPIKey();
+      const newApiKey = await createAPIKey();
       setAPIKey(newApiKey);
       setAPIKeyState(APIKeyState.SUCCESFULLY_GENERATED);
       enqueueSnackbar(
@@ -70,7 +72,7 @@ export const APIKeys = () => {
 
     try {
       await removeAPIKey();
-      setAPIKey("");
+      setAPIKey(undefined);
       enqueueSnackbar("Your API Key has been succesfully removed!", {
         variant: "success",
       });
@@ -83,8 +85,8 @@ export const APIKeys = () => {
     }
   };
 
-  const handleCopyAPIKeyClick = () => {
-    navigator.clipboard.writeText(apiKey).then(
+  const handleCopyAPIKeyClick = (text: string) => {
+    navigator.clipboard.writeText(text).then(
       () => {
         setCopyAPIKeyTooltipText(CopyAPIKeyTooltipTextState.COPIED);
       },
@@ -103,8 +105,15 @@ export const APIKeys = () => {
 
   useEffect(() => {
     getAPIKey()
-      .then((apiKey) => {
-        setAPIKey(apiKey);
+      .then((key) => {
+        setAPIKey(
+          key
+            ? {
+                key,
+                secret: "********************************",
+              }
+            : undefined
+        );
       })
       .catch((e) =>
         enqueueSnackbar(e.message, {
@@ -118,8 +127,9 @@ export const APIKeys = () => {
       title="API Keys"
       description={
         <>
-          Place your API Key in the <code>fractalflows-api-key</code> HTTP
-          header to authenticate.
+          Place your API Key in the <code>fractalflows-api-key</code> and your
+          API Secret in the <code>fractalflows-api-secret</code> HTTP headers to
+          authenticate.
           <br />
           <MuiLink
             href="https://server.fractalflows.com/graphql"
@@ -133,17 +143,18 @@ export const APIKeys = () => {
       }
     >
       <Stack spacing={3}>
-        {apiKey ? (
+        {isEmpty(apiKey) ? null : (
           <form>
             <Stack spacing={3}>
               {apiKeyState === APIKeyState.SUCCESFULLY_GENERATED ? (
                 <Alert severity="warning">
-                  Save this API Key in a safe place because it will never be
+                  Save your API Secret in a safe place because it will never be
                   shown again!
                 </Alert>
               ) : null}
               <TextField
-                value={apiKey}
+                value={apiKey?.key}
+                label="API Key"
                 fullWidth
                 InputProps={{
                   readOnly: true,
@@ -156,7 +167,32 @@ export const APIKeys = () => {
                         >
                           <IconButton
                             aria-label="Copy API Key to clipboard"
-                            onClick={handleCopyAPIKeyClick}
+                            onClick={() => handleCopyAPIKeyClick(apiKey.key)}
+                            edge="end"
+                          >
+                            <ContentCopyIcon />
+                          </IconButton>
+                        </Tooltip>
+                      </InputAdornment>
+                    ) : null,
+                }}
+              />
+              <TextField
+                value={apiKey?.secret}
+                label="API Secret"
+                fullWidth
+                InputProps={{
+                  readOnly: true,
+                  endAdornment:
+                    apiKeyState === APIKeyState.SUCCESFULLY_GENERATED ? (
+                      <InputAdornment position="end">
+                        <Tooltip
+                          title={copyAPIKeyTooltipText}
+                          onMouseLeave={handleCopyAPIKeyMouseLeave}
+                        >
+                          <IconButton
+                            aria-label="Copy API Secret to clipboard"
+                            onClick={() => handleCopyAPIKeyClick(apiKey.secret)}
                             edge="end"
                           >
                             <ContentCopyIcon />
@@ -168,13 +204,13 @@ export const APIKeys = () => {
               />
             </Stack>
           </form>
-        ) : null}
+        )}
         <Stack direction={{ xs: "column", sm: "row" }} spacing={1}>
           <LoadingButton
             loading={apiKeyState === APIKeyState.GENERATING}
             variant="contained"
             size="large"
-            onClick={handleGenerateAPIKeyClick}
+            onClick={handleCreateAPIKeyClick}
             sx={{ alignSelf: { xs: "initial", sm: "start" } }}
           >
             Generate {apiKey ? "new" : ""} API Key
