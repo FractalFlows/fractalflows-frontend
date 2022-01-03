@@ -146,6 +146,9 @@ const NewClaim: NextPage = () => {
             <Stack spacing={3}>
               <TextField
                 label="Title"
+                multiline
+                minRows={1}
+                maxRows={Infinity}
                 fullWidth
                 {...registerMui({
                   register,

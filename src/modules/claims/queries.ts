@@ -15,6 +15,20 @@ export const GET_CLAIM = gql`
   query GetClaim($slug: String!) {
     claim(slug: $slug) {
       ...CoreClaimFields
+      createdAt
+      user {
+        avatar
+        username
+      }
+      sources {
+        id
+        origin
+        url
+      }
+      tags {
+        id
+        label
+      }
     }
   }
 `;

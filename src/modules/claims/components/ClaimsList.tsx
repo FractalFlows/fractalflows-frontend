@@ -11,7 +11,7 @@ export const ClaimsList = ({ claims = [] }: ClaimsListProps) => {
   return (
     <Stack spacing={1}>
       {claims.map((claim) => (
-        <ClaimTile {...claim} key={claim.slug} />
+        <ClaimTile claim={claim} key={claim.slug} />
       ))}
     </Stack>
   );

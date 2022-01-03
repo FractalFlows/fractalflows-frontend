@@ -1,3 +1,5 @@
+import { UserProps } from "modules/users/interfaces";
+
 export interface Source {
   origin: string;
   url: string;
@@ -13,6 +15,12 @@ export interface Attributions {
   identifier: string;
 }
 
+export interface KnowledgeBitProps {
+  id: string;
+  label: string;
+  summary?: string;
+}
+
 export interface ClaimProps {
   title: string;
   summary: string;
@@ -20,4 +28,7 @@ export interface ClaimProps {
   sources?: Source[];
   tags?: Tag[];
   attributions?: Attributions[];
+  knowledgeBits?: KnowledgeBitProps[];
+  createdAt: Date;
+  user: UserProps;
 }
