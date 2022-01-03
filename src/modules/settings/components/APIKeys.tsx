@@ -7,6 +7,7 @@ import {
   Tooltip,
   Button,
   Link as MuiLink,
+  Alert,
 } from "@mui/material";
 import {
   ContentCopy as ContentCopyIcon,
@@ -20,6 +21,7 @@ import { TabPanel } from "./TabPanel";
 
 enum APIKeyState {
   GENERATING,
+  SUCCESFULLY_GENERATED,
   REMOVING,
 }
 
@@ -45,6 +47,7 @@ export const APIKeys = () => {
     try {
       const newApiKey = await generateAPIKey();
       setAPIKey(newApiKey);
+      setAPIKeyState(APIKeyState.SUCCESFULLY_GENERATED);
       enqueueSnackbar(
         `Your ${apiKey ? "new" : ""} API Key has been succesfully generated!`,
         {
@@ -52,11 +55,10 @@ export const APIKeys = () => {
         }
       );
     } catch (e: any) {
+      setAPIKeyState(undefined);
       enqueueSnackbar(e.message, {
         variant: "error",
       });
-    } finally {
-      setAPIKeyState(undefined);
     }
   };
 
@@ -133,29 +135,38 @@ export const APIKeys = () => {
       <Stack spacing={3}>
         {apiKey ? (
           <form>
-            <TextField
-              value={apiKey}
-              fullWidth
-              InputProps={{
-                readOnly: true,
-                endAdornment: (
-                  <InputAdornment position="end">
-                    <Tooltip
-                      title={copyAPIKeyTooltipText}
-                      onMouseLeave={handleCopyAPIKeyMouseLeave}
-                    >
-                      <IconButton
-                        aria-label="Copy API Key to clipboard"
-                        onClick={handleCopyAPIKeyClick}
-                        edge="end"
-                      >
-                        <ContentCopyIcon />
-                      </IconButton>
-                    </Tooltip>
-                  </InputAdornment>
-                ),
-              }}
-            />
+            <Stack spacing={3}>
+              {apiKeyState === APIKeyState.SUCCESFULLY_GENERATED ? (
+                <Alert severity="warning">
+                  Save this API Key in a safe place because it will never be
+                  shown again!
+                </Alert>
+              ) : null}
+              <TextField
+                value={apiKey}
+                fullWidth
+                InputProps={{
+                  readOnly: true,
+                  endAdornment:
+                    apiKeyState === APIKeyState.SUCCESFULLY_GENERATED ? (
+                      <InputAdornment position="end">
+                        <Tooltip
+                          title={copyAPIKeyTooltipText}
+                          onMouseLeave={handleCopyAPIKeyMouseLeave}
+                        >
+                          <IconButton
+                            aria-label="Copy API Key to clipboard"
+                            onClick={handleCopyAPIKeyClick}
+                            edge="end"
+                          >
+                            <ContentCopyIcon />
+                          </IconButton>
+                        </Tooltip>
+                      </InputAdornment>
+                    ) : null,
+                }}
+              />
+            </Stack>
           </form>
         ) : null}
         <Stack direction={{ xs: "column", sm: "row" }} spacing={1}>

@@ -48,6 +48,7 @@ export const SettingsService = {
   async getAPIKey(): Promise<string> {
     const { data } = await apolloClient.query({
       query: GET_API_KEY,
+      fetchPolicy: "no-cache",
     });
 
     return data.apiKey;
