@@ -1,4 +1,3 @@
-import { useState } from "react";
 import { Controller } from "react-hook-form";
 import { debounce, last, get } from "lodash-es";
 import {
@@ -38,72 +37,60 @@ export const Autocomplete = ({
   loading,
   onSearch,
   ...autocompleteProps
-}: AutocompleteProps) => {
-  const [value, setValue] = useState<
-    | string
-    | AutocompleteOptionProps
-    | (string | AutocompleteOptionProps)[]
-    | null
-  >([]);
+}: AutocompleteProps) => (
+  <Controller
+    render={({ field: { onChange, ...controllerProps } }) => (
+      <MuiAutocomplete
+        options={options}
+        loading={loading}
+        renderOption={(props, option) => (
+          <Box {...props} component="li" key={get(option, "id", option)}>
+            {get(option, "label", option)}
+          </Box>
+        )}
+        renderInput={(params) => (
+          <TextField
+            {...params}
+            onChange={debounce((ev) => {
+              onSearch(ev.target.value);
+            }, 300)}
+            label={label}
+            InputProps={{
+              ...params.InputProps,
+              endAdornment: (
+                <>
+                  {loading ? (
+                    <CircularProgress color="inherit" size={20} />
+                  ) : null}
+                  {params.InputProps.endAdornment}
+                </>
+              ),
+            }}
+          />
+        )}
+        onChange={(e, data) => {
+          if (autocompleteProps.multiple && Array.isArray(data)) {
+            const value = last(data);
 
-  return (
-    <Controller
-      render={({ field: { onChange, ...controllerProps } }) => (
-        <MuiAutocomplete
-          options={options}
-          loading={loading}
-          renderOption={(props, option) => (
-            <Box {...props} component="li" key={get(option, "id", option)}>
-              {get(option, "label", option)}
-            </Box>
-          )}
-          renderInput={(params) => (
-            <TextField
-              {...params}
-              onChange={debounce((ev) => {
-                onSearch(ev.target.value);
-              }, 300)}
-              label={label}
-              InputProps={{
-                ...params.InputProps,
-                endAdornment: (
-                  <>
-                    {loading ? (
-                      <CircularProgress color="inherit" size={20} />
-                    ) : null}
-                    {params.InputProps.endAdornment}
-                  </>
-                ),
-              }}
-            />
-          )}
-          onChange={(e, data) => {
-            if (autocompleteProps.multiple && Array.isArray(data)) {
-              const value = last(data);
-
-              if (typeof value === "string") {
-                data[data.length - 1] = {
-                  label: value,
-                };
-              }
-
-              if ((maxTags && data.length <= maxTags) || !maxTags) {
-                onChange(data);
-                setValue(data);
-              }
-            } else {
-              onChange(data);
-              setValue(data);
+            if (typeof value === "string") {
+              data[data.length - 1] = {
+                label: value,
+              };
             }
-          }}
-          {...autocompleteProps}
-          {...controllerProps}
-          value={value}
-        />
-      )}
-      defaultValue={defaultValue}
-      name={name}
-      control={control}
-    />
-  );
-};
+
+            if ((maxTags && data.length <= maxTags) || !maxTags) {
+              onChange(data);
+            }
+          } else {
+            onChange(data);
+          }
+        }}
+        {...autocompleteProps}
+        {...controllerProps}
+      />
+    )}
+    defaultValue={defaultValue}
+    name={name}
+    control={control}
+  />
+);

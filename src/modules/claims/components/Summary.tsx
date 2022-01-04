@@ -18,6 +18,7 @@ import {
 import type { ClaimProps } from "modules/claims/interfaces";
 import type { TagProps } from "modules/tags/interfaces";
 import { AuthorBlock } from "modules/users/components/AuthorBlock";
+import { Link } from "common/components/Link";
 
 export const ClaimSummary: FC<{ claim: ClaimProps }> = ({ claim }) => {
   return (
@@ -49,11 +50,13 @@ export const ClaimSummary: FC<{ claim: ClaimProps }> = ({ claim }) => {
             </IconButton>
           </Tooltip>
 
-          <Tooltip title="Edit claim">
-            <IconButton>
-              <EditIcon />
-            </IconButton>
-          </Tooltip>
+          <Link href={`/claim/${claim.slug}/edit`}>
+            <Tooltip title="Edit claim">
+              <IconButton>
+                <EditIcon />
+              </IconButton>
+            </Tooltip>
+          </Link>
           <Tooltip title="Delete claim">
             <IconButton>
               <DeleteIcon />

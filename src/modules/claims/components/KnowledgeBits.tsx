@@ -22,7 +22,7 @@ export const KnowledgeBitsPanel: FC<{
         <Typography variant="h5" component="h3" flexGrow={1}>
           {title}
         </Typography>
-        <Button variant="contained" color="primary">
+        <Button variant="contained" color="secondary">
           Add Knowledge Bit
         </Button>
       </Stack>
@@ -41,9 +41,9 @@ export const KnowledgeBits: FC<{
   return (
     <Box>
       <Stack spacing={4}>
-        <Stack direction="row" spacing={2} alignItems="center">
+        <Stack direction="row" spacing={1} alignItems="center">
           <Typography variant="h4" component="h2">
-            What science says: Knowledge Bits{" "}
+            What science says: Knowledge Bits
           </Typography>
           <Tooltip
             title={

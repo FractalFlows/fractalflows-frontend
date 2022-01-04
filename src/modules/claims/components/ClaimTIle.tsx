@@ -5,6 +5,7 @@ import { Link } from "common/components/Link";
 import type { ClaimProps } from "../interfaces";
 import { AuthorBlock } from "modules/users/components/AuthorBlock";
 import { TagProps } from "modules/tags/interfaces";
+import { isEmpty } from "lodash-es";
 
 export const ClaimTile: FC<{ claim: ClaimProps }> = ({ claim }) => {
   return (
@@ -29,11 +30,13 @@ export const ClaimTile: FC<{ claim: ClaimProps }> = ({ claim }) => {
               {claim.summary.length > 350 ? "..." : ""}
             </Typography>
           ) : null}
-          <Stack direction="row" spacing={1}>
-            {claim?.tags?.map(({ id, label }: TagProps) => (
-              <Chip key={id} label={label} />
-            ))}
-          </Stack>
+          {isEmpty(claim?.tags) ? null : (
+            <Stack direction="row" spacing={1}>
+              {claim?.tags?.map(({ id, label }: TagProps) => (
+                <Chip key={id} label={label} />
+              ))}
+            </Stack>
+          )}
         </Stack>
       </Paper>
     </Link>

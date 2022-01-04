@@ -25,6 +25,11 @@ export const GET_CLAIM = gql`
         origin
         url
       }
+      attributions {
+        id
+        origin
+        identifier
+      }
       tags {
         id
         label

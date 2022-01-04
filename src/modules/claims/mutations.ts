@@ -8,3 +8,12 @@ export const CREATE_CLAIM = gql`
     }
   }
 `;
+
+export const UPDATE_CLAIM = gql`
+  mutation UpdateClaim($updateClaimInput: UpdateClaimInput!) {
+    updateClaim(updateClaimInput: $updateClaimInput) {
+      id
+      slug
+    }
+  }
+`;
