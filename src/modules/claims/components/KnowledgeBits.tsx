@@ -40,7 +40,7 @@ export const KnowledgeBits: FC<{
 }> = ({ knowledgeBits = [] }) => {
   return (
     <Box>
-      <Stack spacing={3}>
+      <Stack spacing={4}>
         <Stack direction="row" spacing={2} alignItems="center">
           <Typography variant="h4" component="h2">
             What science says: Knowledge Bits{" "}

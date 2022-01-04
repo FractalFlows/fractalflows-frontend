@@ -9,7 +9,7 @@ export interface ClaimsListProps {
 
 export const ClaimsList = ({ claims = [] }: ClaimsListProps) => {
   return (
-    <Stack spacing={1}>
+    <Stack spacing={2}>
       {claims.map((claim) => (
         <ClaimTile claim={claim} key={claim.slug} />
       ))}

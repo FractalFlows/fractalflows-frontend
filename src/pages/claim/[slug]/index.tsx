@@ -36,7 +36,7 @@ const Claim: NextPage<{ claim: ClaimProps }> = ({ claim }) => {
         <meta property="og:title" content={claim?.title} />
       </Head>
 
-      <Stack spacing={10}>
+      <Stack spacing={14}>
         <ClaimSummary claim={claim} />
         <KnowledgeBits knowledgeBits={knowledgeBits} />
         <ConsiderIt />
