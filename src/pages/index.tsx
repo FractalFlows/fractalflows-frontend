@@ -52,7 +52,6 @@ const Home: NextPage<HomeProps> = (serverProps) => {
     } else {
       getClaims(pagination)
         .then((claims) => {
-          console.log(claims);
           setAllClaims(claims);
         })
         .catch((e) => {

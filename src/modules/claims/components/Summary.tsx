@@ -1,4 +1,5 @@
-import { FC } from "react";
+import { FC, useState } from "react";
+import { useRouter } from "next/router";
 import {
   Typography,
   Box,
@@ -7,6 +8,10 @@ import {
   Divider,
   IconButton,
   Tooltip,
+  Dialog,
+  DialogTitle,
+  DialogActions,
+  Button,
 } from "@mui/material";
 import {
   Edit as EditIcon,
@@ -19,8 +24,38 @@ import type { ClaimProps } from "modules/claims/interfaces";
 import type { TagProps } from "modules/tags/interfaces";
 import { AuthorBlock } from "modules/users/components/AuthorBlock";
 import { Link } from "common/components/Link";
+import { deleteClaim } from "../hooks/delete";
+import { useClaims } from "../hooks/useClaims";
+import { useSnackbar } from "notistack";
+import { Spinner } from "common/components/Spinner";
 
 export const ClaimSummary: FC<{ claim: ClaimProps }> = ({ claim }) => {
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
+  const { deleteClaim } = useClaims();
+  const router = useRouter();
+  const { enqueueSnackbar } = useSnackbar();
+
+  const handleDelete = async () => {
+    try {
+      setIsDeleting(true);
+      await deleteClaim({ id: claim.id });
+      setIsDeleteDialogOpen(false);
+      enqueueSnackbar("Your claim has been sucesfully deleted!", {
+        variant: "success",
+      });
+      router.push("/");
+    } catch (e) {
+      enqueueSnackbar(e.message, {
+        variant: "error",
+      });
+    } finally {
+      setIsDeleting(false);
+    }
+  };
+  const handleDeleteDialogOpen = () => setIsDeleteDialogOpen(true);
+  const handleDeleteDialogClose = () => setIsDeleteDialogOpen(false);
+
   return (
     <Stack spacing={3}>
       <Typography variant="h3" component="h1">
@@ -58,10 +93,34 @@ export const ClaimSummary: FC<{ claim: ClaimProps }> = ({ claim }) => {
             </Tooltip>
           </Link>
           <Tooltip title="Delete claim">
-            <IconButton>
+            <IconButton onClick={handleDeleteDialogOpen}>
               <DeleteIcon />
             </IconButton>
           </Tooltip>
+          <Dialog
+            open={isDeleteDialogOpen}
+            onClose={handleDeleteDialogClose}
+            fullWidth
+            maxWidth="xs"
+            aria-labelledby="alert-dialog-title"
+            aria-describedby="alert-dialog-description"
+          >
+            {isDeleting ? (
+              <Spinner />
+            ) : (
+              <>
+                <DialogTitle id="alert-dialog-title">
+                  Delete this claim?
+                </DialogTitle>
+                <DialogActions>
+                  <Button onClick={handleDeleteDialogClose}>Cancel</Button>
+                  <Button onClick={handleDelete} autoFocus>
+                    Delete
+                  </Button>
+                </DialogActions>
+              </>
+            )}
+          </Dialog>
         </Stack>
       </Stack>
       <Divider></Divider>

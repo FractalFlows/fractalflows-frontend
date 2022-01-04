@@ -17,3 +17,9 @@ export const UPDATE_CLAIM = gql`
     }
   }
 `;
+
+export const DELETE_CLAIM = gql`
+  mutation DeleteClaim($id: String!) {
+    deleteClaim(id: $id)
+  }
+`;

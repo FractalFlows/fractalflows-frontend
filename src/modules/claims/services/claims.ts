@@ -1,9 +1,9 @@
 import { apolloClient } from "common/services/apollo/client";
 
-import { CREATE_CLAIM, UPDATE_CLAIM } from "../mutations";
+import { CREATE_CLAIM, UPDATE_CLAIM, DELETE_CLAIM } from "../mutations";
 import { GET_CLAIM, GET_CLAIMS, GET_TRENDING_CLAIMS } from "../queries";
 import type { ClaimProps } from "../interfaces";
-import { PaginationProps } from "modules/interfaces";
+import type { PaginationProps } from "modules/interfaces";
 
 export const ClaimsService = {
   async getClaim({ slug }: { slug: string }): Promise<ClaimProps> {
@@ -73,5 +73,16 @@ export const ClaimsService = {
     });
 
     return data.updateClaim;
+  },
+
+  async deleteClaim({ id }: { id: string }): Promise<Boolean> {
+    const { data } = await apolloClient.mutate({
+      mutation: DELETE_CLAIM,
+      variables: {
+        id,
+      },
+    });
+
+    return data.deleteClaim;
   },
 };

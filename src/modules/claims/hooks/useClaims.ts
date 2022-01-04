@@ -1,5 +1,6 @@
 import { createClaim } from "./create";
 import { updateClaim } from "./update";
+import { deleteClaim } from "./delete";
 import { getClaim, getClaims, getTrendingClaims } from "./get";
 
 export const useClaims = () => {
@@ -9,5 +10,6 @@ export const useClaims = () => {
     getTrendingClaims,
     createClaim,
     updateClaim,
+    deleteClaim,
   };
 };

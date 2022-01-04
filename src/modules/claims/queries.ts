@@ -44,6 +44,15 @@ export const GET_CLAIMS = gql`
   query GetClaims($offset: Int!, $limit: Int!) {
     claims(offset: $offset, limit: $limit) {
       ...CoreClaimFields
+      createdAt
+      user {
+        avatar
+        username
+      }
+      tags {
+        id
+        label
+      }
     }
   }
 `;
