@@ -6,6 +6,15 @@ export const CORE_CLAIM_FIELDS = gql`
     title
     summary
     slug
+    createdAt
+    user {
+      avatar
+      username
+    }
+    tags {
+      id
+      label
+    }
   }
 `;
 
@@ -15,11 +24,6 @@ export const GET_CLAIM = gql`
   query GetClaim($slug: String!) {
     claim(slug: $slug) {
       ...CoreClaimFields
-      createdAt
-      user {
-        avatar
-        username
-      }
       sources {
         id
         origin
@@ -30,9 +34,28 @@ export const GET_CLAIM = gql`
         origin
         identifier
       }
-      tags {
+    }
+    relatedClaims(slug: $slug) {
+      ...CoreClaimFields
+    }
+  }
+`;
+
+export const GET_PARTIAL_CLAIM = gql`
+  ${CORE_CLAIM_FIELDS}
+
+  query GetPartialClaim($slug: String!) {
+    claim(slug: $slug) {
+      ...CoreClaimFields
+      sources {
         id
-        label
+        origin
+        url
+      }
+      attributions {
+        id
+        origin
+        identifier
       }
     }
   }
@@ -44,15 +67,6 @@ export const GET_CLAIMS = gql`
   query GetClaims($offset: Int!, $limit: Int!) {
     claims(offset: $offset, limit: $limit) {
       ...CoreClaimFields
-      createdAt
-      user {
-        avatar
-        username
-      }
-      tags {
-        id
-        label
-      }
     }
   }
 `;

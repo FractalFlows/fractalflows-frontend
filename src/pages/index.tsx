@@ -28,36 +28,43 @@ interface HomeProps {
 const Home: NextPage<HomeProps> = (serverProps) => {
   const { getTrendingClaims, getClaims } = useClaims();
   const [activeTab, setActiveTab] = useState<HomeTab>(HomeTab.TRENDING);
-  const [trendingClaims, setTrendingClaims] = useState<ClaimProps[]>(
+  const [loadingClaims, setLoadingClaims] = useState<boolean>(false);
+  const [claims, setClaims] = useState<ClaimProps[]>(
     serverProps.trendingClaims
   );
-  const [allClaims, setAllClaims] = useState<ClaimProps[]>([]);
   const { enqueueSnackbar } = useSnackbar();
 
   const handleTabChange = (ev: SyntheticEvent, tab: HomeTab) => {
     setActiveTab(tab);
+    setLoadingClaims(true);
 
     const pagination = { limit: 20, offset: 0 };
 
     if (tab === HomeTab.TRENDING) {
       getTrendingClaims(pagination)
         .then((trendingClaims) => {
-          setTrendingClaims(trendingClaims);
+          setClaims(trendingClaims);
         })
         .catch((e) => {
           enqueueSnackbar(e.message, {
             variant: "error",
           });
+        })
+        .finally(() => {
+          setLoadingClaims(false);
         });
     } else {
       getClaims(pagination)
         .then((claims) => {
-          setAllClaims(claims);
+          setClaims(claims);
         })
         .catch((e) => {
           enqueueSnackbar(e.message, {
             variant: "error",
           });
+        })
+        .finally(() => {
+          setLoadingClaims(false);
         });
     }
   };
@@ -73,6 +80,7 @@ const Home: NextPage<HomeProps> = (serverProps) => {
                 component="h1"
                 color="primary.contrastText"
                 align="center"
+                fontWeight="700"
               >
                 Fractal Flows
               </Typography>
@@ -122,7 +130,7 @@ const Home: NextPage<HomeProps> = (serverProps) => {
           </Stack>
         </Box>
       </Box>
-      <Box className="container page">
+      <Box className="container" sx={{ py: 12 }}>
         <Stack spacing={{ xs: 3, md: 4 }} className="horizontal-tabs">
           <TabContext value={activeTab}>
             <Paper variant="outlined" sx={{ alignSelf: "start" }}>
@@ -138,10 +146,10 @@ const Home: NextPage<HomeProps> = (serverProps) => {
             </Paper>
 
             <TabPanel value={HomeTab.TRENDING}>
-              <ClaimsList claims={trendingClaims} />
+              <ClaimsList claims={claims} loading={loadingClaims} />
             </TabPanel>
             <TabPanel value={HomeTab.ALL}>
-              <ClaimsList claims={allClaims} />
+              <ClaimsList claims={claims} loading={loadingClaims} />
             </TabPanel>
           </TabContext>
         </Stack>

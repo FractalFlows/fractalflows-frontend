@@ -1,7 +1,12 @@
 import { apolloClient } from "common/services/apollo/client";
 
 import { CREATE_CLAIM, UPDATE_CLAIM, DELETE_CLAIM } from "../mutations";
-import { GET_CLAIM, GET_CLAIMS, GET_TRENDING_CLAIMS } from "../queries";
+import {
+  GET_CLAIM,
+  GET_PARTIAL_CLAIM,
+  GET_CLAIMS,
+  GET_TRENDING_CLAIMS,
+} from "../queries";
 import type { ClaimProps } from "../interfaces";
 import type { PaginationProps } from "modules/interfaces";
 
@@ -9,6 +14,17 @@ export const ClaimsService = {
   async getClaim({ slug }: { slug: string }): Promise<ClaimProps> {
     const { data } = await apolloClient.query({
       query: GET_CLAIM,
+      variables: {
+        slug,
+      },
+    });
+
+    return data;
+  },
+
+  async getPartialClaim({ slug }: { slug: string }): Promise<ClaimProps> {
+    const { data } = await apolloClient.query({
+      query: GET_PARTIAL_CLAIM,
       variables: {
         slug,
       },

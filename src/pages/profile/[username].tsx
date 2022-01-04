@@ -26,17 +26,24 @@ const Profile = (
   const [activeTab, setActiveTab] = useState<UserClaimRelation>(
     UserClaimRelation.OWN
   );
+  const [loadingClaims, setLoadingClaims] = useState<boolean>(false);
   const [profile] = useState<ProfileProps>(serverProps.profile);
   const [claims, setClaims] = useState<ClaimProps[]>(serverProps.userClaims);
 
   const handleTabChange = (ev: SyntheticEvent, tab: UserClaimRelation) => {
     setActiveTab(tab);
+    setLoadingClaims(true);
+
     getProfile({
       username: serverProps.username,
       claimsRelation: tab,
-    }).then((data) => {
-      setClaims(data.userClaims);
-    });
+    })
+      .then((data) => {
+        setClaims(data.userClaims);
+      })
+      .finally(() => {
+        setLoadingClaims(false);
+      });
   };
 
   return (
@@ -97,13 +104,13 @@ const Profile = (
               </TabList>
             </Paper>
             <TabPanel value={UserClaimRelation.OWN}>
-              <ClaimsList claims={claims} />
+              <ClaimsList claims={claims} loading={loadingClaims} />
             </TabPanel>
             <TabPanel value={UserClaimRelation.CONTRIBUTED}>
-              <ClaimsList claims={claims} />
+              <ClaimsList claims={claims} loading={loadingClaims} />
             </TabPanel>
             <TabPanel value={UserClaimRelation.FOLLOWING}>
-              <ClaimsList claims={claims} />
+              <ClaimsList claims={claims} loading={loadingClaims} />
             </TabPanel>
           </TabContext>
         </Stack>

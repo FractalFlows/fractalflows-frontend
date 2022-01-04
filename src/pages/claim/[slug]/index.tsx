@@ -9,7 +9,13 @@ import { ClaimSummary } from "modules/claims/components/Summary";
 import { ConsiderIt } from "modules/claims/components/ConsiderIt";
 import { RelatedClaims } from "modules/claims/components/RelatedClaims";
 
-const Claim: NextPage<{ claim: ClaimProps }> = ({ claim }) => {
+interface ClaimPageProps {
+  data: { claim: ClaimProps; relatedClaims: ClaimProps[] };
+}
+
+const Claim: NextPage<ClaimPageProps> = ({
+  data: { claim, relatedClaims },
+}) => {
   const knowledgeBits = [
     {
       id: 0,
@@ -40,7 +46,7 @@ const Claim: NextPage<{ claim: ClaimProps }> = ({ claim }) => {
         <ClaimSummary claim={claim} />
         <KnowledgeBits knowledgeBits={knowledgeBits} />
         <ConsiderIt />
-        <RelatedClaims relatedClaims={[claim, claim, claim]} />
+        <RelatedClaims relatedClaims={relatedClaims} />
       </Stack>
     </Box>
   );
@@ -48,12 +54,13 @@ const Claim: NextPage<{ claim: ClaimProps }> = ({ claim }) => {
 
 export async function getServerSideProps(context) {
   const { slug } = context.query;
-  const claim = await ClaimsService.getClaim({
+  const data = await ClaimsService.getClaim({
     slug,
   });
+
   return {
     props: {
-      claim,
+      data,
     },
   };
 }

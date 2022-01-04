@@ -3,6 +3,6 @@ import { CircularProgress, Stack } from "@mui/material";
 
 export const Spinner: FC<{ size?: number }> = ({ size = 40 }) => (
   <Stack sx={{ p: 6 }} alignItems="center">
-    <CircularProgress color="inherit" size={size} />
+    <CircularProgress size={size} />
   </Stack>
 );

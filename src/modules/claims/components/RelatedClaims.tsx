@@ -3,6 +3,7 @@ import { Typography, Box, Stack } from "@mui/material";
 
 import { ClaimProps } from "modules/claims/interfaces";
 import { ClaimsList } from "./ClaimsList";
+import { Link } from "common/components/Link";
 
 export const RelatedClaims: FC<{
   relatedClaims?: ClaimProps[];
@@ -13,9 +14,12 @@ export const RelatedClaims: FC<{
         <Typography variant="h4" component="h2">
           Related claims
         </Typography>
-        <Stack spacing={1}>
-          <ClaimsList claims={relatedClaims} />
-        </Stack>
+        <ClaimsList claims={relatedClaims}>
+          We couldn't find any related claims at this time, but you can help by{" "}
+          <Link href="/claim/new" text>
+            contributing
+          </Link>
+        </ClaimsList>
       </Stack>
     </Box>
   );

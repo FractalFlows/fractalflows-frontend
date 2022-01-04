@@ -17,7 +17,7 @@ import { CircularProgress } from "@mui/material";
 
 const EditClaim: NextPage = () => {
   const { session } = useAuth();
-  const { getClaim } = useClaims();
+  const { getPartialClaim } = useClaims();
   const [claim, setClaim] = useState<ClaimProps>();
   const router = useRouter();
   const { enqueueSnackbar } = useSnackbar();
@@ -25,7 +25,7 @@ const EditClaim: NextPage = () => {
 
   useEffect(() => {
     if (slug) {
-      getClaim({ slug })
+      getPartialClaim({ slug })
         .then((data) => setClaim(data))
         .catch((e) =>
           enqueueSnackbar(e.message, {

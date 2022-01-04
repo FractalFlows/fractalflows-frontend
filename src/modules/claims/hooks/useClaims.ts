@@ -1,11 +1,12 @@
 import { createClaim } from "./create";
 import { updateClaim } from "./update";
 import { deleteClaim } from "./delete";
-import { getClaim, getClaims, getTrendingClaims } from "./get";
+import { getClaim, getPartialClaim, getClaims, getTrendingClaims } from "./get";
 
 export const useClaims = () => {
   return {
     getClaim,
+    getPartialClaim,
     getClaims,
     getTrendingClaims,
     createClaim,
