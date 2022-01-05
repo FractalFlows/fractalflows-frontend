@@ -96,7 +96,6 @@ export const KnowledgeBits: FC<{
     [knowledgeBits]
   );
 
-  console.log(refutingKnowledgeBits, KnowledgeBitSides);
   return (
     <Box>
       <Stack spacing={4}>

@@ -37,8 +37,17 @@ export const GET_CLAIM = gql`
       knowledgeBits {
         id
         name
+        summary
         side
+        type
+        customType
+        location
+        customLocation
         url
+        attributions {
+          origin
+          identifier
+        }
         user {
           avatar
           username

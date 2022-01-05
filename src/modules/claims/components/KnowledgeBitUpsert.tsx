@@ -164,14 +164,14 @@ export const KnowledgeBitUpsert: FC<KnowledgeBitUpsertProps> = ({
     handleSubmit: handleSubmitHook,
   } = useForm<KnowledgeBitUpsertFormProps>({
     defaultValues: {
-      name: get(knowledgeBit, "title", ""),
+      name: get(knowledgeBit, "name", ""),
       summary: get(knowledgeBit, "summary", ""),
       side: get(knowledgeBit, "side"),
       type: get(knowledgeBit, "type", ""),
       customType: get(knowledgeBit, "customType", ""),
       location: get(knowledgeBit, "location", ""),
       customLocation: get(knowledgeBit, "customLocation", ""),
-      url: get(knowledgeBit, "link", ""),
+      url: get(knowledgeBit, "url", ""),
       attributions: mapArray(knowledgeBit?.attributions, [
         "id",
         "origin",
