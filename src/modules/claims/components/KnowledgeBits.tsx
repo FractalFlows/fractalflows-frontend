@@ -1,4 +1,4 @@
-import { FC } from "react";
+import { FC, useRef, useState } from "react";
 import {
   Typography,
   Box,
@@ -6,30 +6,59 @@ import {
   Tooltip,
   IconButton,
   Button,
+  Paper,
 } from "@mui/material";
-import { Add as AddIcon, Help as HelpIcon } from "@mui/icons-material";
+import { Help as HelpIcon } from "@mui/icons-material";
 
 import { KnowledgeBitProps } from "modules/claims/interfaces";
 import { KnowledgeBit } from "./KnowledgeBit";
+import { KnowledgeBitUpsert } from "./KnowledgeBitUpsert";
+
+enum KnowledgeBitsPanelState {
+  CREATING,
+  UPDATING,
+}
 
 export const KnowledgeBitsPanel: FC<{
   title: string;
   knowledgeBits?: KnowledgeBitProps[];
 }> = ({ title, knowledgeBits = [] }) => {
+  const [knowledgeBitsPanelState, setKnowledgeBitsPanelState] =
+    useState<KnowledgeBitsPanelState>();
+  const knowledgeBitUpsertRef = useRef(null);
+
+  const handleAddKnowledgeBit = async () => {
+    await setKnowledgeBitsPanelState(KnowledgeBitsPanelState.CREATING);
+    knowledgeBitUpsertRef?.current?.scrollIntoView({
+      behavior: "smooth",
+    });
+  };
+
   return (
     <Stack sx={{ width: { xs: "100%", md: "47%" } }} spacing={3}>
       <Stack direction="row" alignItems="center">
         <Typography variant="h5" component="h3" flexGrow={1}>
           {title}
         </Typography>
-        <Button variant="contained" color="secondary">
-          Add Knowledge Bit
+        <Button
+          variant="contained"
+          color="secondary"
+          onClick={handleAddKnowledgeBit}
+        >
+          Add
         </Button>
       </Stack>
       <Stack spacing={1}>
         {knowledgeBits?.map((knowledgeBit) => (
           <KnowledgeBit knowledgeBit={knowledgeBit} key={knowledgeBit.id} />
         ))}
+        {knowledgeBitsPanelState === KnowledgeBitsPanelState.CREATING ? (
+          <Box sx={{ p: 4 }} ref={knowledgeBitUpsertRef}>
+            <KnowledgeBitUpsert
+              handleClose={() => setKnowledgeBitsPanelState(undefined)}
+            />
+          </Box>
+        ) : null}
       </Stack>
     </Stack>
   );

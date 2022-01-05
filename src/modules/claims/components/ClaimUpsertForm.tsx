@@ -22,7 +22,11 @@ import {
 import { Select } from "common/components/Select";
 import { useClaims } from "modules/claims/hooks/useClaims";
 import { useTags } from "modules/tags/hooks/useTags";
-import type { ClaimProps } from "modules/claims/interfaces";
+import type {
+  AttributionProps,
+  ClaimProps,
+  SourceProps,
+} from "modules/claims/interfaces";
 import type { TagProps } from "modules/tags/interfaces";
 import {
   validateDOI,
@@ -74,9 +78,9 @@ export const ClaimUpsertForm: FC<ClaimUpsertFormProps> = ({
   } = useForm<{
     title: string;
     summary: string;
-    tags: NestedValue<any[]>;
-    sources: NestedValue<any[]>;
-    attributions: NestedValue<any[]>;
+    tags: NestedValue<TagProps[]>;
+    sources: NestedValue<SourceProps[]>;
+    attributions: NestedValue<AttributionProps[]>;
   }>({
     defaultValues: {
       title: get(claim, "title", ""),
@@ -129,7 +133,7 @@ export const ClaimUpsertForm: FC<ClaimUpsertFormProps> = ({
     try {
       const { slug } = await (operation === ClaimUpsertFormOperation.CREATE
         ? createClaim({ claim: data })
-        : updateClaim({ id: claim?.id, claim: data }));
+        : updateClaim({ id: claim?.id as string, claim: data }));
       enqueueSnackbar(ClaimUpsertFormOperationText[operation].successFeedback, {
         variant: "success",
       });

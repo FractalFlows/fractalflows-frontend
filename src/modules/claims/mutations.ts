@@ -18,6 +18,28 @@ export const UPDATE_CLAIM = gql`
   }
 `;
 
+export const CREATE_KNOWLEDGE_BIT = gql`
+  mutation CreateClaim(
+    $claimSlug: String!
+    $createKnowledgeBitInput: CreateKnowledgeBitInput!
+  ) {
+    createKnowledgeBit(
+      claimSlug: $claimSlug
+      createKnowledgeBitInput: $createKnowledgeBitInput
+    ) {
+      id
+    }
+  }
+`;
+
+export const UPDATE_KNOWLEDGE_BIT = gql`
+  mutation UpdateClaim($updateKnowledgeBitInput: UpdateKnowledgeBitInput!) {
+    updateKnowledgeBit(updateKnowledgeBitInput: $updateKnowledgeBitInput) {
+      id
+    }
+  }
+`;
+
 export const DELETE_CLAIM = gql`
   mutation DeleteClaim($id: String!) {
     deleteClaim(id: $id)

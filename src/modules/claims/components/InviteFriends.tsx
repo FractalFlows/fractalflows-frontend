@@ -111,7 +111,7 @@ export const InviteFriends: FC<InviteFriendsProps> = ({
               />
 
               <TextField
-                label="Message"
+                label="Message (optional)"
                 multiline
                 minRows={4}
                 maxRows={Infinity}

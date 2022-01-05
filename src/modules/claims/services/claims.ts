@@ -5,6 +5,8 @@ import {
   UPDATE_CLAIM,
   DELETE_CLAIM,
   INVITE_FRIENDS,
+  CREATE_KNOWLEDGE_BIT,
+  UPDATE_KNOWLEDGE_BIT,
 } from "../mutations";
 import {
   GET_CLAIM,
@@ -12,7 +14,11 @@ import {
   GET_CLAIMS,
   GET_TRENDING_CLAIMS,
 } from "../queries";
-import type { ClaimProps, InviteFriendsProps } from "../interfaces";
+import type {
+  ClaimProps,
+  InviteFriendsProps,
+  KnowledgeBitProps,
+} from "../interfaces";
 import type { PaginationProps } from "modules/interfaces";
 
 export const ClaimsService = {
@@ -124,5 +130,43 @@ export const ClaimsService = {
     });
 
     return data.inviteFriends;
+  },
+
+  async createKnowledgeBit({
+    claimSlug,
+    knowledgeBit,
+  }: {
+    claimSlug: string;
+    knowledgeBit: KnowledgeBitProps;
+  }): Promise<KnowledgeBitProps> {
+    const { data } = await apolloClient.mutate({
+      mutation: CREATE_KNOWLEDGE_BIT,
+      variables: {
+        claimSlug: claimSlug,
+        createKnowledgeBitInput: knowledgeBit,
+      },
+    });
+
+    return data.createKnowledgeBit;
+  },
+
+  async updateKnowledgeBit({
+    id,
+    knowledgeBit,
+  }: {
+    id: string;
+    knowledgeBit: KnowledgeBitProps;
+  }): Promise<KnowledgeBitProps> {
+    const { data } = await apolloClient.mutate({
+      mutation: UPDATE_KNOWLEDGE_BIT,
+      variables: {
+        updateKnowledgeBitInput: {
+          id,
+          ...knowledgeBit,
+        },
+      },
+    });
+
+    return data.updateKnowledgeBit;
   },
 };
