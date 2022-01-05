@@ -1,13 +1,18 @@
 import { apolloClient } from "common/services/apollo/client";
 
-import { CREATE_CLAIM, UPDATE_CLAIM, DELETE_CLAIM } from "../mutations";
+import {
+  CREATE_CLAIM,
+  UPDATE_CLAIM,
+  DELETE_CLAIM,
+  INVITE_FRIENDS,
+} from "../mutations";
 import {
   GET_CLAIM,
   GET_PARTIAL_CLAIM,
   GET_CLAIMS,
   GET_TRENDING_CLAIMS,
 } from "../queries";
-import type { ClaimProps } from "../interfaces";
+import type { ClaimProps, InviteFriendsProps } from "../interfaces";
 import type { PaginationProps } from "modules/interfaces";
 
 export const ClaimsService = {
@@ -100,5 +105,24 @@ export const ClaimsService = {
     });
 
     return data.deleteClaim;
+  },
+
+  async inviteFriends({
+    slug,
+    emails,
+    message,
+  }: InviteFriendsProps): Promise<Boolean> {
+    const { data } = await apolloClient.mutate({
+      mutation: INVITE_FRIENDS,
+      variables: {
+        inviteFriendsInput: {
+          slug,
+          emails,
+          message,
+        },
+      },
+    });
+
+    return data.inviteFriends;
   },
 };

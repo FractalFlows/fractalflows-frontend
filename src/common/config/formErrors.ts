@@ -3,6 +3,7 @@ export enum FORM_ERRORS {
   url = "Invalid URL",
   doi = "Invalid DOI",
   email = "Invalid email",
+  emails = "All values must be valid emails",
   twitterHandle = "Invalid Twitter handle",
   customUsernameCharacters = "You can only use letters, numbers, underlines and dots",
   customUsernameMinLength = "Username must have at least 4 characters",

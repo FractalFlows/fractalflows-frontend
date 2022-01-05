@@ -35,3 +35,9 @@ export interface ClaimProps {
   createdAt: Date;
   user: UserProps;
 }
+
+export interface InviteFriendsProps {
+  slug: string;
+  emails: string[];
+  message?: string;
+}

@@ -28,8 +28,11 @@ import { deleteClaim } from "../hooks/delete";
 import { useClaims } from "../hooks/useClaims";
 import { useSnackbar } from "notistack";
 import { Spinner } from "common/components/Spinner";
+import { InviteFriends } from "./InviteFriends";
 
 export const ClaimSummary: FC<{ claim: ClaimProps }> = ({ claim }) => {
+  const [isInviteFriendsDialogOpen, setIsInviteFriendsDialogOpen] =
+    useState(false);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
   const { deleteClaim } = useClaims();
@@ -53,8 +56,9 @@ export const ClaimSummary: FC<{ claim: ClaimProps }> = ({ claim }) => {
       setIsDeleting(false);
     }
   };
-  const handleDeleteDialogOpen = () => setIsDeleteDialogOpen(true);
   const handleDeleteDialogClose = () => setIsDeleteDialogOpen(false);
+  const handleInviteFriendsDialogClose = () =>
+    setIsInviteFriendsDialogOpen(false);
 
   return (
     <Stack spacing={3}>
@@ -75,10 +79,14 @@ export const ClaimSummary: FC<{ claim: ClaimProps }> = ({ claim }) => {
         <Box flexGrow="1" />
         <Stack direction="row">
           <Tooltip title="Invite friends to participate in this claim">
-            <IconButton>
+            <IconButton onClick={() => setIsInviteFriendsDialogOpen(true)}>
               <InviteFriendsIcon />
             </IconButton>
           </Tooltip>
+          <InviteFriends
+            open={isInviteFriendsDialogOpen}
+            handleClose={handleInviteFriendsDialogClose}
+          />
           <Tooltip title="Follow this claim to receive notifications whenever it is updated">
             <IconButton>
               <NotificationsIcon />
@@ -93,7 +101,7 @@ export const ClaimSummary: FC<{ claim: ClaimProps }> = ({ claim }) => {
             </Tooltip>
           </Link>
           <Tooltip title="Delete claim">
-            <IconButton onClick={handleDeleteDialogOpen}>
+            <IconButton onClick={() => setIsDeleteDialogOpen(true)}>
               <DeleteIcon />
             </IconButton>
           </Tooltip>
@@ -102,23 +110,20 @@ export const ClaimSummary: FC<{ claim: ClaimProps }> = ({ claim }) => {
             onClose={handleDeleteDialogClose}
             fullWidth
             maxWidth="xs"
-            aria-labelledby="alert-dialog-title"
-            aria-describedby="alert-dialog-description"
+            aria-labelledby="delete-claim-dialog-title"
           >
+            <DialogTitle id="delete-claim-dialog-title">
+              Delete this claim?
+            </DialogTitle>
             {isDeleting ? (
               <Spinner />
             ) : (
-              <>
-                <DialogTitle id="alert-dialog-title">
-                  Delete this claim?
-                </DialogTitle>
-                <DialogActions>
-                  <Button onClick={handleDeleteDialogClose}>Cancel</Button>
-                  <Button onClick={handleDelete} autoFocus>
-                    Delete
-                  </Button>
-                </DialogActions>
-              </>
+              <DialogActions>
+                <Button onClick={handleDeleteDialogClose}>Cancel</Button>
+                <Button onClick={handleDelete} autoFocus>
+                  Delete
+                </Button>
+              </DialogActions>
             )}
           </Dialog>
         </Stack>

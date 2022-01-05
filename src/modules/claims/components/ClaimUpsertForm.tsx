@@ -166,7 +166,7 @@ export const ClaimUpsertForm: FC<ClaimUpsertFormProps> = ({
   return (
     <Box className="container page">
       <Stack alignItems="center">
-        <Stack spacing={6} sx={{ maxWidth: "550px" }}>
+        <Stack spacing={6}>
           <Typography variant="h3" component="h1" align="center">
             {ClaimUpsertFormOperationText[operation].pageTitle}
           </Typography>
@@ -318,6 +318,7 @@ export const ClaimUpsertForm: FC<ClaimUpsertFormProps> = ({
                 <Autocomplete
                   control={control}
                   multiple
+                  errors={errors}
                   options={tagsOptions}
                   loading={tagsOptionsLoading}
                   label="Tags"

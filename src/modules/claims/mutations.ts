@@ -23,3 +23,9 @@ export const DELETE_CLAIM = gql`
     deleteClaim(id: $id)
   }
 `;
+
+export const INVITE_FRIENDS = gql`
+  mutation InviteFriends($inviteFriendsInput: InviteFriendsInput!) {
+    inviteFriends(inviteFriendsInput: $inviteFriendsInput)
+  }
+`;
