@@ -40,9 +40,10 @@ export const ClaimSummary: FC<{ claim: ClaimProps }> = ({ claim }) => {
   const { enqueueSnackbar } = useSnackbar();
 
   const handleDelete = async () => {
+    setIsDeleting(true);
+
     try {
-      setIsDeleting(true);
-      await deleteClaim({ id: claim.id });
+      await deleteClaim({ id: claim?.id as string });
       setIsDeleteDialogOpen(false);
       enqueueSnackbar("Your claim has been sucesfully deleted!", {
         variant: "success",

@@ -7,6 +7,7 @@ import {
   INVITE_FRIENDS,
   CREATE_KNOWLEDGE_BIT,
   UPDATE_KNOWLEDGE_BIT,
+  DELETE_KNOWLEDGE_BIT,
 } from "../mutations";
 import {
   GET_CLAIM,
@@ -161,12 +162,23 @@ export const ClaimsService = {
       mutation: UPDATE_KNOWLEDGE_BIT,
       variables: {
         updateKnowledgeBitInput: {
-          id,
           ...knowledgeBit,
+          id,
         },
       },
     });
 
     return data.updateKnowledgeBit;
+  },
+
+  async deleteKnowledgeBit({ id }: { id: string }): Promise<boolean> {
+    const { data } = await apolloClient.mutate({
+      mutation: DELETE_KNOWLEDGE_BIT,
+      variables: {
+        id,
+      },
+    });
+
+    return data.deleteKnowledgeBit;
   },
 };

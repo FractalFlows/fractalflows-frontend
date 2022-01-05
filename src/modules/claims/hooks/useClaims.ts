@@ -2,7 +2,11 @@ import { createClaim } from "./create";
 import { updateClaim } from "./update";
 import { deleteClaim } from "./delete";
 import { inviteFriends } from "./inviteFriends";
-import { createKnowledgeBit, updateKnowledgeBit } from "./knowledgeBit";
+import {
+  createKnowledgeBit,
+  updateKnowledgeBit,
+  deleteKnowledgeBit,
+} from "./knowledgeBit";
 import { getClaim, getPartialClaim, getClaims, getTrendingClaims } from "./get";
 
 export const useClaims = () => {
@@ -17,5 +21,6 @@ export const useClaims = () => {
     inviteFriends,
     createKnowledgeBit,
     updateKnowledgeBit,
+    deleteKnowledgeBit,
   };
 };

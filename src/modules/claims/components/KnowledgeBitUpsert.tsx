@@ -119,14 +119,14 @@ export enum KnowledgeBitUpsertFormOperation {
 
 const KnowledgeBitUpsertFormOperationText = {
   [KnowledgeBitUpsertFormOperation.CREATE]: {
-    formTitle: "Add Knowledge Bit",
-    submitButton: "Add Knowledge Bit",
-    successFeedback: "Your new Knowledge Bit has been succesfully added!",
+    formTitle: "Add knowledge bit",
+    submitButton: "Add knowledge bit",
+    successFeedback: "Your new knowledge bit has been succesfully added!",
   },
   [KnowledgeBitUpsertFormOperation.UPDATE]: {
-    formTitle: "Edit Knowledge Bit",
-    submitButton: "Edit Knowledge Bit",
-    successFeedback: "Your Knowledge Bit has been succesfully edited!",
+    formTitle: "Edit knowledge bit",
+    submitButton: "Edit knowledge bit",
+    successFeedback: "Your knowledge bit has been succesfully edited!",
   },
 };
 

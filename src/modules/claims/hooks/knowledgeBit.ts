@@ -16,3 +16,6 @@ export const updateKnowledgeBit = async ({
   id: string;
   knowledgeBit: KnowledgeBitProps;
 }) => await ClaimsService.updateKnowledgeBit({ id, knowledgeBit });
+
+export const deleteKnowledgeBit = async ({ id }: { id: string }) =>
+  await ClaimsService.deleteKnowledgeBit({ id });

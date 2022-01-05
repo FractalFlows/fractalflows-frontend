@@ -1,6 +1,10 @@
 import { FC, SyntheticEvent, useState } from "react";
 import {
   Box,
+  Button,
+  Dialog,
+  DialogActions,
+  DialogTitle,
   Divider,
   IconButton,
   Menu,
@@ -23,6 +27,9 @@ import {
   KnowledgeBitUpsert,
   KnowledgeBitUpsertFormOperation,
 } from "./KnowledgeBitUpsert";
+import { Spinner } from "common/components/Spinner";
+import { useSnackbar } from "notistack";
+import { useClaims } from "../hooks/useClaims";
 
 enum KnowledgeBitStates {
   UPDATING,
@@ -32,12 +39,15 @@ enum KnowledgeBitStates {
 export const KnowledgeBit: FC<{ knowledgeBit: KnowledgeBitProps }> = ({
   knowledgeBit,
 }) => {
+  const { deleteKnowledgeBit } = useClaims();
   const [knowledgeBitState, setKnowledgeBitState] =
     useState<KnowledgeBitStates>();
   const [menuAnchorEl, setMenuAnchorEl] = useState<Element>();
   const isMenuOpen = Boolean(menuAnchorEl);
+  const [isDeleting, setIsDeleting] = useState(false);
+  const { enqueueSnackbar } = useSnackbar();
 
-  const handleClick = (event: SyntheticEvent) => {
+  const handleMenuOpen = (event: SyntheticEvent) => {
     event.preventDefault();
     setMenuAnchorEl(event.currentTarget);
   };
@@ -48,6 +58,29 @@ export const KnowledgeBit: FC<{ knowledgeBit: KnowledgeBitProps }> = ({
     setKnowledgeBitState(KnowledgeBitStates.UPDATING);
     handleMenuClose();
   };
+  const handleDelete = () => {
+    setKnowledgeBitState(KnowledgeBitStates.DELETING);
+    handleMenuClose();
+  };
+  const handleDeleteConfirmation = async () => {
+    handleMenuClose();
+    setIsDeleting(true);
+
+    try {
+      await deleteKnowledgeBit({ id: knowledgeBit?.id as string });
+      enqueueSnackbar("Your knowledge bit has been sucesfully deleted!", {
+        variant: "success",
+      });
+    } catch (e: any) {
+      enqueueSnackbar(e.message, {
+        variant: "error",
+      });
+    } finally {
+      setKnowledgeBitState(undefined);
+      setIsDeleting(false);
+    }
+  };
+  const handleDeleteDialogClose = () => setKnowledgeBitState(undefined);
 
   return (
     <Box>
@@ -58,11 +91,7 @@ export const KnowledgeBit: FC<{ knowledgeBit: KnowledgeBitProps }> = ({
               <Typography variant="body1">{knowledgeBit?.name}</Typography>
               <AvatarWithUsername user={knowledgeBit?.user} size={20} />
             </Stack>
-            <IconButton
-              aria-label="more"
-              id="long-button"
-              onClick={handleClick}
-            >
+            <IconButton onClick={handleMenuOpen}>
               <MoreVertIcon />
             </IconButton>
             <Menu
@@ -80,7 +109,7 @@ export const KnowledgeBit: FC<{ knowledgeBit: KnowledgeBitProps }> = ({
               onClose={handleMenuClose}
             >
               <MenuItem onClick={handleEdit}>Edit</MenuItem>
-              <MenuItem onClick={handleMenuClose}>Delete</MenuItem>
+              <MenuItem onClick={handleDelete}>Delete</MenuItem>
             </Menu>
             <Tooltip title="Upvote">
               <IconButton>
@@ -106,6 +135,28 @@ export const KnowledgeBit: FC<{ knowledgeBit: KnowledgeBitProps }> = ({
           </Box>
         </Paper>
       ) : null}
+
+      <Dialog
+        open={knowledgeBitState === KnowledgeBitStates.DELETING}
+        onClose={handleDeleteDialogClose}
+        fullWidth
+        maxWidth="xs"
+        aria-labelledby="delete-knowledge-bit-dialog-title"
+      >
+        <DialogTitle id="delete-knowledge-bit-dialog-title">
+          Delete the <strong>{knowledgeBit?.name}</strong> knowledge bit?
+        </DialogTitle>
+        {isDeleting ? (
+          <Spinner />
+        ) : (
+          <DialogActions>
+            <Button onClick={handleDeleteDialogClose}>Cancel</Button>
+            <Button onClick={handleDeleteConfirmation} autoFocus>
+              Delete
+            </Button>
+          </DialogActions>
+        )}
+      </Dialog>
     </Box>
   );
 };

@@ -18,6 +18,18 @@ export const UPDATE_CLAIM = gql`
   }
 `;
 
+export const DELETE_CLAIM = gql`
+  mutation DeleteClaim($id: String!) {
+    deleteClaim(id: $id)
+  }
+`;
+
+export const INVITE_FRIENDS = gql`
+  mutation InviteFriends($inviteFriendsInput: InviteFriendsInput!) {
+    inviteFriends(inviteFriendsInput: $inviteFriendsInput)
+  }
+`;
+
 export const CREATE_KNOWLEDGE_BIT = gql`
   mutation CreateClaim(
     $claimSlug: String!
@@ -40,14 +52,8 @@ export const UPDATE_KNOWLEDGE_BIT = gql`
   }
 `;
 
-export const DELETE_CLAIM = gql`
+export const DELETE_KNOWLEDGE_BIT = gql`
   mutation DeleteClaim($id: String!) {
-    deleteClaim(id: $id)
-  }
-`;
-
-export const INVITE_FRIENDS = gql`
-  mutation InviteFriends($inviteFriendsInput: InviteFriendsInput!) {
-    inviteFriends(inviteFriendsInput: $inviteFriendsInput)
+    deleteKnowledgeBit(id: $id)
   }
 `;
