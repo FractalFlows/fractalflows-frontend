@@ -1,4 +1,4 @@
-import { FC, useRef, useState } from "react";
+import { FC, useMemo, useRef, useState } from "react";
 import {
   Typography,
   Box,
@@ -6,23 +6,37 @@ import {
   Tooltip,
   IconButton,
   Button,
-  Paper,
 } from "@mui/material";
 import { Help as HelpIcon } from "@mui/icons-material";
 
-import { KnowledgeBitProps } from "modules/claims/interfaces";
+import {
+  KnowledgeBitProps,
+  KnowledgeBitSides,
+} from "modules/claims/interfaces";
 import { KnowledgeBit } from "./KnowledgeBit";
 import { KnowledgeBitUpsert } from "./KnowledgeBitUpsert";
+import { NoResults } from "common/components/NoResults";
 
 enum KnowledgeBitsPanelState {
   CREATING,
   UPDATING,
 }
 
+const KnowledgeBitsPanelTexts = {
+  [KnowledgeBitSides.REFUTING]: {
+    panelTitle: "Refuting",
+    side: "refuting",
+  },
+  [KnowledgeBitSides.SUPPORTING]: {
+    panelTitle: "Supporting",
+    side: "supporting",
+  },
+};
+
 export const KnowledgeBitsPanel: FC<{
-  title: string;
+  side: KnowledgeBitSides;
   knowledgeBits?: KnowledgeBitProps[];
-}> = ({ title, knowledgeBits = [] }) => {
+}> = ({ side, knowledgeBits = [] }) => {
   const [knowledgeBitsPanelState, setKnowledgeBitsPanelState] =
     useState<KnowledgeBitsPanelState>();
   const knowledgeBitUpsertRef = useRef(null);
@@ -38,13 +52,9 @@ export const KnowledgeBitsPanel: FC<{
     <Stack sx={{ width: { xs: "100%", md: "47%" } }} spacing={3}>
       <Stack direction="row" alignItems="center">
         <Typography variant="h5" component="h3" flexGrow={1}>
-          {title}
+          {KnowledgeBitsPanelTexts[side].panelTitle}
         </Typography>
-        <Button
-          variant="contained"
-          color="secondary"
-          onClick={handleAddKnowledgeBit}
-        >
+        <Button variant="contained" onClick={handleAddKnowledgeBit}>
           Add
         </Button>
       </Stack>
@@ -52,9 +62,17 @@ export const KnowledgeBitsPanel: FC<{
         {knowledgeBits?.map((knowledgeBit) => (
           <KnowledgeBit knowledgeBit={knowledgeBit} key={knowledgeBit.id} />
         ))}
+        {knowledgeBits.length === 0 &&
+        knowledgeBitsPanelState !== KnowledgeBitsPanelState.CREATING ? (
+          <NoResults>
+            We couldn&apos;t find any {KnowledgeBitsPanelTexts[side].side}{" "}
+            knowledge bits at this time
+          </NoResults>
+        ) : null}
         {knowledgeBitsPanelState === KnowledgeBitsPanelState.CREATING ? (
           <Box sx={{ p: 4 }} ref={knowledgeBitUpsertRef}>
             <KnowledgeBitUpsert
+              knowledgeBit={{ side } as KnowledgeBitProps}
               handleClose={() => setKnowledgeBitsPanelState(undefined)}
             />
           </Box>
@@ -67,6 +85,18 @@ export const KnowledgeBitsPanel: FC<{
 export const KnowledgeBits: FC<{
   knowledgeBits?: KnowledgeBitProps[];
 }> = ({ knowledgeBits = [] }) => {
+  const refutingKnowledgeBits = useMemo(
+    () =>
+      knowledgeBits.filter(({ side }) => side === KnowledgeBitSides.REFUTING),
+    [knowledgeBits]
+  );
+  const supportingKnowledgeBits = useMemo(
+    () =>
+      knowledgeBits.filter(({ side }) => side === KnowledgeBitSides.SUPPORTING),
+    [knowledgeBits]
+  );
+
+  console.log(refutingKnowledgeBits, KnowledgeBitSides);
   return (
     <Box>
       <Stack spacing={4}>
@@ -106,10 +136,13 @@ export const KnowledgeBits: FC<{
           spacing={3}
           justifyContent="space-between"
         >
-          <KnowledgeBitsPanel title="Refuting" knowledgeBits={knowledgeBits} />
           <KnowledgeBitsPanel
-            title="Supporting"
-            knowledgeBits={knowledgeBits}
+            side={KnowledgeBitSides.REFUTING}
+            knowledgeBits={refutingKnowledgeBits}
+          />
+          <KnowledgeBitsPanel
+            side={KnowledgeBitSides.SUPPORTING}
+            knowledgeBits={supportingKnowledgeBits}
           />
         </Stack>
       </Stack>

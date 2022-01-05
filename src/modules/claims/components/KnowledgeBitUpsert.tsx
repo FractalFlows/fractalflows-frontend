@@ -20,6 +20,7 @@ import {
   AttributionProps,
   KnowledgeBitLocations,
   KnowledgeBitProps,
+  KnowledgeBitSides,
   KnowledgeBitTypes,
 } from "modules/claims/interfaces";
 import {
@@ -138,6 +139,7 @@ interface KnowledgeBitUpsertProps {
 interface KnowledgeBitUpsertFormProps {
   name: string;
   summary?: string;
+  side: KnowledgeBitSides;
   type: string;
   customType?: string;
   location: string;
@@ -164,6 +166,7 @@ export const KnowledgeBitUpsert: FC<KnowledgeBitUpsertProps> = ({
     defaultValues: {
       name: get(knowledgeBit, "title", ""),
       summary: get(knowledgeBit, "summary", ""),
+      side: get(knowledgeBit, "side"),
       type: get(knowledgeBit, "type", ""),
       customType: get(knowledgeBit, "customType", ""),
       location: get(knowledgeBit, "location", ""),

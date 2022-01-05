@@ -34,6 +34,16 @@ export const GET_CLAIM = gql`
         origin
         identifier
       }
+      knowledgeBits {
+        id
+        name
+        side
+        url
+        user {
+          avatar
+          username
+        }
+      }
     }
     relatedClaims(slug: $slug) {
       ...CoreClaimFields

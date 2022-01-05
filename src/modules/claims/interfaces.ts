@@ -69,9 +69,15 @@ export enum KnowledgeBitLocations {
   OTHER = "OTHER",
 }
 
+export enum KnowledgeBitSides {
+  REFUTING = "REFUTING",
+  SUPPORTING = "SUPPORTING",
+}
+
 export interface KnowledgeBitProps {
   id: string;
   name: string;
+  side: KnowledgeBitSides;
   summary?: string;
   type: KnowledgeBitTypes;
   customType?: string;
@@ -79,6 +85,7 @@ export interface KnowledgeBitProps {
   customLocation?: string;
   url: string;
   attributions?: AttributionProps[];
+  user: UserProps;
 }
 
 export interface ClaimProps {

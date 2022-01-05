@@ -85,13 +85,17 @@ export const ClaimUpsertForm: FC<ClaimUpsertFormProps> = ({
     defaultValues: {
       title: get(claim, "title", ""),
       summary: get(claim, "summary", ""),
-      tags: mapArray(claim?.tags, ["id", "label"]),
-      sources: mapArray(claim?.sources, ["id", "origin", "url"]),
+      tags: mapArray(claim?.tags, ["id", "label"]) as TagProps[],
+      sources: mapArray(claim?.sources, [
+        "id",
+        "origin",
+        "url",
+      ]) as SourceProps[],
       attributions: mapArray(claim?.attributions, [
         "id",
         "origin",
         "identifier",
-      ]),
+      ]) as AttributionProps[],
     },
   });
   const {

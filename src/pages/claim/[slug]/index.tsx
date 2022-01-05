@@ -16,25 +16,6 @@ interface ClaimPageProps {
 const Claim: NextPage<ClaimPageProps> = ({
   data: { claim, relatedClaims },
 }) => {
-  const knowledgeBits = [
-    {
-      id: 0,
-      label: "Lorem ipsum dolor sit",
-      user: claim.user,
-    },
-    {
-      id: 2,
-      label: "Lorem ipsum dolor sit 2",
-      user: claim.user,
-    },
-
-    {
-      id: 8,
-      label: "Lorem ipsum dolor sit 3",
-      user: claim.user,
-    },
-  ];
-
   return (
     <Box className="container page">
       <Head>
@@ -44,7 +25,7 @@ const Claim: NextPage<ClaimPageProps> = ({
 
       <Stack spacing={14}>
         <ClaimSummary claim={claim} />
-        <KnowledgeBits knowledgeBits={knowledgeBits} />
+        <KnowledgeBits knowledgeBits={claim?.knowledgeBits} />
         <ConsiderIt />
         <RelatedClaims relatedClaims={relatedClaims} />
       </Stack>
