@@ -1,11 +1,9 @@
 import { FC } from "react";
-import { Avatar, Tooltip, Typography } from "@mui/material";
+import { Tooltip, Typography } from "@mui/material";
 
-import AccountCircle from "@mui/icons-material/AccountCircle";
+import { Avatar } from "modules/users/components/Avatar";
 
 export const HistogramAvatar: FC = ({ node, onClick = () => {} }) => {
-  const size = node.radius * 2;
-
   return (
     <Tooltip
       title={
@@ -18,16 +16,13 @@ export const HistogramAvatar: FC = ({ node, onClick = () => {} }) => {
       <Avatar
         src={node.opinion.user.avatar}
         onClick={onClick}
+        size={node.radius * 2}
         sx={{
           position: "absolute",
           left: node.x,
           bottom: node.y,
-          width: size,
-          height: size,
         }}
-      >
-        <AccountCircle sx={{ fontSize: size }} />
-      </Avatar>
+      />
     </Tooltip>
   );
 };

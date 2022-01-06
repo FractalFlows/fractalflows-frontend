@@ -119,3 +119,9 @@ export interface InviteFriendsProps {
   emails: string[];
   message?: string;
 }
+
+// Consider it
+export enum ArgumentTypes {
+  CON = "CON",
+  PRO = "PRO",
+}

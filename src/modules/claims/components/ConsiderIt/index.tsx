@@ -1,7 +1,9 @@
-import { Stack } from "@mui/material";
 import { useEffect, useState } from "react";
+import { Stack } from "@mui/material";
 
+import { ArgumentTypes } from "modules/claims/interfaces";
 import { Histogram } from "./Histogram";
+import { Arguments } from "./Arguments";
 import { Slider } from "./Slider";
 
 const user = {
@@ -37,11 +39,33 @@ const discussion = {
   ],
   arguments: [
     {
+      id: 34,
       summary: "My argument",
       user,
-      type: "x",
+      type: ArgumentTypes.CON,
+      createdAt: new Date(),
       evidences: [],
-      referrers: [],
+      referrers: [user, user],
+      comments: [],
+    },
+    {
+      id: 36,
+      summary: "My argument 2",
+      user,
+      type: ArgumentTypes.CON,
+      createdAt: new Date(),
+      evidences: [],
+      referrers: [user],
+      comments: [],
+    },
+    {
+      id: 38,
+      summary: "My argument3",
+      user,
+      type: ArgumentTypes.PRO,
+      createdAt: new Date(),
+      evidences: [],
+      referrers: [user, user],
       comments: [],
     },
   ],
@@ -49,6 +73,7 @@ const discussion = {
 
 export const ConsiderIt = () => {
   const [isOpining, setIsOpining] = useState(false);
+  const [showSingleOpinion, setShowSingleOpinion] = useState(false);
   const [opinion, setOpinion] = useState("Slide Your Overall Opinion");
   const [acceptance, setAcceptance] = useState(0.5);
 
@@ -70,6 +95,17 @@ export const ConsiderIt = () => {
     }
   }, [acceptance]);
 
+  const showOpinionFrom = (userId: string) => {
+    setShowSingleOpinion(true);
+  };
+
+  const cons = discussion.arguments.filter(
+    (argument) => argument.type === ArgumentTypes.CON
+  );
+  const pros = discussion.arguments.filter(
+    (argument) => argument.type === ArgumentTypes.PRO
+  );
+
   return (
     <Stack alignItems="center">
       <Stack sx={{ width: 700 }}>
@@ -77,6 +113,7 @@ export const ConsiderIt = () => {
           isOpining={isOpining}
           setIsOpining={setIsOpining}
           opinions={discussion.opinions}
+          showOpinionFrom={showOpinionFrom}
         />
         <Slider
           isOpining={isOpining}
@@ -86,6 +123,67 @@ export const ConsiderIt = () => {
           setAcceptance={setAcceptance}
         />
       </Stack>
+
+      {showSingleOpinion ? (
+        "Single opinion"
+      ) : (
+        <Stack direction="row" spacing={10}>
+          <Arguments
+            // addArgumentToSet={this._addArgumentToSet}
+            type={ArgumentTypes.CON}
+            arguments={cons}
+            // pickedArguments={pickedCons}
+            isOpining={isOpining}
+          />
+          <Arguments
+            // addArgumentToSet={this._addArgumentToSet}
+            type={ArgumentTypes.PRO}
+            arguments={pros}
+            // pickedArguments={pickedCons}
+            isOpining={isOpining}
+          />
+        </Stack>
+        // <SingleOpinion
+        //   opinion={
+        //     filter({ createdById: singleOpinionFromUserId }, opinions)[0]
+        //   }
+        //   cons={cons}
+        //   pros={pros}
+        //   hideSingleOpinion={this._hideSingleOpinion}
+        // />
+        // <OpinionContainer>
+        //   <ListArguments
+        //     addArgumentToSet={this._addArgumentToSet}
+        //     type="con"
+        //     argumentsList={cons}
+        //     pickedArguments={pickedCons}
+        //     givingOpinion={givingOpinion}
+        //   />
+
+        //   <GiveOpinion
+        //     dragging={dragging}
+        //     addArgumentToSet={this._addArgumentToSet}
+        //     removeArgumentFromSet={this._removeArgumentFromSet}
+        //     cons={cons}
+        //     pros={pros}
+        //     pickedCons={pickedCons}
+        //     pickedPros={pickedPros}
+        //     acceptance={acceptance}
+        //     givingOpinion={givingOpinion}
+        //     setGivingOpinionAs={this._setGivingOpinionAs}
+        //     setHasOpinedAs={this._setHasOpinedAs}
+        //     setUserAcceptance={this._setUserAcceptance}
+        //   />
+
+        //   <ListArguments
+        //     addArgumentToSet={this._addArgumentToSet}
+        //     type="pro"
+        //     argumentsList={pros}
+        //     pickedArguments={pickedPros}
+        //     givingOpinion={givingOpinion}
+        //   />
+        // </OpinionContainer>
+      )}
     </Stack>
   );
 };
