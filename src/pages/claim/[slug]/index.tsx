@@ -10,19 +10,20 @@ import type {
 import { ClaimsService } from "modules/claims/services/claims";
 import { KnowledgeBits } from "modules/claims/components/KnowledgeBits";
 import { ClaimSummary } from "modules/claims/components/Summary";
-import { ConsiderIt } from "modules/claims/components/ConsiderIt";
+import { SocialOpinions } from "modules/claims/components/SocialOpinions";
 import { RelatedClaims } from "modules/claims/components/RelatedClaims";
 
 interface ClaimPageProps {
   data: {
     claim: ClaimProps;
     relatedClaims: ClaimProps[];
+    knowledgeBits: KnowledgeBitProps[];
     userKnowledgeBitsVotes: KnowledgeBitVoteProps[];
   };
 }
 
 const Claim: NextPage<ClaimPageProps> = ({
-  data: { claim, relatedClaims, userKnowledgeBitsVotes },
+  data: { claim, relatedClaims, knowledgeBits, userKnowledgeBitsVotes },
 }) => {
   return (
     <Box className="container page">
@@ -34,10 +35,10 @@ const Claim: NextPage<ClaimPageProps> = ({
       <Stack spacing={14}>
         <ClaimSummary claim={claim} />
         <KnowledgeBits
-          knowledgeBits={claim?.knowledgeBits}
+          knowledgeBits={knowledgeBits}
           userVotes={userKnowledgeBitsVotes}
         />
-        <ConsiderIt />
+        <SocialOpinions />
         <RelatedClaims relatedClaims={relatedClaims} />
       </Stack>
     </Box>
@@ -49,24 +50,16 @@ export async function getServerSideProps(context) {
   const data = await ClaimsService.getClaim({
     slug,
   });
-  const knowledgeBits = await ClaimsService.getKnowledgeBits({
-    claimSlug: slug,
-  });
-  const userKnowledgeBitsVotes = await ClaimsService.getUserKnowledgeBitsVotes({
-    claimSlug: slug,
-  });
+
+  // ClaimsService.getKnowledgeBits({
+  //   claimSlug: slug,
+  // }),
+  // ClaimsService.getUserKnowledgeBitsVotes({
+  //   claimSlug: slug,
+  // }),
 
   return {
-    props: {
-      data: {
-        ...data,
-        userKnowledgeBitsVotes,
-        claim: {
-          ...data.claim,
-          knowledgeBits,
-        },
-      },
-    },
+    props: { data },
   };
 }
 

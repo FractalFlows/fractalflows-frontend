@@ -94,7 +94,7 @@ export const ClaimSummary: FC<{ claim: ClaimProps }> = ({ claim }) => {
             </IconButton>
           </Tooltip>
 
-          <Link href={`/claim/${claim.slug}/edit`}>
+          <Link href={`/claim/${claim?.slug}/edit`}>
             <Tooltip title="Edit claim">
               <IconButton>
                 <EditIcon />

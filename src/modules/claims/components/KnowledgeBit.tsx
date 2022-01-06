@@ -44,18 +44,20 @@ enum KnowledgeBitStates {
   DOWNVOTING,
 }
 
-interface KnowledgeBitProps {
+interface KnowledgeBitComponentProps {
   knowledgeBit: KnowledgeBitProps;
   userVote: KnowledgeBitVoteProps;
   handleUserVotesReload: () => any;
 }
 
-export const KnowledgeBit: FC<KnowledgeBitProps> = ({
+export const KnowledgeBit: FC<KnowledgeBitComponentProps> = ({
   knowledgeBit: preloadedKnowledgeBit,
   userVote = {},
   handleUserVotesReload,
 }) => {
-  const [knowledgeBit, setKnowledgeBit] = useState(preloadedKnowledgeBit);
+  const [knowledgeBit, setKnowledgeBit] = useState<KnowledgeBitProps>(
+    preloadedKnowledgeBit
+  );
   const { getKnowledgeBit, deleteKnowledgeBit, saveKnowledgeBitVote } =
     useClaims();
   const [knowledgeBitState, setKnowledgeBitState] =
@@ -117,10 +119,12 @@ export const KnowledgeBit: FC<KnowledgeBitProps> = ({
         knowledgeBitId: knowledgeBit?.id as string,
         type,
       });
-      await handleUserVotesReload();
-      const updatedKnowledgeBit = await getKnowledgeBit({
-        id: knowledgeBit.id,
-      });
+      const [updatedKnowledgeBit] = await Promise.all([
+        getKnowledgeBit({
+          id: knowledgeBit?.id,
+        }),
+        handleUserVotesReload(),
+      ]);
       setKnowledgeBit(updatedKnowledgeBit);
     } catch (e: any) {
       enqueueSnackbar(e.message, {

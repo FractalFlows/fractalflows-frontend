@@ -1,0 +1,56 @@
+.slider {
+  --fractalflows-considerit-thumb-height: 5px;
+  --fractalflows-considerit-franklin-diameter: 50px;
+}
+
+.slider__thumb {
+  background-color: #e0e0e0;
+  height: var(--fractalflows-considerit-thumb-height);
+  width: 100%;
+  position: relative;
+  margin-bottom: 100px;
+}
+
+.slider__thumb--moving {
+  background-color: #ddd;
+}
+
+.slider__handle {
+  height: var(--fractalflows-considerit-franklin-diameter);
+  width: var(--fractalflows-considerit-franklin-diameter);
+  border-radius: 50%;
+  position: relative;
+  top: calc(
+    var(--fractalflows-considerit-franklin-diameter) / -2 -
+      var(--fractalflows-considerit-thumb-height) / 2
+  );
+}
+
+.slider__franklin {
+  background-color: var(--fractalflows-colors-primary);
+  height: 100%;
+  width: 100%;
+  border-radius: 50%;
+  cursor: pointer;
+  transition: 0.15s;
+}
+
+/* .slider__frankling--moving {
+    background-color: ${grey600};
+  } */
+
+.slider__label {
+  color: var(--fractalflows-colors-primary);
+  font-size: 24px;
+  font-weight: bold;
+  position: absolute;
+  white-space: nowrap;
+  user-select: none;
+  transform: translateX(-50%);
+  margin-left: calc(var(--fractalflows-considerit-franklin-diameter) / 2);
+  top: 60px;
+}
+
+.slider__label--opining {
+  display: none;
+}

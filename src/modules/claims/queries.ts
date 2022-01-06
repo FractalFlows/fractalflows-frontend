@@ -18,8 +18,33 @@ export const CORE_CLAIM_FIELDS = gql`
   }
 `;
 
+export const KNOWLEDGE_BIT_FIELDS = gql`
+  fragment KnowledgeBitFields on KnowledgeBit {
+    id
+    name
+    summary
+    side
+    type
+    customType
+    location
+    customLocation
+    url
+    attributions {
+      origin
+      identifier
+    }
+    user {
+      avatar
+      username
+    }
+    upvotesCount
+    downvotesCount
+  }
+`;
+
 export const GET_CLAIM = gql`
   ${CORE_CLAIM_FIELDS}
+  ${KNOWLEDGE_BIT_FIELDS}
 
   query GetClaim($slug: String!) {
     claim(slug: $slug) {
@@ -37,6 +62,15 @@ export const GET_CLAIM = gql`
     }
     relatedClaims(slug: $slug) {
       ...CoreClaimFields
+    }
+    knowledgeBits(claimSlug: $slug) {
+      ...KnowledgeBitFields
+    }
+    userKnowledgeBitsVotes(claimSlug: $slug) {
+      type
+      knowledgeBit {
+        id
+      }
     }
   }
 `;
@@ -78,30 +112,6 @@ export const GET_TRENDING_CLAIMS = gql`
     trendingClaims(offset: $offset, limit: $limit) {
       ...CoreClaimFields
     }
-  }
-`;
-
-export const KNOWLEDGE_BIT_FIELDS = gql`
-  fragment KnowledgeBitFields on KnowledgeBit {
-    id
-    name
-    summary
-    side
-    type
-    customType
-    location
-    customLocation
-    url
-    attributions {
-      origin
-      identifier
-    }
-    user {
-      avatar
-      username
-    }
-    upvotesCount
-    downvotesCount
   }
 `;
 
