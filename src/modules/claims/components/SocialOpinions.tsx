@@ -6,7 +6,7 @@ import { ConsiderIt } from "./ConsiderIt";
 export const SocialOpinions: NextPage<{}> = ({}) => {
   return (
     <Box>
-      <Stack spacing={3}>
+      <Stack spacing={8}>
         <Typography variant="h4" component="h2">
           Social opinions
         </Typography>

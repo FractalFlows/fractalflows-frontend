@@ -1,6 +1,6 @@
 .slider {
   --fractalflows-considerit-thumb-height: 5px;
-  --fractalflows-considerit-franklin-diameter: 50px;
+  --fractalflows-considerit-franklin-diameter: 60px;
 }
 
 .slider__thumb {
@@ -21,9 +21,10 @@
   border-radius: 50%;
   position: relative;
   top: calc(
-    var(--fractalflows-considerit-franklin-diameter) / -2 -
+    var(--fractalflows-considerit-franklin-diameter) / -2 +
       var(--fractalflows-considerit-thumb-height) / 2
   );
+  margin-left: calc(var(--fractalflows-considerit-franklin-diameter) / -2);
 }
 
 .slider__franklin {
@@ -48,7 +49,7 @@
   user-select: none;
   transform: translateX(-50%);
   margin-left: calc(var(--fractalflows-considerit-franklin-diameter) / 2);
-  top: 60px;
+  top: calc(var(--fractalflows-considerit-franklin-diameter) + 10px);
 }
 
 .slider__label--opining {

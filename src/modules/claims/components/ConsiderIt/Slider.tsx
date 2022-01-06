@@ -1,18 +1,9 @@
-/*
- * Built by Astrocoders
- * @flow
- */
-
 import React, { Component, useCallback, useRef, useState } from "react";
 import { clamp, get } from "lodash-es";
 
 import styles from "./Slider.module.css";
-import { Box } from "@mui/material";
 
-const grey800 = "#888";
-const grey600 = "#666";
 const franklinDiameter = 50;
-const thumbHeight = 5;
 
 // const GiveOpinionBtn = styled.div`
 //   background-color: ${grey800};
@@ -56,6 +47,8 @@ export const Slider: FC<{}> = ({
   const franklinSmileCurve = acceptance * 10;
 
   const moveSlide = useCallback((event) => {
+    event.preventDefault();
+
     const { offsetWidth, offsetLeft } = sliderThumb.current;
     const acceptanceInPixels = clamp(
       event.clientX - offsetLeft,
@@ -73,12 +66,6 @@ export const Slider: FC<{}> = ({
     setIsSliding(false);
   }, []);
 
-  const getSliderHandlePosition = () =>
-    `${
-      acceptance * get(sliderThumb.current, "offsetWidth", 0) -
-      get(sliderHandle.current, "offsetWidth", 0) / 2
-    }px`;
-
   const handleSlideStart = () => {
     document.body.addEventListener("mousemove", moveSlide, false);
     document.body.addEventListener("touchmove", moveSlide, false);
@@ -87,7 +74,7 @@ export const Slider: FC<{}> = ({
     setIsOpining(true);
     setIsSliding(true);
   };
-  console.log(getSliderHandlePosition());
+
   return (
     <div className={styles.slider}>
       <div
@@ -108,14 +95,14 @@ export const Slider: FC<{}> = ({
           <div
             className={styles.slider__franklin}
             style={{
-              transform: isOpining ? "" : "scale(.3)",
+              transform: isOpining ? "" : "scale(.4)",
             }}
           >
             <svg
-              width={franklinDiameter}
-              height={franklinDiameter}
               viewBox="-2 -1 104 104"
               style={{
+                width: "var(--fractalflows-considerit-franklin-diameter)",
+                height: "var(--fractalflows-considerit-franklin-diameter)",
                 display: isOpining ? "initial" : "none",
               }}
             >

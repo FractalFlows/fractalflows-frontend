@@ -1,5 +1,51 @@
+import { Stack } from "@mui/material";
 import { useEffect, useState } from "react";
+
+import { Histogram } from "./Histogram";
 import { Slider } from "./Slider";
+
+const user = {
+  ethAddress: "0xd01159A043d1d6bc575daE358C6046F5Cc08e7E6",
+  email: "yuri.fabris@gmail.com",
+  username: "blocknomad.eth",
+  usernameSource: "ENS",
+  avatar: "https://www.gravatar.com/avatar/49a046a0de6b525d1f41beab756cd89c",
+  avatarSource: "GRAVATAR",
+  __typename: "User",
+};
+
+const discussion = {
+  opinions: [
+    {
+      id: 1,
+      user,
+      arguments: [],
+      acceptance: 0.2,
+    },
+    {
+      id: 2,
+      user,
+      arguments: [],
+      acceptance: 0.2,
+    },
+    {
+      id: 3,
+      user,
+      arguments: [],
+      acceptance: 1,
+    },
+  ],
+  arguments: [
+    {
+      summary: "My argument",
+      user,
+      type: "x",
+      evidences: [],
+      referrers: [],
+      comments: [],
+    },
+  ],
+};
 
 export const ConsiderIt = () => {
   const [isOpining, setIsOpining] = useState(false);
@@ -25,12 +71,21 @@ export const ConsiderIt = () => {
   }, [acceptance]);
 
   return (
-    <Slider
-      isOpining={isOpining}
-      setIsOpining={setIsOpining}
-      opinion={opinion}
-      acceptance={acceptance}
-      setAcceptance={setAcceptance}
-    />
+    <Stack alignItems="center">
+      <Stack sx={{ width: 700 }}>
+        <Histogram
+          isOpining={isOpining}
+          setIsOpining={setIsOpining}
+          opinions={discussion.opinions}
+        />
+        <Slider
+          isOpining={isOpining}
+          setIsOpining={setIsOpining}
+          opinion={opinion}
+          acceptance={acceptance}
+          setAcceptance={setAcceptance}
+        />
+      </Stack>
+    </Stack>
   );
 };
