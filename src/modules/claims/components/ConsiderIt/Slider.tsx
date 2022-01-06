@@ -123,7 +123,9 @@ export const Slider: FC<{}> = ({
             </svg>
           </div>
 
-          <div className={styles.slider__label}>{opinion}</div>
+          {isOpining ? (
+            <div className={styles.slider__label}>{opinion}</div>
+          ) : null}
           {/* <div givingOpinion={isOpining}>{opinionStrength}</SliderLabel> */}
 
           {/* <GiveOpinionBtn givingOpinion={isOpining}>

@@ -5,6 +5,7 @@ import { ArgumentTypes } from "modules/claims/interfaces";
 import { Histogram } from "./Histogram";
 import { Arguments } from "./Arguments";
 import { Slider } from "./Slider";
+import { Opinion } from "./Opinion";
 
 const user = {
   ethAddress: "0xd01159A043d1d6bc575daE358C6046F5Cc08e7E6",
@@ -16,64 +17,66 @@ const user = {
   __typename: "User",
 };
 
+const argumentsList = [
+  {
+    id: 34,
+    summary: "My argument",
+    user,
+    type: ArgumentTypes.CON,
+    createdAt: new Date(),
+    evidences: [],
+    referrers: [user, user],
+    comments: [],
+  },
+  {
+    id: 36,
+    summary: "My argument 2",
+    user,
+    type: ArgumentTypes.CON,
+    createdAt: new Date(),
+    evidences: [],
+    referrers: [user],
+    comments: [],
+  },
+  {
+    id: 38,
+    summary: "My argument3",
+    user,
+    type: ArgumentTypes.PRO,
+    createdAt: new Date(),
+    evidences: [],
+    referrers: [user, user],
+    comments: [],
+  },
+];
+
 const discussion = {
   opinions: [
     {
       id: 1,
       user,
-      arguments: [],
+      arguments: argumentsList,
       acceptance: 0.2,
     },
     {
       id: 2,
       user,
-      arguments: [],
+      arguments: argumentsList,
       acceptance: 0.2,
     },
     {
       id: 3,
       user,
-      arguments: [],
+      arguments: [argumentsList[0]],
       acceptance: 1,
     },
   ],
-  arguments: [
-    {
-      id: 34,
-      summary: "My argument",
-      user,
-      type: ArgumentTypes.CON,
-      createdAt: new Date(),
-      evidences: [],
-      referrers: [user, user],
-      comments: [],
-    },
-    {
-      id: 36,
-      summary: "My argument 2",
-      user,
-      type: ArgumentTypes.CON,
-      createdAt: new Date(),
-      evidences: [],
-      referrers: [user],
-      comments: [],
-    },
-    {
-      id: 38,
-      summary: "My argument3",
-      user,
-      type: ArgumentTypes.PRO,
-      createdAt: new Date(),
-      evidences: [],
-      referrers: [user, user],
-      comments: [],
-    },
-  ],
+  arguments: argumentsList,
 };
 
 export const ConsiderIt = () => {
   const [isOpining, setIsOpining] = useState(false);
-  const [showSingleOpinion, setShowSingleOpinion] = useState(false);
+  const [showOpinion, setShowOpinion] = useState(false);
   const [opinion, setOpinion] = useState("Slide Your Overall Opinion");
   const [acceptance, setAcceptance] = useState(0.5);
 
@@ -95,8 +98,11 @@ export const ConsiderIt = () => {
     }
   }, [acceptance]);
 
-  const showOpinionFrom = (userId: string) => {
-    setShowSingleOpinion(true);
+  const handleShowOpinion = (userId: string) => {
+    setShowOpinion(true);
+  };
+  const handleHideOpinion = () => {
+    setShowOpinion(false);
   };
 
   const cons = discussion.arguments.filter(
@@ -105,7 +111,7 @@ export const ConsiderIt = () => {
   const pros = discussion.arguments.filter(
     (argument) => argument.type === ArgumentTypes.PRO
   );
-
+  console.log(discussion);
   return (
     <Stack alignItems="center">
       <Stack sx={{ width: 700 }}>
@@ -113,7 +119,7 @@ export const ConsiderIt = () => {
           isOpining={isOpining}
           setIsOpining={setIsOpining}
           opinions={discussion.opinions}
-          showOpinionFrom={showOpinionFrom}
+          handleShowOpinion={handleShowOpinion}
         />
         <Slider
           isOpining={isOpining}
@@ -124,14 +130,18 @@ export const ConsiderIt = () => {
         />
       </Stack>
 
-      {showSingleOpinion ? (
-        "Single opinion"
+      {showOpinion ? (
+        <Opinion
+          opinion={discussion.opinions[0]}
+          handleHideOpinion={handleHideOpinion}
+        />
       ) : (
         <Stack direction="row" spacing={10}>
           <Arguments
             // addArgumentToSet={this._addArgumentToSet}
             type={ArgumentTypes.CON}
             arguments={cons}
+            title={`${isOpining ? "Others'" : "Top"} arguments against`}
             // pickedArguments={pickedCons}
             isOpining={isOpining}
           />
@@ -139,6 +149,7 @@ export const ConsiderIt = () => {
             // addArgumentToSet={this._addArgumentToSet}
             type={ArgumentTypes.PRO}
             arguments={pros}
+            title={`${isOpining ? "Others'" : "Top"} arguments for`}
             // pickedArguments={pickedCons}
             isOpining={isOpining}
           />

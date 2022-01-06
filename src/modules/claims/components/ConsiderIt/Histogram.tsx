@@ -9,7 +9,7 @@ export const Histogram: FC<{}> = ({
   opinions,
   isOpining,
   setIsOpining,
-  showOpinionFrom,
+  handleShowOpinion,
 }) => {
   const histogram = useRef(null);
   const [nodes, setNodes] = useState([]);
@@ -44,7 +44,7 @@ export const Histogram: FC<{}> = ({
         <HistogramAvatar
           key={node.opinion.id}
           node={node}
-          onClick={() => showOpinionFrom(node.opinion.user.id)}
+          onClick={() => handleShowOpinion(node.opinion.user.id)}
         />
       ))}
     </div>
