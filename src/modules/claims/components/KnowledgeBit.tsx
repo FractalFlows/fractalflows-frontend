@@ -2,10 +2,10 @@ import { FC, SyntheticEvent, useState } from "react";
 import {
   Box,
   Button,
+  CircularProgress,
   Dialog,
   DialogActions,
   DialogTitle,
-  Divider,
   IconButton,
   Menu,
   MenuItem,
@@ -15,13 +15,18 @@ import {
   Typography,
 } from "@mui/material";
 import {
-  Edit as EditIcon,
   ThumbUpOffAlt as ThumbUpOffAltIcon,
+  ThumbUpAlt as ThumbUpAltIcon,
   ThumbDownOffAlt as ThumbDownOffAltIconIcon,
+  ThumbDownAlt as ThumbDownAltIcon,
   MoreVert as MoreVertIcon,
 } from "@mui/icons-material";
 
-import { KnowledgeBitProps } from "modules/claims/interfaces";
+import {
+  KnowledgeBitProps,
+  KnowledgeBitVoteProps,
+  KnowledgeBitVoteTypes,
+} from "modules/claims/interfaces";
 import { AvatarWithUsername } from "modules/users/components/AvatarWithUsername";
 import {
   KnowledgeBitUpsert,
@@ -30,16 +35,29 @@ import {
 import { Spinner } from "common/components/Spinner";
 import { useSnackbar } from "notistack";
 import { useClaims } from "../hooks/useClaims";
+import { getKnowledgeBit } from "../hooks/knowledgeBit";
 
 enum KnowledgeBitStates {
   UPDATING,
   DELETING,
+  UPVOTING,
+  DOWNVOTING,
 }
 
-export const KnowledgeBit: FC<{ knowledgeBit: KnowledgeBitProps }> = ({
-  knowledgeBit,
+interface KnowledgeBitProps {
+  knowledgeBit: KnowledgeBitProps;
+  userVote: KnowledgeBitVoteProps;
+  handleUserVotesReload: () => any;
+}
+
+export const KnowledgeBit: FC<KnowledgeBitProps> = ({
+  knowledgeBit: preloadedKnowledgeBit,
+  userVote = {},
+  handleUserVotesReload,
 }) => {
-  const { deleteKnowledgeBit } = useClaims();
+  const [knowledgeBit, setKnowledgeBit] = useState(preloadedKnowledgeBit);
+  const { getKnowledgeBit, deleteKnowledgeBit, saveKnowledgeBitVote } =
+    useClaims();
   const [knowledgeBitState, setKnowledgeBitState] =
     useState<KnowledgeBitStates>();
   const [menuAnchorEl, setMenuAnchorEl] = useState<Element>();
@@ -82,6 +100,37 @@ export const KnowledgeBit: FC<{ knowledgeBit: KnowledgeBitProps }> = ({
   };
   const handleDeleteDialogClose = () => setKnowledgeBitState(undefined);
 
+  const handleVote = async (
+    ev: SyntheticEvent,
+    type: KnowledgeBitVoteTypes
+  ) => {
+    ev.preventDefault();
+
+    setKnowledgeBitState(
+      type === KnowledgeBitVoteTypes.UPVOTE
+        ? KnowledgeBitStates.UPVOTING
+        : KnowledgeBitStates.DOWNVOTING
+    );
+
+    try {
+      await saveKnowledgeBitVote({
+        knowledgeBitId: knowledgeBit?.id as string,
+        type,
+      });
+      await handleUserVotesReload();
+      const updatedKnowledgeBit = await getKnowledgeBit({
+        id: knowledgeBit.id,
+      });
+      setKnowledgeBit(updatedKnowledgeBit);
+    } catch (e: any) {
+      enqueueSnackbar(e.message, {
+        variant: "error",
+      });
+    } finally {
+      setKnowledgeBitState(undefined);
+    }
+  };
+
   return (
     <Box>
       <a href={knowledgeBit.url} target="_blank" rel="noreferrer">
@@ -111,22 +160,49 @@ export const KnowledgeBit: FC<{ knowledgeBit: KnowledgeBitProps }> = ({
               <MenuItem onClick={handleEdit}>Edit</MenuItem>
               <MenuItem onClick={handleDelete}>Delete</MenuItem>
             </Menu>
-            <Tooltip title="Upvote">
-              <IconButton>
-                <ThumbUpOffAltIcon />
-              </IconButton>
-            </Tooltip>
-            <Tooltip title="Downvote">
-              <IconButton>
-                <ThumbDownOffAltIconIcon />
-              </IconButton>
-            </Tooltip>
+            <Stack alignItems="center">
+              <Tooltip title="Upvote">
+                <IconButton
+                  onClick={(ev) => handleVote(ev, KnowledgeBitVoteTypes.UPVOTE)}
+                >
+                  {knowledgeBitState === KnowledgeBitStates.UPVOTING ? (
+                    <CircularProgress size={24} />
+                  ) : userVote.type === KnowledgeBitVoteTypes.UPVOTE ? (
+                    <ThumbUpAltIcon />
+                  ) : (
+                    <ThumbUpOffAltIcon />
+                  )}
+                </IconButton>
+              </Tooltip>
+              <Typography variant="caption">
+                {knowledgeBit?.upvotesCount}
+              </Typography>
+            </Stack>
+            <Stack alignItems="center">
+              <Tooltip
+                title="Downvote"
+                onClick={(ev) => handleVote(ev, KnowledgeBitVoteTypes.DOWNVOTE)}
+              >
+                <IconButton>
+                  {knowledgeBitState === KnowledgeBitStates.DOWNVOTING ? (
+                    <CircularProgress size={24} />
+                  ) : userVote.type === KnowledgeBitVoteTypes.DOWNVOTE ? (
+                    <ThumbDownAltIcon />
+                  ) : (
+                    <ThumbDownOffAltIconIcon />
+                  )}
+                </IconButton>
+              </Tooltip>
+              <Typography variant="caption">
+                {knowledgeBit?.downvotesCount}
+              </Typography>
+            </Stack>
           </Stack>
         </Paper>
       </a>
       {knowledgeBitState === KnowledgeBitStates.UPDATING ? (
         <Paper variant="outlined">
-          <Box sx={{ p: 4 }}>
+          <Box sx={{ p: { xs: 2, sm: 4 } }}>
             <KnowledgeBitUpsert
               knowledgeBit={knowledgeBit}
               operation={KnowledgeBitUpsertFormOperation.UPDATE}

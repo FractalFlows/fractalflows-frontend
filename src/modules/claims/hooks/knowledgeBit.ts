@@ -1,6 +1,12 @@
 import { ClaimsService } from "../services/claims";
 import type { KnowledgeBitProps } from "../interfaces";
 
+export const getKnowledgeBit = async ({ id }: { id: string }) =>
+  await ClaimsService.getKnowledgeBit({ id });
+
+export const getKnowledgeBits = async ({ claimSlug }: { claimSlug: string }) =>
+  await ClaimsService.getKnowledgeBits({ claimSlug });
+
 export const createKnowledgeBit = async ({
   claimSlug,
   knowledgeBit,

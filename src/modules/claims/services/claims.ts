@@ -8,22 +8,32 @@ import {
   CREATE_KNOWLEDGE_BIT,
   UPDATE_KNOWLEDGE_BIT,
   DELETE_KNOWLEDGE_BIT,
+  SAVE_KNOWLEDGE_BIT_VOTE,
 } from "../mutations";
 import {
   GET_CLAIM,
   GET_PARTIAL_CLAIM,
   GET_CLAIMS,
   GET_TRENDING_CLAIMS,
+  GET_KNOWLEDGE_BIT,
+  GET_KNOWLEDGE_BITS,
+  GET_USER_KNOWLEDGE_BITS_VOTES,
 } from "../queries";
 import type {
   ClaimProps,
   InviteFriendsProps,
   KnowledgeBitProps,
+  KnowledgeBitVoteProps,
+  KnowledgeBitVoteTypes,
 } from "../interfaces";
 import type { PaginationProps } from "modules/interfaces";
 
 export const ClaimsService = {
-  async getClaim({ slug }: { slug: string }): Promise<ClaimProps> {
+  async getClaim({
+    slug,
+  }: {
+    slug: string;
+  }): Promise<{ claim: ClaimProps; relatedClaims: ClaimProps[] }> {
     const { data } = await apolloClient.query({
       query: GET_CLAIM,
       variables: {
@@ -133,6 +143,47 @@ export const ClaimsService = {
     return data.inviteFriends;
   },
 
+  async getKnowledgeBit({ id }: { id: string }): Promise<KnowledgeBitProps> {
+    const { data } = await apolloClient.query({
+      query: GET_KNOWLEDGE_BIT,
+      variables: {
+        id,
+      },
+    });
+
+    return data.knowledgeBit;
+  },
+
+  async getKnowledgeBits({
+    claimSlug,
+  }: {
+    claimSlug: string;
+  }): Promise<KnowledgeBitProps[]> {
+    const { data } = await apolloClient.query({
+      query: GET_KNOWLEDGE_BITS,
+      variables: {
+        claimSlug,
+      },
+    });
+
+    return data.knowledgeBits;
+  },
+
+  async getUserKnowledgeBitsVotes({
+    claimSlug,
+  }: {
+    claimSlug: string;
+  }): Promise<KnowledgeBitVoteProps[]> {
+    const { data } = await apolloClient.query({
+      query: GET_USER_KNOWLEDGE_BITS_VOTES,
+      variables: {
+        claimSlug,
+      },
+    });
+
+    return data.userKnowledgeBitsVotes;
+  },
+
   async createKnowledgeBit({
     claimSlug,
     knowledgeBit,
@@ -180,5 +231,23 @@ export const ClaimsService = {
     });
 
     return data.deleteKnowledgeBit;
+  },
+
+  async saveKnowledgeBitVote({
+    knowledgeBitId,
+    type,
+  }: {
+    knowledgeBitId: string;
+    type: KnowledgeBitVoteTypes;
+  }): Promise<boolean> {
+    const { data } = await apolloClient.mutate({
+      mutation: SAVE_KNOWLEDGE_BIT_VOTE,
+      variables: {
+        knowledgeBitId,
+        type,
+      },
+    });
+
+    return data.saveKnowledgeBitVote;
   },
 };

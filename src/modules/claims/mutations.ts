@@ -45,7 +45,9 @@ export const CREATE_KNOWLEDGE_BIT = gql`
 `;
 
 export const UPDATE_KNOWLEDGE_BIT = gql`
-  mutation UpdateClaim($updateKnowledgeBitInput: UpdateKnowledgeBitInput!) {
+  mutation UpdateKnowledgeBit(
+    $updateKnowledgeBitInput: UpdateKnowledgeBitInput!
+  ) {
     updateKnowledgeBit(updateKnowledgeBitInput: $updateKnowledgeBitInput) {
       id
     }
@@ -53,7 +55,16 @@ export const UPDATE_KNOWLEDGE_BIT = gql`
 `;
 
 export const DELETE_KNOWLEDGE_BIT = gql`
-  mutation DeleteClaim($id: String!) {
+  mutation DeleteKnowledgeBit($id: String!) {
     deleteKnowledgeBit(id: $id)
+  }
+`;
+
+export const SAVE_KNOWLEDGE_BIT_VOTE = gql`
+  mutation SaveKnowledgeBitVote(
+    $knowledgeBitId: String!
+    $type: KnowledgeBitVoteTypes!
+  ) {
+    saveKnowledgeBitVote(knowledgeBitId: $knowledgeBitId, type: $type)
   }
 `;

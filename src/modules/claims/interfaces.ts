@@ -74,6 +74,11 @@ export enum KnowledgeBitSides {
   SUPPORTING = "SUPPORTING",
 }
 
+export enum KnowledgeBitVoteTypes {
+  UPVOTE = "UPVOTE",
+  DOWNVOTE = "DOWNVOTE",
+}
+
 export interface KnowledgeBitProps {
   id: string;
   name: string;
@@ -86,6 +91,14 @@ export interface KnowledgeBitProps {
   url: string;
   attributions?: AttributionProps[];
   user: UserProps;
+  upvotesCount: number;
+  downvotesCount: number;
+}
+
+export interface KnowledgeBitVoteProps {
+  id: string;
+  type: KnowledgeBitVoteTypes;
+  // knowledgeBitId:
 }
 
 export interface ClaimProps {
@@ -95,7 +108,7 @@ export interface ClaimProps {
   slug: string;
   sources?: SourceProps[];
   tags?: TagProps[];
-  attributions?: AttributionsProps[];
+  attributions?: AttributionProps[];
   knowledgeBits?: KnowledgeBitProps[];
   createdAt: Date;
   user: UserProps;

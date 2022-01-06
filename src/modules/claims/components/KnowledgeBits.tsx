@@ -12,10 +12,13 @@ import { Help as HelpIcon } from "@mui/icons-material";
 import {
   KnowledgeBitProps,
   KnowledgeBitSides,
+  KnowledgeBitVoteProps,
 } from "modules/claims/interfaces";
 import { KnowledgeBit } from "./KnowledgeBit";
 import { KnowledgeBitUpsert } from "./KnowledgeBitUpsert";
 import { NoResults } from "common/components/NoResults";
+import { useClaims } from "../hooks/useClaims";
+import { useRouter } from "next/router";
 
 enum KnowledgeBitsPanelState {
   CREATING,
@@ -36,16 +39,27 @@ const KnowledgeBitsPanelTexts = {
 export const KnowledgeBitsPanel: FC<{
   side: KnowledgeBitSides;
   knowledgeBits?: KnowledgeBitProps[];
-}> = ({ side, knowledgeBits = [] }) => {
+  userVotes: KnowledgeBitVoteProps[];
+}> = ({ side, knowledgeBits = [], userVotes: preloadedUserVotes }) => {
+  const { getUserKnowledgeBitsVotes } = useClaims();
   const [knowledgeBitsPanelState, setKnowledgeBitsPanelState] =
     useState<KnowledgeBitsPanelState>();
+  const [userVotes, setUserVotes] =
+    useState<KnowledgeBitVoteProps[]>(preloadedUserVotes);
   const knowledgeBitUpsertRef = useRef(null);
+  const router = useRouter();
 
   const handleAddKnowledgeBit = async () => {
     await setKnowledgeBitsPanelState(KnowledgeBitsPanelState.CREATING);
     knowledgeBitUpsertRef?.current?.scrollIntoView({
       behavior: "smooth",
     });
+  };
+  const handleUserVotesReload = async () => {
+    const updatedUserVotes = await getUserKnowledgeBitsVotes({
+      claimSlug: router.query.slug as string,
+    });
+    setUserVotes(updatedUserVotes);
   };
 
   return (
@@ -60,7 +74,14 @@ export const KnowledgeBitsPanel: FC<{
       </Stack>
       <Stack spacing={1}>
         {knowledgeBits?.map((knowledgeBit) => (
-          <KnowledgeBit knowledgeBit={knowledgeBit} key={knowledgeBit.id} />
+          <KnowledgeBit
+            knowledgeBit={knowledgeBit}
+            userVote={userVotes?.find(
+              (userVote) => userVote.knowledgeBit.id === knowledgeBit.id
+            )}
+            handleUserVotesReload={handleUserVotesReload}
+            key={knowledgeBit.id}
+          />
         ))}
         {knowledgeBits.length === 0 &&
         knowledgeBitsPanelState !== KnowledgeBitsPanelState.CREATING ? (
@@ -70,7 +91,10 @@ export const KnowledgeBitsPanel: FC<{
           </NoResults>
         ) : null}
         {knowledgeBitsPanelState === KnowledgeBitsPanelState.CREATING ? (
-          <Box sx={{ p: 4 }} ref={knowledgeBitUpsertRef}>
+          <Box
+            sx={{ py: { xs: 2, sm: 4 }, px: { xs: 0, sm: 4 } }}
+            ref={knowledgeBitUpsertRef}
+          >
             <KnowledgeBitUpsert
               knowledgeBit={{ side } as KnowledgeBitProps}
               handleClose={() => setKnowledgeBitsPanelState(undefined)}
@@ -84,7 +108,8 @@ export const KnowledgeBitsPanel: FC<{
 
 export const KnowledgeBits: FC<{
   knowledgeBits?: KnowledgeBitProps[];
-}> = ({ knowledgeBits = [] }) => {
+  userVotes?: KnowledgeBitVoteProps[];
+}> = ({ knowledgeBits = [], userVotes = [] }) => {
   const refutingKnowledgeBits = useMemo(
     () =>
       knowledgeBits.filter(({ side }) => side === KnowledgeBitSides.REFUTING),
@@ -99,10 +124,8 @@ export const KnowledgeBits: FC<{
   return (
     <Box>
       <Stack spacing={4}>
-        <Stack direction="row" spacing={1} alignItems="center">
-          <Typography variant="h4" component="h2">
-            What science says: Knowledge Bits
-          </Typography>
+        <Typography variant="h4" component="h2">
+          What science says: Knowledge Bits
           <Tooltip
             title={
               <>
@@ -124,24 +147,26 @@ export const KnowledgeBits: FC<{
               </>
             }
           >
-            <IconButton>
+            <IconButton sx={{ marginLeft: 1 }}>
               <HelpIcon />
             </IconButton>
           </Tooltip>
-        </Stack>
+        </Typography>
 
         <Stack
           direction={{ xs: "column", md: "row" }}
-          spacing={3}
+          spacing={{ xs: 8, sm: 3 }}
           justifyContent="space-between"
         >
           <KnowledgeBitsPanel
             side={KnowledgeBitSides.REFUTING}
             knowledgeBits={refutingKnowledgeBits}
+            userVotes={userVotes}
           />
           <KnowledgeBitsPanel
             side={KnowledgeBitSides.SUPPORTING}
             knowledgeBits={supportingKnowledgeBits}
+            userVotes={userVotes}
           />
         </Stack>
       </Stack>
