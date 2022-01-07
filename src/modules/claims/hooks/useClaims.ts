@@ -1,3 +1,4 @@
+import { getClaim, getPartialClaim, getClaims, getTrendingClaims } from "./get";
 import { createClaim } from "./create";
 import { updateClaim } from "./update";
 import { deleteClaim } from "./delete";
@@ -13,7 +14,6 @@ import {
   saveKnowledgeBitVote,
   getUserKnowledgeBitsVotes,
 } from "./knowledgeBitVote";
-import { getClaim, getPartialClaim, getClaims, getTrendingClaims } from "./get";
 
 export const useClaims = () => {
   return {

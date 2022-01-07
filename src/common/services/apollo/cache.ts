@@ -1,6 +1,7 @@
 import { InMemoryCache } from "@apollo/client";
 
 import { AuthCache } from "modules/auth/cache";
+import { ClaimsCache } from "modules/claims/cache";
 
 const cacheOptions = {
   typePolicies: {
@@ -17,6 +18,12 @@ const cacheOptions = {
           merge(existing = [], incoming = []) {
             return [...existing, ...incoming];
           },
+        },
+        arguments: {
+          read: () => ClaimsCache.arguments(),
+        },
+        pickedArguments: {
+          read: () => ClaimsCache.pickedArguments(),
         },
       },
     },

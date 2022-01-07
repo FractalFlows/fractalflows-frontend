@@ -4,7 +4,7 @@ import { Paper, Stack, Typography } from "@mui/material";
 import { Avatar } from "modules/users/components/Avatar";
 import { formatDate } from "common/utils/format";
 import styles from "./Argument.module.css";
-import { ArgumentTypes } from "modules/claims/interfaces";
+import { ArgumentSides } from "modules/claims/interfaces";
 // import ArgumentDetails from "./ArgumentDetails";
 
 export const Argument: FC = ({ argument, isOpining, hideReferrers }) => {
@@ -23,7 +23,7 @@ export const Argument: FC = ({ argument, isOpining, hideReferrers }) => {
     <div
       className={`${styles.argument} ${
         styles[
-          `argument--${argument.type === ArgumentTypes.CON ? "cons" : "pros"}`
+          `argument--${argument.side === ArgumentSides.CON ? "cons" : "pros"}`
         ]
       }`}
     >
@@ -50,7 +50,7 @@ export const Argument: FC = ({ argument, isOpining, hideReferrers }) => {
               size={30}
               sx={{
                 position: "absolute",
-                [argument.type === ArgumentTypes.CON ? "right" : "left"]:
+                [argument.side === ArgumentSides.CON ? "right" : "left"]:
                   (Math.floor(i / 10) * 30 + i) % (10 * 1),
                 top: (i % 10) * 4,
                 zIndex: 300 - i,

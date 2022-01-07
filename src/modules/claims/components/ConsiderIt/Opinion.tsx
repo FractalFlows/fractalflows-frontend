@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Button, Stack, Typography } from "@mui/material";
 
-import { ArgumentTypes } from "modules/claims/interfaces";
+import { ArgumentSides } from "modules/claims/interfaces";
 import { Arguments } from "./Arguments";
 
 const op = {
@@ -13,7 +13,7 @@ const op = {
     usernameSource: "ENS",
     avatar: "https://www.gravatar.com/avatar/49a046a0de6b525d1f41beab756cd89c",
     avatarSource: "GRAVATAR",
-    __typename: "User",
+    __sidename: "User",
   },
   arguments: [
     {
@@ -27,9 +27,9 @@ const op = {
         avatar:
           "https://www.gravatar.com/avatar/49a046a0de6b525d1f41beab756cd89c",
         avatarSource: "GRAVATAR",
-        __typename: "User",
+        __sidename: "User",
       },
-      type: ArgumentTypes.CON,
+      side: ArgumentSides.CON,
       createdAt: new Date(),
       evidences: [],
       referrers: [
@@ -41,7 +41,7 @@ const op = {
           avatar:
             "https://www.gravatar.com/avatar/49a046a0de6b525d1f41beab756cd89c",
           avatarSource: "GRAVATAR",
-          __typename: "User",
+          __sidename: "User",
         },
         {
           ethAddress: "0xd01159A043d1d6bc575daE358C6046F5Cc08e7E6",
@@ -51,7 +51,7 @@ const op = {
           avatar:
             "https://www.gravatar.com/avatar/49a046a0de6b525d1f41beab756cd89c",
           avatarSource: "GRAVATAR",
-          __typename: "User",
+          __sidename: "User",
         },
       ],
       comments: [],
@@ -67,9 +67,9 @@ const op = {
         avatar:
           "https://www.gravatar.com/avatar/49a046a0de6b525d1f41beab756cd89c",
         avatarSource: "GRAVATAR",
-        __typename: "User",
+        __sidename: "User",
       },
-      type: ArgumentTypes.CON,
+      side: ArgumentSides.CON,
       createdAt: new Date(),
       evidences: [],
       referrers: [
@@ -81,7 +81,7 @@ const op = {
           avatar:
             "https://www.gravatar.com/avatar/49a046a0de6b525d1f41beab756cd89c",
           avatarSource: "GRAVATAR",
-          __typename: "User",
+          __sidename: "User",
         },
       ],
       comments: [],
@@ -97,9 +97,9 @@ const op = {
         avatar:
           "https://www.gravatar.com/avatar/49a046a0de6b525d1f41beab756cd89c",
         avatarSource: "GRAVATAR",
-        __typename: "User",
+        __sidename: "User",
       },
-      type: ArgumentTypes.PRO,
+      side: ArgumentSides.PRO,
       createdAt: new Date(),
       evidences: [],
       referrers: [
@@ -111,7 +111,7 @@ const op = {
           avatar:
             "https://www.gravatar.com/avatar/49a046a0de6b525d1f41beab756cd89c",
           avatarSource: "GRAVATAR",
-          __typename: "User",
+          __sidename: "User",
         },
         {
           ethAddress: "0xd01159A043d1d6bc575daE358C6046F5Cc08e7E6",
@@ -121,7 +121,7 @@ const op = {
           avatar:
             "https://www.gravatar.com/avatar/49a046a0de6b525d1f41beab756cd89c",
           avatarSource: "GRAVATAR",
-          __typename: "User",
+          __sidename: "User",
         },
       ],
       comments: [],
@@ -133,10 +133,10 @@ const op = {
 export const Opinion = ({ opinionId, handleHideOpinion }) => {
   const [opinion, setOpinion] = useState(op);
   const cons = opinion.arguments.filter(
-    (argument) => argument.type === ArgumentTypes.CON
+    (argument) => argument.side === ArgumentSides.CON
   );
   const pros = opinion.arguments.filter(
-    (argument) => argument.type === ArgumentTypes.PRO
+    (argument) => argument.side === ArgumentSides.PRO
   );
 
   return (

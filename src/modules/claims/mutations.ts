@@ -68,3 +68,27 @@ export const SAVE_KNOWLEDGE_BIT_VOTE = gql`
     saveKnowledgeBitVote(knowledgeBitId: $knowledgeBitId, type: $type)
   }
 `;
+
+export const CREATE_ARGUMENT = gql`
+  mutation CreateArgument(
+    $claimSlug: String!
+    $createArgumentInput: CreateArgumentInput!
+  ) {
+    createArgument(
+      claimSlug: $claimSlug
+      createArgumentInput: $createArgumentInput
+    ) {
+      id
+      summary
+      createdAt
+      side
+      user {
+        username
+        avatar
+      }
+      comments {
+        id
+      }
+    }
+  }
+`;

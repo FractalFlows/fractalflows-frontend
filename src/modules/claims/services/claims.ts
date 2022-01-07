@@ -9,6 +9,7 @@ import {
   UPDATE_KNOWLEDGE_BIT,
   DELETE_KNOWLEDGE_BIT,
   SAVE_KNOWLEDGE_BIT_VOTE,
+  CREATE_ARGUMENT,
 } from "../mutations";
 import {
   GET_CLAIM,
@@ -20,7 +21,9 @@ import {
   GET_USER_KNOWLEDGE_BITS_VOTES,
 } from "../queries";
 import type {
+  ArgumentProps,
   ClaimProps,
+  CreateArgumentProps,
   InviteFriendsProps,
   KnowledgeBitProps,
   KnowledgeBitVoteProps,
@@ -194,7 +197,7 @@ export const ClaimsService = {
     const { data } = await apolloClient.mutate({
       mutation: CREATE_KNOWLEDGE_BIT,
       variables: {
-        claimSlug: claimSlug,
+        claimSlug,
         createKnowledgeBitInput: knowledgeBit,
       },
     });
@@ -249,5 +252,23 @@ export const ClaimsService = {
     });
 
     return data.saveKnowledgeBitVote;
+  },
+
+  async createArgument({
+    claimSlug,
+    argument,
+  }: {
+    claimSlug: string;
+    argument: CreateArgumentProps;
+  }): Promise<ArgumentProps> {
+    const { data } = await apolloClient.mutate({
+      mutation: CREATE_ARGUMENT,
+      variables: {
+        claimSlug,
+        createArgumentInput: argument,
+      },
+    });
+
+    return data.createArgument;
   },
 };

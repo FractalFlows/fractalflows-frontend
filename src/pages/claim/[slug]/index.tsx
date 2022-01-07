@@ -2,7 +2,8 @@ import { Box, Stack } from "@mui/material";
 import type { NextPage } from "next";
 import Head from "next/head";
 
-import type {
+import {
+  ArgumentSides,
   ClaimProps,
   KnowledgeBitProps,
   KnowledgeBitVoteProps,
@@ -12,6 +13,8 @@ import { KnowledgeBits } from "modules/claims/components/KnowledgeBits";
 import { ClaimSummary } from "modules/claims/components/Summary";
 import { SocialOpinions } from "modules/claims/components/SocialOpinions";
 import { RelatedClaims } from "modules/claims/components/RelatedClaims";
+import { useArguments } from "modules/claims/hooks/useArguments";
+import { useEffect } from "react";
 
 interface ClaimPageProps {
   data: {
@@ -25,6 +28,12 @@ interface ClaimPageProps {
 const Claim: NextPage<ClaimPageProps> = ({
   data: { claim, relatedClaims, knowledgeBits, userKnowledgeBitsVotes },
 }) => {
+  const { setArguments } = useArguments();
+
+  useEffect(() => {
+    setArguments([]);
+  }, []);
+
   return (
     <Box className="container page">
       <Head>

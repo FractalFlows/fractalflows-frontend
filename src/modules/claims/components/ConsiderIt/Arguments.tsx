@@ -1,7 +1,7 @@
 import { FC } from "react";
 import { Stack, Typography } from "@mui/material";
 
-import { ArgumentTypes } from "modules/claims/interfaces";
+import { ArgumentSides } from "modules/claims/interfaces";
 import { Argument } from "./Argument";
 
 export const Arguments: FC = ({

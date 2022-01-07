@@ -1,26 +1,21 @@
-import { LoadingButton } from "@mui/lab";
-import { Button, Stack, TextField, Typography } from "@mui/material";
-import { Autocomplete } from "common/components/Autocomplete";
+import { Button, Stack, Typography } from "@mui/material";
+import { useSnackbar } from "notistack";
 
-import { registerMui } from "common/utils/registerMui";
-import { ArgumentTypes } from "modules/claims/interfaces";
-import { useState } from "react";
-import { useForm } from "react-hook-form";
+import { ArgumentSides } from "modules/claims/interfaces";
 import { Argument } from "./Argument";
-
-interface ArgumentFormProps {
-  summary: string;
-  evidences: string[];
-}
+import { ArgumentUpsertForm } from "./ArgumentUpsertForm";
+import { useState } from "react";
+import { UpsertFormOperation } from "common/interfaces";
+import { useArguments } from "modules/claims/hooks/useArguments";
 
 const OpineColumnTexts = {
-  [ArgumentTypes.CON]: {
+  [ArgumentSides.CON]: {
     columnTitle: "against",
     columnSide: "left",
     submitButton: "Host claim",
-    successFeedback: "Your new claim has been succesfully added!",
+    successFeedback: "Your new claim haeen succesfully added!",
   },
-  [ArgumentTypes.PRO]: {
+  [ArgumentSides.PRO]: {
     columnTitle: "for",
     columnSide: "right",
     submitButton: "Edit claim",
@@ -28,28 +23,21 @@ const OpineColumnTexts = {
   },
 };
 
-const argumentFormDefaultValues = {
-  summary: "",
-  evidences: [],
-};
+export const OpineColumn = ({ side }) => {
+  const { pickedArguments } = useArguments();
+  const [isAddingArgument, setIsAddingArgument] = useState(false);
 
-export const OpineColumn = ({ type, pickedArguments, setPickedArguments }) => {
-  const [isAddingNewArgument, setIsAddingNewArgument] = useState(false);
-  const {
-    control,
-    register,
-    reset,
-    formState: { errors, isSubmitting },
-    handleSubmit: handleSubmitHook,
-  } = useForm<ArgumentFormProps>({ defaultValues: argumentFormDefaultValues });
+  const filteredPickedArgumments = pickedArguments.filter(
+    (pickedArgument) => pickedArgument.side === side
+  );
 
   return (
     <Stack sx={{ width: "50%" }} spacing={3}>
       <Typography variant="h5">
-        Give your arguments {OpineColumnTexts[type].columnTitle}
+        Give your arguments {OpineColumnTexts[side].columnTitle}
       </Typography>
       <Stack spacing={1}>
-        {pickedArguments.map((pickedArgument) => (
+        {filteredPickedArgumments.map((pickedArgument) => (
           <Argument
             key={pickedArgument.id}
             argument={pickedArgument}
@@ -58,74 +46,23 @@ export const OpineColumn = ({ type, pickedArguments, setPickedArguments }) => {
         ))}
       </Stack>
       <Typography variant="body1">
-        Drag an <b>argument {OpineColumnTexts[type].columnTitle}</b> from the{" "}
-        {OpineColumnTexts[type].columnSide} or
+        Drag an <b>argument {OpineColumnTexts[side].columnTitle}</b> from the{" "}
+        {OpineColumnTexts[side].columnSide} or
       </Typography>
-      {isAddingNewArgument ? (
-        <form>
-          <Stack spacing={3}>
-            <TextField
-              label="Message (optional)"
-              multiline
-              minRows={4}
-              maxRows={Infinity}
-              fullWidth
-              {...registerMui({
-                register,
-                name: "message",
-                errors,
-              })}
-            ></TextField>
-            <Autocomplete
-              control={control}
-              multiple
-              errors={errors}
-              options={[]}
-              name="evidences"
-              label="Evidences"
-              freeSolo
-              rules={{
-                required: true,
-                minLength: 1,
-                validate: {
-                  emails: (emails: AutocompleteOptionProps[]) =>
-                    emails.reduce(
-                      (acc: boolean, curr) => acc && validateEmail(curr.label),
-                      true
-                    ),
-                },
-              }}
-            />
-
-            <Stack spacing={1}>
-              <LoadingButton
-                type="submit"
-                loading={isSubmitting}
-                variant="contained"
-              >
-                Save new argument {OpineColumnTexts[type].columnTitle}
-              </LoadingButton>
-              <Button
-                variant="contained"
-                color="secondary"
-                onClick={() => {
-                  setIsAddingNewArgument(false);
-                  reset(argumentFormDefaultValues);
-                }}
-              >
-                Cancel
-              </Button>
-            </Stack>
-          </Stack>
-        </form>
+      {isAddingArgument ? (
+        <ArgumentUpsertForm
+          argument={{ side }}
+          operation={UpsertFormOperation.CREATE}
+          handleClose={() => setIsAddingArgument(false)}
+        />
       ) : (
         <Button
           variant="contained"
           color="secondary"
           sx={{ marginTop: 1 }}
-          onClick={() => setIsAddingNewArgument(true)}
+          onClick={() => setIsAddingArgument(true)}
         >
-          Write a new argument {OpineColumnTexts[type].columnTitle}
+          Write a new argument {OpineColumnTexts[side].columnTitle}
         </Button>
       )}
     </Stack>

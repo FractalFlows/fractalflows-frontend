@@ -1,7 +1,7 @@
 import { FC, useState } from "react";
 import { Button, Paper, Stack } from "@mui/material";
 
-import { ArgumentTypes } from "modules/claims/interfaces";
+import { ArgumentSides } from "modules/claims/interfaces";
 import { OpineColumn } from "./OpineColumn";
 import styles from "./Opine.module.css";
 
@@ -24,17 +24,8 @@ export const Opine: FC = ({
     setIsDraggingOver(true);
   };
   const handleDragLeave = () => {
-    console.log("laskdlkaskd leave");
     setIsDraggingOver(false);
   };
-
-  const conPickedArgumments = pickedArguments.filter(
-    (pickedArgument) => pickedArgument.type === ArgumentTypes.CON
-  );
-  const proPickedArgumments = pickedArguments.filter(
-    (pickedArgument) => pickedArgument.type === ArgumentTypes.PRO
-  );
-  console.log(pickedArguments, conPickedArgumments);
 
   return (
     <Stack spacing={2}>
@@ -55,16 +46,8 @@ export const Opine: FC = ({
         onDragLeave={handleDragLeave}
       >
         <Stack direction="row" spacing={6}>
-          <OpineColumn
-            type={ArgumentTypes.CON}
-            setPickedArguments={setPickedArguments}
-            pickedArguments={conPickedArgumments}
-          />
-          <OpineColumn
-            type={ArgumentTypes.PRO}
-            setPickedArguments={setPickedArguments}
-            pickedArguments={proPickedArgumments}
-          />
+          <OpineColumn side={ArgumentSides.CON} />
+          <OpineColumn side={ArgumentSides.PRO} />
         </Stack>
       </Paper>
       <Button variant="contained" size="large">

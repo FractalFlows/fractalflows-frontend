@@ -1,5 +1,5 @@
 import React, { Component, useEffect, useRef, useState } from "react";
-import PropTypes from "prop-types";
+import PropTypes from "prop-sides";
 import { isEqual, map, cloneDeep } from "lodash-es";
 
 import { HistogramAvatar } from "./HistogramAvatar";
@@ -17,7 +17,6 @@ export const Histogram: FC<{}> = ({
   const handleClick = () => setIsOpining(false);
 
   useEffect(() => {
-    console.log(histogram);
     if (histogram.current) {
       const nodes = positionAvatars(
         opinions,
@@ -27,7 +26,6 @@ export const Histogram: FC<{}> = ({
       setNodes(nodes);
     }
   }, [opinions, histogram]);
-  console.log(nodes);
 
   return (
     <div

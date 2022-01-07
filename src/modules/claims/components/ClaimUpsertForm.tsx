@@ -217,7 +217,6 @@ export const ClaimUpsertForm: FC<ClaimUpsertFormProps> = ({
                     your claim.
                   </Typography>
                 </Box>
-
                 {sourcesFields.map((sourceField, sourceFieldIndex) => {
                   const origin: string = watch(
                     `sources.${sourceFieldIndex}.origin`

@@ -121,7 +121,20 @@ export interface InviteFriendsProps {
 }
 
 // Consider it
-export enum ArgumentTypes {
+
+export enum ArgumentSides {
   CON = "CON",
   PRO = "PRO",
+}
+
+export interface CreateArgumentProps {
+  summary: string;
+  side: ArgumentSides;
+  evidencesIds: string[];
+}
+
+export interface ArgumentProps {
+  summary: string;
+  side: ArgumentSides;
+  evidences: KnowledgeBitProps[];
 }
