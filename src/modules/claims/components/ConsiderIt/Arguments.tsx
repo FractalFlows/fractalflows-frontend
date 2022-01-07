@@ -14,7 +14,11 @@ export const Arguments: FC = ({
       <Typography variant="h5">{title}</Typography>
       <Stack spacing={2}>
         {argumentsList.map((argument) => (
-          <Argument key={argument.id} argument={argument} />
+          <Argument
+            key={argument.id}
+            argument={argument}
+            isOpining={isOpining}
+          />
         ))}
       </Stack>
     </Stack>

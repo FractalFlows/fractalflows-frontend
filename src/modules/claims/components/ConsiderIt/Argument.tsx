@@ -7,15 +7,17 @@ import styles from "./Argument.module.css";
 import { ArgumentTypes } from "modules/claims/interfaces";
 // import ArgumentDetails from "./ArgumentDetails";
 
-export const Argument: FC = ({ argument }) => {
+export const Argument: FC = ({ argument, isOpining }) => {
   // state = {
   //   showDetails: false,
   // };
 
-  const { summary, createdAt, comments } = argument;
   const [showDetails, setShowDetails] = useState(false);
 
   // const commentsCount = filter({ active: true }, comments).length;
+  const handleDragStart = (event) => {
+    event.dataTransfer.setData("argument", JSON.stringify(argument));
+  };
 
   return (
     <div
@@ -25,8 +27,13 @@ export const Argument: FC = ({ argument }) => {
         ]
       }`}
     >
-      <Paper variant="outlined" sx={{ p: 1 }}>
-        <Stack spacing={1} sx={{ width: 300 }}>
+      <Paper
+        variant="outlined"
+        sx={{ p: 1 }}
+        onDragStart={handleDragStart}
+        draggable={isOpining}
+      >
+        <Stack spacing={1} sx={{ width: 312 }}>
           <Typography variant="body2">{argument?.summary}</Typography>
           <Typography variant="caption">
             {formatDate(argument?.createdAt)}, 3 comments

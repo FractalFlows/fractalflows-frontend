@@ -155,7 +155,7 @@ export const KnowledgeBits: FC<{
 
         <Stack
           direction={{ xs: "column", md: "row" }}
-          spacing={{ xs: 8, sm: 3 }}
+          spacing={{ xs: 8, md: 3 }}
           justifyContent="space-between"
         >
           <KnowledgeBitsPanel

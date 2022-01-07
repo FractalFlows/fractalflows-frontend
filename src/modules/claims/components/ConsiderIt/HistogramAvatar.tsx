@@ -2,6 +2,7 @@ import { FC } from "react";
 import { Tooltip, Typography } from "@mui/material";
 
 import { Avatar } from "modules/users/components/Avatar";
+import styles from "./HistogramAvatar.module.css";
 
 export const HistogramAvatar: FC = ({ node, onClick = () => {} }) => {
   return (
@@ -17,6 +18,7 @@ export const HistogramAvatar: FC = ({ node, onClick = () => {} }) => {
         src={node.opinion.user.avatar}
         onClick={onClick}
         size={node.radius * 2}
+        className={styles.avatar}
         sx={{
           position: "absolute",
           left: node.x,

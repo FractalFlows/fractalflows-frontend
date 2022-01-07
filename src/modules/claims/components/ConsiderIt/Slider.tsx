@@ -2,6 +2,7 @@ import React, { Component, useCallback, useRef, useState } from "react";
 import { clamp, get } from "lodash-es";
 
 import styles from "./Slider.module.css";
+import { Typography } from "@mui/material";
 
 const franklinDiameter = 50;
 
@@ -48,6 +49,8 @@ export const Slider: FC<{}> = ({
 
   const moveSlide = useCallback((event) => {
     event.preventDefault();
+
+    if (!sliderThumb.current) return;
 
     const { offsetWidth, offsetLeft } = sliderThumb.current;
     const acceptanceInPixels = clamp(
@@ -124,7 +127,9 @@ export const Slider: FC<{}> = ({
           </div>
 
           {isOpining ? (
-            <div className={styles.slider__label}>{opinion}</div>
+            <Typography variant="h5" className={styles.slider__label}>
+              {opinion}
+            </Typography>
           ) : null}
           {/* <div givingOpinion={isOpining}>{opinionStrength}</SliderLabel> */}
 

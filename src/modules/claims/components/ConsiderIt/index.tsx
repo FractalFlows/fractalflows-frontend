@@ -6,6 +6,7 @@ import { Histogram } from "./Histogram";
 import { Arguments } from "./Arguments";
 import { Slider } from "./Slider";
 import { Opinion } from "./Opinion";
+import { Opine } from "./Opine";
 
 const user = {
   ethAddress: "0xd01159A043d1d6bc575daE358C6046F5Cc08e7E6",
@@ -111,6 +112,12 @@ export const ConsiderIt = () => {
   const pros = discussion.arguments.filter(
     (argument) => argument.type === ArgumentTypes.PRO
   );
+
+  useEffect(() => {
+    if (isOpining) {
+      setShowOpinion(false);
+    }
+  }, [isOpining]);
   console.log(discussion);
   return (
     <Stack alignItems="center">
@@ -136,7 +143,7 @@ export const ConsiderIt = () => {
           handleHideOpinion={handleHideOpinion}
         />
       ) : (
-        <Stack direction="row" spacing={10}>
+        <Stack direction="row" spacing={5}>
           <Arguments
             // addArgumentToSet={this._addArgumentToSet}
             type={ArgumentTypes.CON}
@@ -145,6 +152,23 @@ export const ConsiderIt = () => {
             // pickedArguments={pickedCons}
             isOpining={isOpining}
           />
+          {isOpining ? (
+            <Opine setIsOpining={setIsOpining} />
+          ) : // <GiveOpinion
+          //   dragging={dragging}
+          //   addArgumentToSet={this._addArgumentToSet}
+          //   removeArgumentFromSet={this._removeArgumentFromSet}
+          //   cons={cons}
+          //   pros={pros}
+          //   pickedCons={pickedCons}
+          //   pickedPros={pickedPros}
+          //   acceptance={acceptance}
+          //   givingOpinion={givingOpinion}
+          //   setGivingOpinionAs={this._setGivingOpinionAs}
+          //   setHasOpinedAs={this._setHasOpinedAs}
+          //   setUserAcceptance={this._setUserAcceptance}
+          // />
+          null}
           <Arguments
             // addArgumentToSet={this._addArgumentToSet}
             type={ArgumentTypes.PRO}

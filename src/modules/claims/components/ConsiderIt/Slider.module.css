@@ -42,14 +42,13 @@
 
 .slider__label {
   color: var(--fractalflows-colors-primary);
-  font-size: 24px;
   font-weight: bold;
   position: absolute;
   white-space: nowrap;
   user-select: none;
   transform: translateX(-50%);
   margin-left: calc(var(--fractalflows-considerit-franklin-diameter) / 2);
-  top: calc(var(--fractalflows-considerit-franklin-diameter) + 10px);
+  top: calc(var(--fractalflows-considerit-franklin-diameter) + 8px);
 }
 
 .slider__label--opining {

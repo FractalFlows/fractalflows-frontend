@@ -145,7 +145,7 @@ export const Opinion = ({ opinionId, handleHideOpinion }) => {
         <b>{opinion.user.username}</b>&apos;s opinion
       </Typography>
 
-      <Stack direction="row" spacing={10}>
+      <Stack direction="row" spacing={5}>
         <Arguments title="Cons" arguments={cons} />
         <Arguments title="Pros" arguments={pros} />
       </Stack>
