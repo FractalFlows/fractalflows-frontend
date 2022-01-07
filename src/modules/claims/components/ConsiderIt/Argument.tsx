@@ -57,10 +57,10 @@ export const Argument: FC<ArgumentCompProps> = ({ argument, placement }) => {
 
       {placement === ArgumentPlacements.PICKED ? null : (
         <div className={styles.argument__referrers}>
-          {argument?.referrers?.map((referrer, i) => (
+          {argument?.opinions?.map(({ user }, i) => (
             <Avatar
-              key={referrer.id}
-              src={referrer.avatar}
+              key={user.username}
+              src={user.avatar}
               size={30}
               sx={{
                 position: "absolute",
@@ -69,7 +69,7 @@ export const Argument: FC<ArgumentCompProps> = ({ argument, placement }) => {
                 top: (i % 10) * 4,
                 zIndex: 300 - i,
               }}
-              title={referrer.username}
+              title={user.username}
             />
           ))}
         </div>
