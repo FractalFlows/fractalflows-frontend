@@ -3,10 +3,11 @@ import { Stack } from "@mui/material";
 
 import { ArgumentSides } from "modules/claims/interfaces";
 import { Histogram } from "./Histogram";
-import { Arguments } from "./Arguments";
+import { ArgumentColumn } from "./ArgumentColumn";
 import { Slider } from "./Slider";
 import { Opinion } from "./Opinion";
 import { Opine } from "./Opine";
+import { useOpinion } from "modules/claims/hooks/useOpinion";
 
 const user = {
   ethAddress: "0xd01159A043d1d6bc575daE358C6046F5Cc08e7E6",
@@ -76,11 +77,10 @@ const discussion = {
 };
 
 export const ConsiderIt = () => {
-  const [isOpining, setIsOpining] = useState(false);
+  const { isOpining } = useOpinion();
   const [showOpinion, setShowOpinion] = useState(false);
   const [opinion, setOpinion] = useState("Slide Your Overall Opinion");
   const [acceptance, setAcceptance] = useState(0.5);
-  const [pickedArguments, setPickedArguments] = useState([]);
 
   useEffect(() => {
     if (acceptance < 0.01) {
@@ -107,13 +107,6 @@ export const ConsiderIt = () => {
     setShowOpinion(false);
   };
 
-  const cons = discussion.arguments.filter(
-    (argument) => argument.side === ArgumentSides.CON
-  );
-  const pros = discussion.arguments.filter(
-    (argument) => argument.side === ArgumentSides.PRO
-  );
-
   useEffect(() => {
     if (isOpining) {
       setShowOpinion(false);
@@ -124,14 +117,10 @@ export const ConsiderIt = () => {
     <Stack alignItems="center">
       <Stack sx={{ width: 700 }}>
         <Histogram
-          isOpining={isOpining}
-          setIsOpining={setIsOpining}
           opinions={discussion.opinions}
           handleShowOpinion={handleShowOpinion}
         />
         <Slider
-          isOpining={isOpining}
-          setIsOpining={setIsOpining}
           opinion={opinion}
           acceptance={acceptance}
           setAcceptance={setAcceptance}
@@ -145,29 +134,14 @@ export const ConsiderIt = () => {
         />
       ) : (
         <Stack direction="row" spacing={5}>
-          <Arguments
-            // addArgumentToSet={this._addArgumentToSet}
+          <ArgumentColumn
             side={ArgumentSides.CON}
-            arguments={cons}
             title={`${isOpining ? "Others'" : "Top"} arguments against`}
-            // pickedArguments={pickedCons}
-            isOpining={isOpining}
           />
-          {isOpining ? (
-            <Opine
-              setIsOpining={setIsOpining}
-              pickedArguments={pickedArguments}
-              setPickedArguments={setPickedArguments}
-              acceptance={acceptance}
-            />
-          ) : null}
-          <Arguments
-            // addArgumentToSet={this._addArgumentToSet}
+          {isOpining ? <Opine acceptance={acceptance} /> : null}
+          <ArgumentColumn
             side={ArgumentSides.PRO}
-            arguments={pros}
             title={`${isOpining ? "Others'" : "Top"} arguments for`}
-            // pickedArguments={pickedCons}
-            isOpining={isOpining}
           />
         </Stack>
       )}

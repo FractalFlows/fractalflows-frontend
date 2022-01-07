@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Button, Stack, Typography } from "@mui/material";
 
 import { ArgumentSides } from "modules/claims/interfaces";
-import { Arguments } from "./Arguments";
+import { ArgumentColumn } from "./ArgumentColumn";
 
 const op = {
   id: 1,
@@ -146,8 +146,8 @@ export const Opinion = ({ opinionId, handleHideOpinion }) => {
       </Typography>
 
       <Stack direction="row" spacing={5}>
-        <Arguments title="Cons" arguments={cons} />
-        <Arguments title="Pros" arguments={pros} />
+        <ArgumentColumn title="Cons" arguments={cons} />
+        <ArgumentColumn title="Pros" arguments={pros} />
       </Stack>
       <Button variant="contained" color="secondary" onClick={handleHideOpinion}>
         Back to results

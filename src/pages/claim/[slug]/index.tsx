@@ -31,7 +31,7 @@ const Claim: NextPage<ClaimPageProps> = ({
   const { setArguments } = useArguments();
 
   useEffect(() => {
-    setArguments([]);
+    setArguments(claim.arguments);
   }, []);
 
   return (

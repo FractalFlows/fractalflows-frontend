@@ -271,4 +271,19 @@ export const ClaimsService = {
 
     return data.createArgument;
   },
+
+  async getArguments({
+    claimSlug,
+  }: {
+    claimSlug: string;
+  }): Promise<KnowledgeBitProps[]> {
+    const { data } = await apolloClient.query({
+      query: GET_ARGUMENTS,
+      variables: {
+        claimSlug,
+      },
+    });
+
+    return data.arguments;
+  },
 };

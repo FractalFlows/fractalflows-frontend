@@ -3,6 +3,7 @@ import { clamp, get } from "lodash-es";
 
 import styles from "./Slider.module.css";
 import { Typography } from "@mui/material";
+import { useOpinion } from "modules/claims/hooks/useOpinion";
 
 const franklinDiameter = 50;
 
@@ -35,13 +36,12 @@ const franklinDiameter = 50;
 // `;
 
 export const Slider: FC<{}> = ({
-  isOpining = false,
-  setIsOpining,
   acceptance,
   setAcceptance,
   hasOpined = false,
   opinion,
 }) => {
+  const { isOpining, setIsOpining } = useOpinion();
   const [isSliding, setIsSliding] = useState(false);
   const sliderThumb = useRef(null);
   const sliderHandle = useRef(null);

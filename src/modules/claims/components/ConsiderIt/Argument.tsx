@@ -4,20 +4,33 @@ import { Paper, Stack, Typography } from "@mui/material";
 import { Avatar } from "modules/users/components/Avatar";
 import { formatDate } from "common/utils/format";
 import styles from "./Argument.module.css";
-import { ArgumentSides } from "modules/claims/interfaces";
+import { ArgumentProps, ArgumentSides } from "modules/claims/interfaces";
+import { useOpinion } from "modules/claims/hooks/useOpinion";
 // import ArgumentDetails from "./ArgumentDetails";
 
-export const Argument: FC = ({ argument, isOpining, hideReferrers }) => {
+export enum ArgumentPlacements {
+  PICKED,
+  ALL,
+}
+
+interface ArgumentCompProps {
+  argument: ArgumentProps;
+  placement: ArgumentPlacements;
+}
+
+export const Argument: FC<ArgumentCompProps> = ({ argument, placement }) => {
   // state = {
   //   showDetails: false,
   // };
-
+  const { isOpining } = useOpinion();
   const [showDetails, setShowDetails] = useState(false);
 
   // const commentsCount = filter({ active: true }, comments).length;
   const handleDragStart = (event) => {
     event.dataTransfer.setData("argument", JSON.stringify(argument));
   };
+
+  const commentsCount = argument?.comments?.length || 0;
 
   return (
     <div
@@ -33,15 +46,16 @@ export const Argument: FC = ({ argument, isOpining, hideReferrers }) => {
         onDragStart={handleDragStart}
         draggable={isOpining}
       >
-        <Stack spacing={1} sx={{ width: 312 }}>
+        <Stack spacing={1}>
           <Typography variant="body2">{argument?.summary}</Typography>
           <Typography variant="caption">
-            {formatDate(argument?.createdAt)}, 3 comments
+            {formatDate(argument?.createdAt)}, {commentsCount} comment
+            {commentsCount === 1 ? "" : "s"}
           </Typography>
         </Stack>
       </Paper>
 
-      {hideReferrers ? null : (
+      {placement === ArgumentPlacements.PICKED ? null : (
         <div className={styles.argument__referrers}>
           {argument?.referrers?.map((referrer, i) => (
             <Avatar

@@ -48,14 +48,16 @@ export const removePickedArgument = (argumentId: string) =>
 export const setArguments = (argumentsList: ArgumentProps[]) =>
   ClaimsCache.arguments(argumentsList);
 
-export const useArguments = () => {
+export const setIsOpining = (isOpining: boolean) =>
+  ClaimsCache.isOpining(isOpining);
+
+export const useOpinion = () => {
   const {
-    data: { arguments: argumentsList, pickedArguments },
+    data: { isOpining },
   } = useQuery(
     gql`
-      query Arguments {
-        arguments @client
-        pickedArguments @client
+      query Opinion {
+        isOpining @client
       }
     `,
     { client: apolloClient }
@@ -67,7 +69,7 @@ export const useArguments = () => {
     setArguments,
     addPickedArgument,
     removePickedArgument,
-    argumentsList,
-    pickedArguments,
+    isOpining,
+    setIsOpining,
   };
 };

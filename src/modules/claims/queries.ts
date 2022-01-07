@@ -42,6 +42,20 @@ export const KNOWLEDGE_BIT_FIELDS = gql`
   }
 `;
 
+export const CORE_ARGUMENT_FIELDS = gql`
+  fragment CoreArgumentFields on Argument {
+    id
+    summary
+    createdAt
+    evidences {
+      id
+    }
+    comments {
+      id
+    }
+  }
+`;
+
 export const GET_CLAIM = gql`
   ${CORE_CLAIM_FIELDS}
   ${KNOWLEDGE_BIT_FIELDS}
@@ -58,6 +72,20 @@ export const GET_CLAIM = gql`
         id
         origin
         identifier
+      }
+      arguments {
+        id
+        summary
+        side
+        createdAt
+        comments {
+          id
+        }
+        referrers {
+          id
+          username
+          avatar
+        }
       }
     }
     relatedClaims(slug: $slug) {
@@ -142,6 +170,16 @@ export const GET_USER_KNOWLEDGE_BITS_VOTES = gql`
       knowledgeBit {
         id
       }
+    }
+  }
+`;
+
+export const GET_ARGUMENTS = gql`
+  ${CORE_ARGUMENT_FIELDS}
+
+  query GetArguments($claimSlug: String!) {
+    arguments(claimSlug: $claimSlug) {
+      ...CoreArgumentFields
     }
   }
 `;

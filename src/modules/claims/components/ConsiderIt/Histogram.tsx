@@ -1,16 +1,11 @@
-import React, { Component, useEffect, useRef, useState } from "react";
-import PropTypes from "prop-sides";
-import { isEqual, map, cloneDeep } from "lodash-es";
+import { FC, useEffect, useRef, useState } from "react";
 
 import { HistogramAvatar } from "./HistogramAvatar";
 import { positionAvatars } from "./helpers";
+import { useOpinion } from "modules/claims/hooks/useOpinion";
 
-export const Histogram: FC<{}> = ({
-  opinions,
-  isOpining,
-  setIsOpining,
-  handleShowOpinion,
-}) => {
+export const Histogram: FC<{}> = ({ opinions, handleShowOpinion }) => {
+  const { isOpining, setIsOpining } = useOpinion();
   const histogram = useRef(null);
   const [nodes, setNodes] = useState([]);
 
@@ -48,16 +43,3 @@ export const Histogram: FC<{}> = ({
     </div>
   );
 };
-
-// Histogram.defaultProps = {
-//   showOpinionFrom: PropTypes.func,
-// };
-
-// Histogram.propTypes = {
-//   opinions: PropTypes.array.isRequired,
-//   width: PropTypes.number.isRequired,
-//   height: PropTypes.number.isRequired,
-//   givingOpinion: PropTypes.bool.isRequired,
-//   showOpinionFrom: PropTypes.func,
-//   setGivingOpinionAs: PropTypes.func.isRequired,
-// };

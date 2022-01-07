@@ -110,6 +110,7 @@ export interface ClaimProps {
   tags?: TagProps[];
   attributions?: AttributionProps[];
   knowledgeBits?: KnowledgeBitProps[];
+  arguments?: ArgumentProps[];
   createdAt: Date;
   user: UserProps;
 }
@@ -137,4 +138,5 @@ export interface ArgumentProps {
   summary: string;
   side: ArgumentSides;
   evidences: KnowledgeBitProps[];
+  createdAt: Date;
 }
