@@ -80,6 +80,7 @@ export const ConsiderIt = () => {
   const [showOpinion, setShowOpinion] = useState(false);
   const [opinion, setOpinion] = useState("Slide Your Overall Opinion");
   const [acceptance, setAcceptance] = useState(0.5);
+  const [pickedArguments, setPickedArguments] = useState([]);
 
   useEffect(() => {
     if (acceptance < 0.01) {
@@ -153,7 +154,12 @@ export const ConsiderIt = () => {
             isOpining={isOpining}
           />
           {isOpining ? (
-            <Opine setIsOpining={setIsOpining} />
+            <Opine
+              setIsOpining={setIsOpining}
+              pickedArguments={pickedArguments}
+              setPickedArguments={setPickedArguments}
+              acceptance={acceptance}
+            />
           ) : // <GiveOpinion
           //   dragging={dragging}
           //   addArgumentToSet={this._addArgumentToSet}

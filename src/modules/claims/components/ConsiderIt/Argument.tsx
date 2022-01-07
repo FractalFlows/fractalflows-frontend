@@ -7,7 +7,7 @@ import styles from "./Argument.module.css";
 import { ArgumentTypes } from "modules/claims/interfaces";
 // import ArgumentDetails from "./ArgumentDetails";
 
-export const Argument: FC = ({ argument, isOpining }) => {
+export const Argument: FC = ({ argument, isOpining, hideReferrers }) => {
   // state = {
   //   showDetails: false,
   // };
@@ -41,26 +41,25 @@ export const Argument: FC = ({ argument, isOpining }) => {
         </Stack>
       </Paper>
 
-      <div
-        className={styles.argument__referrers}
-        // side={type === "con" ? "right" : "left"}
-      >
-        {argument?.referrers?.map((referrer, i) => (
-          <Avatar
-            key={referrer.id}
-            src={referrer.avatar}
-            size={30}
-            sx={{
-              position: "absolute",
-              [argument.type === ArgumentTypes.CON ? "right" : "left"]:
-                (Math.floor(i / 10) * 30 + i) % (10 * 1),
-              top: (i % 10) * 4,
-              zIndex: 300 - i,
-            }}
-            title={referrer.username}
-          />
-        ))}
-      </div>
+      {hideReferrers ? null : (
+        <div className={styles.argument__referrers}>
+          {argument?.referrers?.map((referrer, i) => (
+            <Avatar
+              key={referrer.id}
+              src={referrer.avatar}
+              size={30}
+              sx={{
+                position: "absolute",
+                [argument.type === ArgumentTypes.CON ? "right" : "left"]:
+                  (Math.floor(i / 10) * 30 + i) % (10 * 1),
+                top: (i % 10) * 4,
+                zIndex: 300 - i,
+              }}
+              title={referrer.username}
+            />
+          ))}
+        </div>
+      )}
     </div>
   );
 };

@@ -6,6 +6,7 @@ import { registerMui } from "common/utils/registerMui";
 import { ArgumentTypes } from "modules/claims/interfaces";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
+import { Argument } from "./Argument";
 
 interface ArgumentFormProps {
   summary: string;
@@ -32,7 +33,7 @@ const argumentFormDefaultValues = {
   evidences: [],
 };
 
-export const OpineColumn = ({ type }) => {
+export const OpineColumn = ({ type, pickedArguments, setPickedArguments }) => {
   const [isAddingNewArgument, setIsAddingNewArgument] = useState(false);
   const {
     control,
@@ -47,6 +48,15 @@ export const OpineColumn = ({ type }) => {
       <Typography variant="h5">
         Give your arguments {OpineColumnTexts[type].columnTitle}
       </Typography>
+      <Stack spacing={1}>
+        {pickedArguments.map((pickedArgument) => (
+          <Argument
+            key={pickedArgument.id}
+            argument={pickedArgument}
+            hideReferrers
+          />
+        ))}
+      </Stack>
       <Typography variant="body1">
         Drag an <b>argument {OpineColumnTexts[type].columnTitle}</b> from the{" "}
         {OpineColumnTexts[type].columnSide} or

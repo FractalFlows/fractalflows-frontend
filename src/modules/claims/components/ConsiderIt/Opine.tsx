@@ -5,13 +5,17 @@ import { ArgumentTypes } from "modules/claims/interfaces";
 import { OpineColumn } from "./OpineColumn";
 import styles from "./Opine.module.css";
 
-export const Opine: FC = ({ setIsOpining }) => {
+export const Opine: FC = ({
+  setIsOpining,
+  pickedArguments,
+  setPickedArguments,
+  acceptance,
+}) => {
   const [isDraggingOver, setIsDraggingOver] = useState(false);
   const handleDrop = (event) => {
     setIsDraggingOver(false);
     const argument = JSON.parse(event.dataTransfer.getData("argument"));
-    console.log(argument);
-    // this.props.addArgumentToSet(argument);
+    setPickedArguments([...pickedArguments, argument]);
   };
   const handleDragOver = (event: SyntheticEvent) => {
     event.preventDefault();
@@ -23,6 +27,14 @@ export const Opine: FC = ({ setIsOpining }) => {
     console.log("laskdlkaskd leave");
     setIsDraggingOver(false);
   };
+
+  const conPickedArgumments = pickedArguments.filter(
+    (pickedArgument) => pickedArgument.type === ArgumentTypes.CON
+  );
+  const proPickedArgumments = pickedArguments.filter(
+    (pickedArgument) => pickedArgument.type === ArgumentTypes.PRO
+  );
+  console.log(pickedArguments, conPickedArgumments);
 
   return (
     <Stack spacing={2}>
@@ -43,8 +55,16 @@ export const Opine: FC = ({ setIsOpining }) => {
         onDragLeave={handleDragLeave}
       >
         <Stack direction="row" spacing={6}>
-          <OpineColumn type={ArgumentTypes.CON} />
-          <OpineColumn type={ArgumentTypes.PRO} />
+          <OpineColumn
+            type={ArgumentTypes.CON}
+            setPickedArguments={setPickedArguments}
+            pickedArguments={conPickedArgumments}
+          />
+          <OpineColumn
+            type={ArgumentTypes.PRO}
+            setPickedArguments={setPickedArguments}
+            pickedArguments={proPickedArgumments}
+          />
         </Stack>
       </Paper>
       <Button variant="contained" size="large">
