@@ -1,9 +1,12 @@
 import { makeVar } from "@apollo/client";
 
-import type { ArgumentProps } from "./interfaces";
+import type { ArgumentProps, OpinionProps } from "./interfaces";
 
 export const ClaimsCache = {
   arguments: makeVar([] as ArgumentProps[]),
   pickedArguments: makeVar([] as ArgumentProps[]),
+  opinions: makeVar([] as OpinionProps[]),
   isOpining: makeVar(false),
+  showOpinionId: makeVar(null),
+  opinion: makeVar({} as OpinionProps),
 };

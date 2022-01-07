@@ -5,7 +5,7 @@ import { Avatar } from "modules/users/components/Avatar";
 import { formatDate } from "common/utils/format";
 import styles from "./Argument.module.css";
 import { ArgumentProps, ArgumentSides } from "modules/claims/interfaces";
-import { useOpinion } from "modules/claims/hooks/useOpinion";
+import { useOpinions } from "modules/claims/hooks/useOpinions";
 // import ArgumentDetails from "./ArgumentDetails";
 
 export enum ArgumentPlacements {
@@ -22,7 +22,7 @@ export const Argument: FC<ArgumentCompProps> = ({ argument, placement }) => {
   // state = {
   //   showDetails: false,
   // };
-  const { isOpining } = useOpinion();
+  const { isOpining } = useOpinions();
   const [showDetails, setShowDetails] = useState(false);
 
   // const commentsCount = filter({ active: true }, comments).length;
@@ -42,7 +42,7 @@ export const Argument: FC<ArgumentCompProps> = ({ argument, placement }) => {
     >
       <Paper
         variant="outlined"
-        sx={{ p: 1 }}
+        sx={{ p: 1, cursor: "pointer" }}
         onDragStart={handleDragStart}
         draggable={isOpining}
       >

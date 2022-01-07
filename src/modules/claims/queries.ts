@@ -47,11 +47,28 @@ export const CORE_ARGUMENT_FIELDS = gql`
     id
     summary
     createdAt
+    side
     evidences {
       id
     }
     comments {
       id
+    }
+  }
+`;
+
+export const OPINION_FIELDS = gql`
+  ${CORE_ARGUMENT_FIELDS}
+
+  fragment OpinionFields on Opinion {
+    id
+    acceptance
+    user {
+      username
+      avatar
+    }
+    arguments {
+      ...CoreArgumentFields
     }
   }
 `;
@@ -81,8 +98,17 @@ export const GET_CLAIM = gql`
         comments {
           id
         }
-        referrers {
-          id
+        opinions {
+          user {
+            username
+            avatar
+          }
+        }
+      }
+      opinions {
+        id
+        acceptance
+        user {
           username
           avatar
         }
@@ -180,6 +206,16 @@ export const GET_ARGUMENTS = gql`
   query GetArguments($claimSlug: String!) {
     arguments(claimSlug: $claimSlug) {
       ...CoreArgumentFields
+    }
+  }
+`;
+
+export const GET_OPINION = gql`
+  ${OPINION_FIELDS}
+
+  query GetOpinion($id: String!) {
+    opinion(id: $id) {
+      ...OpinionFields
     }
   }
 `;

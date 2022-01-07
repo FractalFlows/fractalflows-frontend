@@ -10,6 +10,7 @@ import {
   DELETE_KNOWLEDGE_BIT,
   SAVE_KNOWLEDGE_BIT_VOTE,
   CREATE_ARGUMENT,
+  SAVE_OPINION,
 } from "../mutations";
 import {
   GET_CLAIM,
@@ -19,15 +20,17 @@ import {
   GET_KNOWLEDGE_BIT,
   GET_KNOWLEDGE_BITS,
   GET_USER_KNOWLEDGE_BITS_VOTES,
+  GET_ARGUMENTS,
+  GET_OPINION,
 } from "../queries";
 import type {
   ArgumentProps,
   ClaimProps,
-  CreateArgumentProps,
   InviteFriendsProps,
   KnowledgeBitProps,
   KnowledgeBitVoteProps,
   KnowledgeBitVoteTypes,
+  OpinionProps,
 } from "../interfaces";
 import type { PaginationProps } from "modules/interfaces";
 
@@ -259,7 +262,7 @@ export const ClaimsService = {
     argument,
   }: {
     claimSlug: string;
-    argument: CreateArgumentProps;
+    argument: ArgumentProps;
   }): Promise<ArgumentProps> {
     const { data } = await apolloClient.mutate({
       mutation: CREATE_ARGUMENT,
@@ -285,5 +288,31 @@ export const ClaimsService = {
     });
 
     return data.arguments;
+  },
+
+  async getOpinion({ id }: { id: string }): Promise<OpinionProps> {
+    const { data } = await apolloClient.query({
+      query: GET_OPINION,
+      variables: {
+        id,
+      },
+    });
+
+    return data.opinion;
+  },
+
+  async saveOpinion({
+    opinion,
+  }: {
+    opinion: OpinionProps;
+  }): Promise<OpinionProps> {
+    const { data } = await apolloClient.mutate({
+      mutation: SAVE_OPINION,
+      variables: {
+        saveOpinionInput: opinion,
+      },
+    });
+
+    return data.saveOpinion;
   },
 };

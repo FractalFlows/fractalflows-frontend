@@ -8,6 +8,7 @@ import { useState } from "react";
 import { UpsertFormOperation } from "common/interfaces";
 import { useArguments } from "modules/claims/hooks/useArguments";
 import { isEmpty } from "lodash-es";
+import { useOpinions } from "modules/claims/hooks/useOpinions";
 
 const OpineColumnTexts = {
   [ArgumentSides.CON]: {
@@ -25,21 +26,21 @@ const OpineColumnTexts = {
 };
 
 export const OpineColumn = ({ side }) => {
-  const { pickedArguments } = useArguments();
+  const { opinion } = useOpinions();
   const [isAddingArgument, setIsAddingArgument] = useState(false);
 
-  const filteredPickedArgumments = pickedArguments.filter(
-    (pickedArgument) => pickedArgument.side === side
+  const filteredArguments = opinion.arguments.filter(
+    (argument) => argument.side === side
   );
 
   return (
     <Stack sx={{ width: "100%" }} spacing={3}>
-      {isEmpty(filteredPickedArgumments) ? null : (
+      {isEmpty(filteredArguments) ? null : (
         <Stack spacing={1}>
-          {filteredPickedArgumments.map((pickedArgument) => (
+          {filteredArguments.map((argument) => (
             <Argument
-              key={pickedArgument.id}
-              argument={pickedArgument}
+              key={argument.id}
+              argument={argument}
               placement={ArgumentPlacements.PICKED}
             />
           ))}

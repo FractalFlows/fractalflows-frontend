@@ -1,8 +1,15 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Button, Stack, Typography } from "@mui/material";
 
-import { ArgumentSides } from "modules/claims/interfaces";
+import { ArgumentSides, OpinionProps } from "modules/claims/interfaces";
 import { ArgumentColumn } from "./ArgumentColumn";
+import {
+  getOpinion,
+  setShowOpinionId,
+  useOpinions,
+} from "modules/claims/hooks/useOpinions";
+import { useSnackbar } from "notistack";
+import { Spinner } from "common/components/Spinner";
 
 const op = {
   id: 1,
@@ -130,26 +137,50 @@ const op = {
   acceptance: -0.6,
 };
 
-export const Opinion = ({ opinionId, handleHideOpinion }) => {
-  const [opinion, setOpinion] = useState(op);
-  const cons = opinion.arguments.filter(
+export const Opinion = () => {
+  const [opinion, setOpinion] = useState({} as OpinionProps);
+  const [isLoadingOpinion, setIsLoadingOpinion] = useState(true);
+  const { showOpinionId, setShowOpinionId } = useOpinions();
+  const { enqueueSnackbar } = useSnackbar();
+
+  useEffect(() => {
+    setIsLoadingOpinion(true);
+    getOpinion({ id: showOpinionId })
+      .then((data) => setOpinion(data))
+      .catch((e) => enqueueSnackbar(e.message, { variant: "error" }))
+      .finally(() => setIsLoadingOpinion(false));
+  }, [showOpinionId]);
+  console.log(
+    "cons",
+    opinion?.arguments?.filter((x) => {
+      console.log("x", x.side === ArgumentSides.CON);
+      return x.side === ArgumentSides.CON;
+    })
+  );
+  const cons = opinion?.arguments?.filter(
     (argument) => argument.side === ArgumentSides.CON
   );
-  const pros = opinion.arguments.filter(
+  const pros = opinion?.arguments?.filter(
     (argument) => argument.side === ArgumentSides.PRO
   );
+
+  if (isLoadingOpinion) return <Spinner />;
 
   return (
     <Stack spacing={5}>
       <Typography variant="h4" align="center">
-        <b>{opinion.user.username}</b>&apos;s opinion
+        <b>{opinion?.user?.username}</b>&apos;s opinion
       </Typography>
 
       <Stack direction="row" spacing={5}>
         <ArgumentColumn title="Cons" arguments={cons} />
         <ArgumentColumn title="Pros" arguments={pros} />
       </Stack>
-      <Button variant="contained" color="secondary" onClick={handleHideOpinion}>
+      <Button
+        variant="contained"
+        color="secondary"
+        onClick={() => setShowOpinionId(null)}
+      >
         Back to results
       </Button>
     </Stack>

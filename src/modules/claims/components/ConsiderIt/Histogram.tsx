@@ -2,19 +2,21 @@ import { FC, useEffect, useRef, useState } from "react";
 
 import { HistogramAvatar } from "./HistogramAvatar";
 import { positionAvatars } from "./helpers";
-import { useOpinion } from "modules/claims/hooks/useOpinion";
+import { useOpinions } from "modules/claims/hooks/useOpinions";
 
-export const Histogram: FC<{}> = ({ opinions, handleShowOpinion }) => {
-  const { isOpining, setIsOpining } = useOpinion();
+export const Histogram: FC<{}> = () => {
+  const { opinions, isOpining, setIsOpining, setShowOpinionId } = useOpinions();
   const histogram = useRef(null);
   const [nodes, setNodes] = useState([]);
 
+  console.log(opinions);
   const handleClick = () => setIsOpining(false);
+  const handleShowOpinion = (opinionId: string) => setShowOpinionId(opinionId);
 
   useEffect(() => {
     if (histogram.current) {
       const nodes = positionAvatars(
-        opinions,
+        [...opinions],
         histogram.current.offsetWidth,
         histogram.current.offsetHeight
       );
@@ -37,7 +39,7 @@ export const Histogram: FC<{}> = ({ opinions, handleShowOpinion }) => {
         <HistogramAvatar
           key={node.opinion.id}
           node={node}
-          onClick={() => handleShowOpinion(node.opinion.user.id)}
+          onClick={() => handleShowOpinion(node.opinion.id)}
         />
       ))}
     </div>

@@ -1,3 +1,4 @@
+import { useEffect } from "react";
 import { Box, Stack } from "@mui/material";
 import type { NextPage } from "next";
 import Head from "next/head";
@@ -14,7 +15,7 @@ import { ClaimSummary } from "modules/claims/components/Summary";
 import { SocialOpinions } from "modules/claims/components/SocialOpinions";
 import { RelatedClaims } from "modules/claims/components/RelatedClaims";
 import { useArguments } from "modules/claims/hooks/useArguments";
-import { useEffect } from "react";
+import { useOpinions } from "modules/claims/hooks/useOpinions";
 
 interface ClaimPageProps {
   data: {
@@ -29,11 +30,22 @@ const Claim: NextPage<ClaimPageProps> = ({
   data: { claim, relatedClaims, knowledgeBits, userKnowledgeBitsVotes },
 }) => {
   const { setArguments } = useArguments();
+  const { setOpinion, setOpinions } = useOpinions();
 
   useEffect(() => {
-    setArguments(claim.arguments);
+    setArguments(claim.arguments || []);
+    setOpinions(claim.opinions || []);
+    setOpinion(
+      claim.opinion || {
+        acceptance: 0.5,
+        arguments: [],
+        claim: {
+          id: claim.id,
+        },
+      }
+    );
   }, []);
-
+  console.log(claim);
   return (
     <Box className="container page">
       <Head>

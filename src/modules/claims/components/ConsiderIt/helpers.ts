@@ -8,10 +8,11 @@ export function positionAvatars(opinions, width, height) {
   opinions = opinions.map((opinion) => {
     const { acceptance } = opinion;
 
-    opinion.acceptance =
-      acceptance >= 0.5 ? (acceptance - 0.5) * 2 : -(0.5 - acceptance) * 2;
-
-    return opinion;
+    return {
+      ...opinion,
+      acceptance:
+        acceptance >= 0.5 ? (acceptance - 0.5) * 2 : -(0.5 - acceptance) * 2,
+    };
   });
 
   // Check if system energy would be reduced if two nodes' positions would

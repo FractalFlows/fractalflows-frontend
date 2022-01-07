@@ -92,3 +92,15 @@ export const CREATE_ARGUMENT = gql`
     }
   }
 `;
+
+export const SAVE_OPINION = gql`
+  mutation SaveOpinion($saveOpinionInput: SaveOpinionInput!) {
+    saveOpinion(saveOpinionInput: $saveOpinionInput) {
+      id
+      acceptance
+      arguments {
+        id
+      }
+    }
+  }
+`;

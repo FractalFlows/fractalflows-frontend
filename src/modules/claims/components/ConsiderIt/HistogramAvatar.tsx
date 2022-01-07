@@ -1,49 +1,44 @@
-import { FC } from "react";
+import { FC, useMemo } from "react";
 import { Tooltip, Typography } from "@mui/material";
 
 import { Avatar } from "modules/users/components/Avatar";
 import styles from "./HistogramAvatar.module.css";
 
-export const HistogramAvatar: FC = ({ node, onClick = () => {} }) => {
+export const HistogramAvatar: FC = ({
+  node: { opinion, radius, x, y },
+  onClick = () => {},
+}) => {
+  const { acceptance } = opinion || {};
+  const acceptanceText = useMemo(() => {
+    if (acceptance <= 0.05 && acceptance >= -0.05) {
+      return "is neutral";
+    } else {
+      return `${acceptance > 0.05 ? "agrees" : "disagrees"} ${(
+        Math.abs(acceptance) * 100
+      ).toFixed(2)}`;
+    }
+  }, [acceptance]);
+
   return (
     <Tooltip
       title={
         <Typography variant="body1">
-          <b>{node.opinion.user.username}</b> disagrees 80%
+          <b>{opinion?.user?.username}</b> {acceptanceText}
         </Typography>
       }
       placement="right"
     >
       <Avatar
-        src={node.opinion.user.avatar}
+        src={opinion?.user?.avatar}
         onClick={onClick}
-        size={node.radius * 2}
+        size={radius * 2}
         className={styles.avatar}
         sx={{
           position: "absolute",
-          left: node.x,
-          bottom: node.y,
+          left: x,
+          bottom: y,
         }}
       />
     </Tooltip>
   );
 };
-
-// _value = () => {
-//   const { acceptance } = this.props.opinion;
-
-//   if (acceptance <= 0.05 && acceptance >= -0.05) {
-//     return "Neutral";
-//   }
-//   return `${(Math.abs(acceptance) * 100).toFixed(2)}%`;
-// };
-
-// _valence = () => {
-//   const { acceptance } = this.props.opinion;
-
-//   if (acceptance > 0.05) {
-//     return "Agree";
-//   } else if (acceptance < -0.05) {
-//     return "Disagree";
-//   }
-// };

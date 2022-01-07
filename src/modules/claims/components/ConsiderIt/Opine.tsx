@@ -5,17 +5,23 @@ import { ArgumentSides } from "modules/claims/interfaces";
 import { OpineColumn } from "./OpineColumn";
 import styles from "./Opine.module.css";
 import { useArguments } from "modules/claims/hooks/useArguments";
-import { useOpinion } from "modules/claims/hooks/useOpinion";
+import { useOpinions } from "modules/claims/hooks/useOpinions";
+import { LoadingButton } from "@mui/lab";
+import { useRouter } from "next/router";
+import { useSnackbar } from "notistack";
 
-export const Opine: FC = ({ acceptance }) => {
-  const { setIsOpining } = useOpinion();
-  const { addPickedArgument } = useArguments();
+export const Opine: FC = () => {
+  const { setIsOpining, opinion, addArgumentToOpinion, saveOpinion } =
+    useOpinions();
+  const [isSavingOpinion, setIsSavingOpinion] = useState(false);
   const [isDraggingOver, setIsDraggingOver] = useState(false);
+  const router = useRouter();
+  const { enqueueSnackbar } = useSnackbar();
 
   const handleDrop = (event: DragEvent) => {
     setIsDraggingOver(false);
     const argument = JSON.parse(event.dataTransfer.getData("argument"));
-    addPickedArgument(argument);
+    addArgumentToOpinion(argument);
   };
   const handleDragOver = (event: SyntheticEvent) => {
     event.preventDefault();
@@ -26,8 +32,26 @@ export const Opine: FC = ({ acceptance }) => {
   const handleDragLeave = () => {
     setIsDraggingOver(false);
   };
+  const handleSaveOpinion = async () => {
+    setIsSavingOpinion(true);
+    console.log(opinion);
+    try {
+      await saveOpinion({ opinion });
+      enqueueSnackbar("Your opinion has been succesfully saved!", {
+        variant: "success",
+      });
+      setIsOpining(false);
+    } catch (e) {
+      enqueueSnackbar(e.message, {
+        variant: "error",
+      });
+    } finally {
+      setIsSavingOpinion(false);
+    }
+  };
 
   return (
+    // This extra div is necessary to make the sticky position work
     <div>
       <Stack spacing={2} sx={{ position: "sticky", top: "20px" }}>
         <Paper
@@ -59,12 +83,15 @@ export const Opine: FC = ({ acceptance }) => {
             <OpineColumn side={ArgumentSides.CON} />
             <OpineColumn side={ArgumentSides.PRO} />
           </div>
-          {/* <Stack direction="row" spacing={6}>
-        </Stack> */}
         </Paper>
-        <Button variant="contained" size="large">
+        <LoadingButton
+          loading={isSavingOpinion}
+          variant="contained"
+          size="large"
+          onClick={handleSaveOpinion}
+        >
           Save opinion
-        </Button>
+        </LoadingButton>
         <Button
           variant="contained"
           color="secondary"

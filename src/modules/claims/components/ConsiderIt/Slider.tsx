@@ -1,11 +1,9 @@
-import React, { Component, useCallback, useRef, useState } from "react";
+import { FC, useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { Typography } from "@mui/material";
 import { clamp, get } from "lodash-es";
 
 import styles from "./Slider.module.css";
-import { Typography } from "@mui/material";
-import { useOpinion } from "modules/claims/hooks/useOpinion";
-
-const franklinDiameter = 50;
+import { useOpinions } from "modules/claims/hooks/useOpinions";
 
 // const GiveOpinionBtn = styled.div`
 //   background-color: ${grey800};
@@ -35,17 +33,20 @@ const franklinDiameter = 50;
 //   }
 // `;
 
-export const Slider: FC<{}> = ({
-  acceptance,
-  setAcceptance,
-  hasOpined = false,
-  opinion,
-}) => {
-  const { isOpining, setIsOpining } = useOpinion();
+export const Slider: FC = () => {
+  const { opinion, setOpinionAcceptance, setShowOpinionId } = useOpinions();
+  const { isOpining, setIsOpining } = useOpinions();
   const [isSliding, setIsSliding] = useState(false);
   const sliderThumb = useRef(null);
   const sliderHandle = useRef(null);
+  const { acceptance } = opinion;
   const franklinSmileCurve = acceptance * 10;
+
+  const setHandlePosition = (acceptance: number) => {
+    if (sliderHandle.current) {
+      sliderHandle.current.style.left = `${acceptance * 100}%`;
+    }
+  };
 
   const moveSlide = useCallback((event) => {
     event.preventDefault();
@@ -53,12 +54,10 @@ export const Slider: FC<{}> = ({
     if (!sliderThumb.current) return;
 
     const { offsetWidth, offsetLeft } = sliderThumb.current;
-    const acceptanceInPixels = clamp(
-      event.clientX - offsetLeft,
-      0,
-      offsetWidth
-    );
-    setAcceptance(acceptanceInPixels / offsetWidth);
+    const acceptance =
+      clamp(event.clientX - offsetLeft, 0, offsetWidth) / offsetWidth;
+    setOpinionAcceptance(acceptance);
+    setHandlePosition(acceptance);
   }, []);
 
   const stopSlide = useCallback((event) => {
@@ -75,8 +74,31 @@ export const Slider: FC<{}> = ({
     document.body.addEventListener("mouseup", stopSlide, false);
     document.body.addEventListener("touchend", stopSlide, false);
     setIsOpining(true);
+    setShowOpinionId(null);
     setIsSliding(true);
   };
+
+  const acceptanceText = useMemo(() => {
+    if (acceptance < 0.01) {
+      return "You Fully Disagree";
+    } else if (acceptance < 0.23) {
+      return "You Firmly Disagree";
+    } else if (acceptance < 0.45) {
+      return "You Slightly Disagree";
+    } else if (acceptance < 0.55) {
+      return "You Are Undecided";
+    } else if (acceptance < 0.77) {
+      return "You Slightly Agree";
+    } else if (acceptance < 0.99) {
+      return "You Firmly Agree";
+    } else {
+      return "You Fully Agree";
+    }
+  }, [acceptance]);
+
+  useEffect(() => {
+    setHandlePosition(acceptance || 0.5);
+  }, []);
 
   return (
     <div className={styles.slider}>
@@ -91,9 +113,6 @@ export const Slider: FC<{}> = ({
           onTouchStart={handleSlideStart}
           ref={sliderHandle}
           className={styles.slider__handle}
-          style={{
-            left: `${acceptance * 100}%`,
-          }}
         >
           <div
             className={styles.slider__franklin}
@@ -128,7 +147,7 @@ export const Slider: FC<{}> = ({
 
           {isOpining ? (
             <Typography variant="h5" className={styles.slider__label}>
-              {opinion}
+              {acceptanceText}
             </Typography>
           ) : null}
           {/* <div givingOpinion={isOpining}>{opinionStrength}</SliderLabel> */}

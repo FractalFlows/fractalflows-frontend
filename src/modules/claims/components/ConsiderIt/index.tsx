@@ -7,7 +7,8 @@ import { ArgumentColumn } from "./ArgumentColumn";
 import { Slider } from "./Slider";
 import { Opinion } from "./Opinion";
 import { Opine } from "./Opine";
-import { useOpinion } from "modules/claims/hooks/useOpinion";
+import { useOpinions } from "modules/claims/hooks/useOpinions";
+import { useArguments } from "modules/claims/hooks/useArguments";
 
 const user = {
   ethAddress: "0xd01159A043d1d6bc575daE358C6046F5Cc08e7E6",
@@ -77,71 +78,42 @@ const discussion = {
 };
 
 export const ConsiderIt = () => {
-  const { isOpining } = useOpinion();
-  const [showOpinion, setShowOpinion] = useState(false);
-  const [opinion, setOpinion] = useState("Slide Your Overall Opinion");
-  const [acceptance, setAcceptance] = useState(0.5);
+  const { isOpining, opinion, showOpinionId } = useOpinions();
+  const { argumentsList } = useArguments();
 
-  useEffect(() => {
-    if (acceptance < 0.01) {
-      setOpinion("You Fully Disagree");
-    } else if (acceptance < 0.23) {
-      setOpinion("You Firmly Disagree");
-    } else if (acceptance < 0.45) {
-      setOpinion("You Slightly Disagree");
-    } else if (acceptance < 0.55) {
-      setOpinion("You Are Undecided");
-    } else if (acceptance < 0.77) {
-      setOpinion("You Slightly Agree");
-    } else if (acceptance < 0.99) {
-      setOpinion("You Firmly Agree");
-    } else {
-      setOpinion("You Fully Agree");
-    }
-  }, [acceptance]);
-
-  const handleShowOpinion = (userId: string) => {
-    setShowOpinion(true);
-  };
-  const handleHideOpinion = () => {
-    setShowOpinion(false);
-  };
-
-  useEffect(() => {
-    if (isOpining) {
-      setShowOpinion(false);
-    }
-  }, [isOpining]);
+  const filterArguments = (side: ArgumentSides) =>
+    argumentsList.filter(
+      (argument) =>
+        argument.side === side &&
+        (isOpining === false ||
+          opinion.arguments.find(
+            (opinionArgument) => argument.id === opinionArgument.id
+          ) === undefined)
+    );
+  const cons = filterArguments(ArgumentSides.CON);
+  const pros = filterArguments(ArgumentSides.PRO);
 
   return (
     <Stack alignItems="center">
       <Stack sx={{ width: 700 }}>
-        <Histogram
-          opinions={discussion.opinions}
-          handleShowOpinion={handleShowOpinion}
-        />
-        <Slider
-          opinion={opinion}
-          acceptance={acceptance}
-          setAcceptance={setAcceptance}
-        />
+        <Histogram opinions={discussion.opinions} />
+        <Slider />
       </Stack>
 
-      {showOpinion ? (
-        <Opinion
-          opinion={discussion.opinions[0]}
-          handleHideOpinion={handleHideOpinion}
-        />
+      {showOpinionId ? (
+        <Opinion />
       ) : (
         <Stack direction="row" spacing={5}>
           <ArgumentColumn
             side={ArgumentSides.CON}
             title={`${isOpining ? "Others'" : "Top"} arguments against`}
+            arguments={cons}
           />
-          {isOpining ? <Opine acceptance={acceptance} /> : null}
+          {isOpining ? <Opine /> : null}
           <ArgumentColumn
             side={ArgumentSides.PRO}
             title={`${isOpining ? "Others'" : "Top"} arguments for`}
+            arguments={pros}
           />
         </Stack>
       )}

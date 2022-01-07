@@ -128,15 +128,17 @@ export enum ArgumentSides {
   PRO = "PRO",
 }
 
-export interface CreateArgumentProps {
-  summary: string;
-  side: ArgumentSides;
-  evidencesIds: string[];
-}
-
 export interface ArgumentProps {
+  id: string;
   summary: string;
   side: ArgumentSides;
   evidences: KnowledgeBitProps[];
   createdAt: Date;
+}
+
+export interface OpinionProps {
+  id: string;
+  acceptance: number;
+  arguments: ArgumentProps[];
+  user: UserProps;
 }
