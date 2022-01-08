@@ -93,12 +93,14 @@ export const Argument: FC<ArgumentCompProps> = ({ argument, placement }) => {
             get(argument, "side") === ArgumentSides.CON ? "left" : "right",
         }}
         PaperProps={{
-          elevation: 3,
+          elevation: 1,
           sx: {
-            width: "500px",
+            width: "600px",
             border: "1px solid rgba(0, 0, 0, 0.12)",
+            maxHeight: "70vh",
           },
         }}
+        disableScrollLock
       >
         <ArgumentDetails argumentId={get(argument, "id")} />
       </Popover>

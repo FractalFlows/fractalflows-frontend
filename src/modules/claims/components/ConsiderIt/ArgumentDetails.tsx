@@ -1,6 +1,6 @@
 import { FC, useEffect, useState } from "react";
 import { Chip, Stack, Typography } from "@mui/material";
-import { isEmpty, map } from "lodash-es";
+import { compact, concat, get, isEmpty, map } from "lodash-es";
 
 import { ArgumentProps, ArgumentSides } from "modules/claims/interfaces";
 import { useSnackbar } from "notistack";
@@ -11,6 +11,8 @@ import { AuthorBlock } from "modules/users/components/AuthorBlock";
 import { AvatarWithUsername } from "modules/users/components/AvatarWithUsername";
 import { useAuth } from "modules/auth/hooks/useAuth";
 import { ArgumentCommentUpsertForm } from "./ArgumentCommentUpsertForm";
+import { UpsertFormOperation } from "common/interfaces";
+import { ArgumentCommentProps } from "modules/argument-comments/interfaces";
 
 interface ArgumentDetailsProps {
   argumentId: string;
@@ -22,6 +24,14 @@ export const ArgumentDetails: FC<ArgumentDetailsProps> = ({ argumentId }) => {
   const [isLoadingArgument, setIsLoadingArgument] = useState(true);
   const { getArgument } = useArguments();
   const { enqueueSnackbar } = useSnackbar();
+
+  const addArgumentComment = (argumentComment: ArgumentCommentProps) => {
+    const updatedArgument = {
+      ...argument,
+      comments: compact(concat(argument.comments, argumentComment)),
+    };
+    setArgument(updatedArgument);
+  };
 
   useEffect(() => {
     setIsLoadingArgument(true);
@@ -36,11 +46,9 @@ export const ArgumentDetails: FC<ArgumentDetailsProps> = ({ argumentId }) => {
   if (isLoadingArgument) return <Spinner />;
 
   return (
-    <Stack spacing={3} sx={{ p: 2 }}>
+    <Stack spacing={3} sx={{ p: 3 }}>
       <Stack spacing={1}>
-        <Typography variant="body1" fontWeight="bold">
-          Evidences
-        </Typography>
+        <Typography variant="h6">Evidences</Typography>
 
         <Stack direction="row" spacing={1}>
           {isEmpty(argument.evidences) ? (
@@ -56,20 +64,23 @@ export const ArgumentDetails: FC<ArgumentDetailsProps> = ({ argumentId }) => {
           )}
         </Stack>
       </Stack>
-      <Stack spacing={3}>
-        <Typography variant="body1" fontWeight="bold">
-          Discuss this point
-        </Typography>
-        <Stack direction="row" spacing={1}>
-          {map(argument.comments, ({ id, user, createdAt }) => (
-            <Stack key={id}>
+      <Stack spacing={1}>
+        <Typography variant="h6">Discuss this point</Typography>
+        <Stack spacing={3}>
+          {map(argument.comments, ({ id, user, content, createdAt }) => (
+            <Stack key={id} spacing={1}>
               <AuthorBlock user={user} createdAt={createdAt} size={20} />
+              <Typography variant="body1">{content}</Typography>
             </Stack>
           ))}
           {isSignedIn ? (
             <Stack spacing={2} sx={{ width: "100%" }}>
               <AvatarWithUsername user={session.user} size={20} />
-              <ArgumentCommentUpsertForm />
+              <ArgumentCommentUpsertForm
+                argumentId={get(argument, "id")}
+                handleSuccess={addArgumentComment}
+                operation={UpsertFormOperation.CREATE}
+              />
             </Stack>
           ) : (
             "Login"

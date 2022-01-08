@@ -3,101 +3,81 @@ import { useSnackbar } from "notistack";
 import { useCallback, useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { LoadingButton } from "@mui/lab";
-import { Button, Stack, TextField, Typography } from "@mui/material";
+import { Button, Stack, TextField } from "@mui/material";
 
-import {
-  Autocomplete,
-  AutocompleteOptionProps,
-} from "common/components/Autocomplete";
 import { registerMui } from "common/utils/registerMui";
-import { useClaims } from "modules/claims/hooks/useClaims";
-import {
-  ArgumentProps,
-  ArgumentSides,
-  KnowledgeBitProps,
-  KnowledgeBitSides,
-} from "modules/claims/interfaces";
-import { useRouter } from "next/router";
 import { UpsertFormOperation } from "common/interfaces";
-import { mapArray } from "common/utils/mapArray";
-import { useArguments } from "modules/claims/hooks/useArguments";
-import { useKnowledgeBits } from "modules/claims/hooks/useKnowledgeBits";
-import { filter } from "lodash-es";
-import { useOpinions } from "modules/claims/hooks/useOpinions";
+import { useArgumentComments } from "modules/argument-comments/useArgumentComments";
 
-interface ArgumentFormProps {
-  summary: string;
-  evidences: string[];
-}
-
-const KnowledgeBitUpsertFormOperationTexts = {
+const ArgumentCommentUpsertFormOperationTexts = {
   [UpsertFormOperation.CREATE]: {
-    submitButton: "Add argument",
-    successFeedback: "Your new argument has been succesfully added!",
+    successFeedback: "Your new comment has been succesfully added!",
   },
   [UpsertFormOperation.UPDATE]: {
-    submitButton: "Edit argument",
-    successFeedback: "Your argument has been succesfully edited!",
+    successFeedback: "Your comment has been succesfully edited!",
   },
 };
 
-const argumentFormDefaultValues = {
-  summary: "",
-  evidences: [],
+const argumentCommentFormDefaultValues = {
+  content: "",
 };
 
-interface ArgumentUpsertFormProps {
-  argument: ArgumentProps;
-  handleClose: () => any;
+interface ArgumentCommentUpsertFormDataProps {
+  content: string;
+}
+
+interface ArgumentCommentUpsertFormProps {
+  argumentId: string;
+  handleClose?: () => any;
+  handleSuccess: () => any;
   operation: UpsertFormOperation;
 }
 
-export const ArgumentCommentUpsertForm: FC<ArgumentUpsertFormProps> = ({
-  argument,
+export const ArgumentCommentUpsertForm: FC<ArgumentCommentUpsertFormProps> = ({
+  argumentId,
   operation,
+  handleSuccess,
   handleClose,
 }) => {
-  const { createArgument, updateArgument } = useArguments();
-  const { addArgumentToOpinion } = useOpinions();
+  const { createArgumentComment, updateArgumentComment } =
+    useArgumentComments();
   const { enqueueSnackbar } = useSnackbar();
-  const { knowledgeBits } = useKnowledgeBits();
-  const router = useRouter();
-  const { slug: claimSlug }: { slug?: string } = router.query;
   const {
     register,
     reset,
     formState: { errors, isSubmitting },
     handleSubmit: handleSubmitHook,
-  } = useForm<ArgumentFormProps>({ defaultValues: argumentFormDefaultValues });
+  } = useForm<ArgumentCommentUpsertFormDataProps>({
+    defaultValues: argumentCommentFormDefaultValues,
+  });
 
-  const handleSubmit = async (data: ArgumentFormProps) => {
-    const mapArgument = () => ({
-      summary: data.summary,
-      side: argument.side,
-      evidences: mapArray(data.evidences, ["id"]),
+  const handleSubmit = async (data: ArgumentCommentUpsertFormDataProps) => {
+    const mapArgumentComment = () => ({
+      content: data.content,
+      argument: { id: argumentId },
     });
 
     try {
       if (operation === UpsertFormOperation.CREATE) {
-        const addedArgument = await createArgument({
-          claimSlug,
-          argument: mapArgument(),
+        const addedArgumentComment = await createArgumentComment({
+          argumentComment: mapArgumentComment(),
         });
-        addArgumentToOpinion(addedArgument);
+        handleSuccess(addedArgumentComment);
       } else {
-        await updateArgument({
-          id: argument?.id as string,
-          argument: mapArgument(),
+        const updatedArgumentComment = await updateArgumentComment({
+          id: get(argumentComment, "id"),
+          argumentComment: mapArgumentComment(),
         });
+        handleSuccess(updatedArgumentComment);
       }
       enqueueSnackbar(
-        KnowledgeBitUpsertFormOperationTexts[operation].submitButton,
+        ArgumentCommentUpsertFormOperationTexts[operation].successFeedback,
         {
           variant: "success",
         }
       );
-      reset(argumentFormDefaultValues);
-      handleClose();
+      reset(argumentCommentFormDefaultValues);
+      handleClose && handleClose();
     } catch (e: any) {
       enqueueSnackbar(e.message, {
         variant: "error",
@@ -137,8 +117,8 @@ export const ArgumentCommentUpsertForm: FC<ArgumentUpsertFormProps> = ({
               variant="contained"
               color="secondary"
               onClick={() => {
-                handleClose();
-                reset(argumentFormDefaultValues);
+                handleClose && handleClose();
+                reset(argumentCommentFormDefaultValues);
               }}
             >
               Cancel

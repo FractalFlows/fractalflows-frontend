@@ -38,7 +38,7 @@
 
 .slider__label {
   color: var(--fractalflows-colors-primary);
-  font-weight: bold;
+  font-weight: 600;
   position: absolute;
   white-space: nowrap;
   user-select: none;

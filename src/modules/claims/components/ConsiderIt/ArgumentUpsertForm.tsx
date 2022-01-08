@@ -25,12 +25,7 @@ import { useKnowledgeBits } from "modules/claims/hooks/useKnowledgeBits";
 import { filter } from "lodash-es";
 import { useOpinions } from "modules/claims/hooks/useOpinions";
 
-interface ArgumentFormProps {
-  summary: string;
-  evidences: string[];
-}
-
-const KnowledgeBitUpsertFormOperationTexts = {
+const ArgumentUpsertFormOperationTexts = {
   [UpsertFormOperation.CREATE]: {
     submitButton: "Add argument",
     successFeedback: "Your new argument has been succesfully added!",
@@ -45,6 +40,11 @@ const argumentFormDefaultValues = {
   summary: "",
   evidences: [],
 };
+
+interface ArgumentUpsertFormDataProps {
+  summary: string;
+  evidences: string[];
+}
 
 interface ArgumentUpsertFormProps {
   argument: ArgumentProps;
@@ -69,13 +69,15 @@ export const ArgumentUpsertForm: FC<ArgumentUpsertFormProps> = ({
     reset,
     formState: { errors, isSubmitting },
     handleSubmit: handleSubmitHook,
-  } = useForm<ArgumentFormProps>({ defaultValues: argumentFormDefaultValues });
+  } = useForm<ArgumentUpsertFormDataProps>({
+    defaultValues: argumentFormDefaultValues,
+  });
 
   const [evidencesOptions, setEvidencesOptions] = useState<
     AutocompleteOptionProps[]
   >([]);
 
-  const handleSubmit = async (data: ArgumentFormProps) => {
+  const handleSubmit = async (data: ArgumentUpsertFormDataProps) => {
     const mapArgument = () => ({
       summary: data.summary,
       side: argument.side,
@@ -96,7 +98,7 @@ export const ArgumentUpsertForm: FC<ArgumentUpsertFormProps> = ({
         });
       }
       enqueueSnackbar(
-        KnowledgeBitUpsertFormOperationTexts[operation].submitButton,
+        ArgumentUpsertFormOperationTexts[operation].successFeedback,
         {
           variant: "success",
         }
@@ -157,7 +159,7 @@ export const ArgumentUpsertForm: FC<ArgumentUpsertFormProps> = ({
             loading={isSubmitting}
             variant="contained"
           >
-            {KnowledgeBitUpsertFormOperationTexts[operation].submitButton}
+            {ArgumentUpsertFormOperationTexts[operation].submitButton}
           </LoadingButton>
           <Button
             variant="contained"

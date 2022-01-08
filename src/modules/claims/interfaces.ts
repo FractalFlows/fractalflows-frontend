@@ -1,3 +1,4 @@
+import { ArgumentCommentProps } from "modules/argument-comments/interfaces";
 import { UserProps } from "modules/users/interfaces";
 
 export interface SourceProps {
@@ -133,6 +134,7 @@ export interface ArgumentProps {
   summary: string;
   side: ArgumentSides;
   evidences: KnowledgeBitProps[];
+  comments: ArgumentCommentProps[];
   opinions: OpinionProps[];
   createdAt: Date;
 }
