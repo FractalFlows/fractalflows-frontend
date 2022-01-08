@@ -9,7 +9,6 @@ export const Histogram: FC<{}> = () => {
   const histogram = useRef(null);
   const [nodes, setNodes] = useState([]);
 
-  console.log(opinions);
   const handleClick = () => setIsOpining(false);
   const handleShowOpinion = (opinionId: string) => setShowOpinionId(opinionId);
 

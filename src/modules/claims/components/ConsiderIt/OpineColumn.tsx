@@ -26,10 +26,10 @@ const OpineColumnTexts = {
 };
 
 export const OpineColumn = ({ side }) => {
-  const { opinion } = useOpinions();
+  const { userOpinion } = useOpinions();
   const [isAddingArgument, setIsAddingArgument] = useState(false);
 
-  const filteredArguments = opinion.arguments.filter(
+  const filteredArguments = userOpinion?.arguments?.filter(
     (argument) => argument.side === side
   );
 
@@ -41,7 +41,7 @@ export const OpineColumn = ({ side }) => {
             <Argument
               key={argument.id}
               argument={argument}
-              placement={ArgumentPlacements.PICKED}
+              placement={ArgumentPlacements.OPINION}
             />
           ))}
         </Stack>

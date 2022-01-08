@@ -25,8 +25,8 @@ const cacheOptions = {
         pickedArguments: {
           read: () => ClaimsCache.pickedArguments(),
         },
-        opinion: {
-          read: () => ClaimsCache.opinion(),
+        userOpinion: {
+          read: () => ClaimsCache.userOpinion(),
         },
         opinions: {
           read: () => ClaimsCache.opinions(),

@@ -1,77 +1,12 @@
 import { gql } from "@apollo/client";
 
-export const CORE_CLAIM_FIELDS = gql`
-  fragment CoreClaimFields on Claim {
-    id
-    title
-    summary
-    slug
-    createdAt
-    user {
-      avatar
-      username
-    }
-    tags {
-      id
-      label
-    }
-  }
-`;
-
-export const KNOWLEDGE_BIT_FIELDS = gql`
-  fragment KnowledgeBitFields on KnowledgeBit {
-    id
-    name
-    summary
-    side
-    type
-    customType
-    location
-    customLocation
-    url
-    attributions {
-      origin
-      identifier
-    }
-    user {
-      avatar
-      username
-    }
-    upvotesCount
-    downvotesCount
-  }
-`;
-
-export const CORE_ARGUMENT_FIELDS = gql`
-  fragment CoreArgumentFields on Argument {
-    id
-    summary
-    createdAt
-    side
-    evidences {
-      id
-    }
-    comments {
-      id
-    }
-  }
-`;
-
-export const OPINION_FIELDS = gql`
-  ${CORE_ARGUMENT_FIELDS}
-
-  fragment OpinionFields on Opinion {
-    id
-    acceptance
-    user {
-      username
-      avatar
-    }
-    arguments {
-      ...CoreArgumentFields
-    }
-  }
-`;
+import {
+  CORE_ARGUMENT_FIELDS,
+  CORE_CLAIM_FIELDS,
+  KNOWLEDGE_BIT_FIELDS,
+  OPINION_FIELDS,
+  USER_OPINION_FIELDS,
+} from "./fragments";
 
 export const GET_CLAIM = gql`
   ${CORE_CLAIM_FIELDS}
@@ -99,6 +34,7 @@ export const GET_CLAIM = gql`
           id
         }
         opinions {
+          id
           user {
             username
             avatar
@@ -216,6 +152,16 @@ export const GET_OPINION = gql`
   query GetOpinion($id: String!) {
     opinion(id: $id) {
       ...OpinionFields
+    }
+  }
+`;
+
+export const GET_USER_OPINION = gql`
+  ${USER_OPINION_FIELDS}
+
+  query GetUserOpinion($claimSlug: String!) {
+    userOpinion(claimSlug: $claimSlug) {
+      ...UserOpinionFields
     }
   }
 `;

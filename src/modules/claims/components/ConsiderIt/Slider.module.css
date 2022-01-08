@@ -54,3 +54,31 @@
 .slider__label--opining {
   display: none;
 }
+
+.slider__cta {
+  background-color: var(--fractalflows-colors-primary);
+  border-radius: 4px;
+  padding: 6px 10px;
+  color: white;
+  font-size: 14px;
+  font-weight: bold;
+  position: absolute;
+  white-space: nowrap;
+  user-select: none;
+  transform: translateX(-50%);
+  margin-left: calc(var(--fractalflows-considerit-franklin-diameter) / 2);
+  bottom: -35px;
+  cursor: pointer;
+}
+
+.slider__cta:before {
+  content: " ";
+  position: absolute;
+  width: 0;
+  height: 0;
+  left: calc(50% - 8px);
+  top: -16px;
+  border: 8px solid;
+  border-color: transparent transparent var(--fractalflows-colors-primary)
+    transparent;
+}

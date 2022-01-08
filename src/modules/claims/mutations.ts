@@ -1,4 +1,5 @@
 import { gql } from "@apollo/client";
+import { USER_OPINION_FIELDS } from "./fragments";
 
 export const CREATE_CLAIM = gql`
   mutation CreateClaim($createClaimInput: CreateClaimInput!) {
@@ -94,13 +95,11 @@ export const CREATE_ARGUMENT = gql`
 `;
 
 export const SAVE_OPINION = gql`
+  ${USER_OPINION_FIELDS}
+
   mutation SaveOpinion($saveOpinionInput: SaveOpinionInput!) {
     saveOpinion(saveOpinionInput: $saveOpinionInput) {
-      id
-      acceptance
-      arguments {
-        id
-      }
+      ...UserOpinionFields
     }
   }
 `;

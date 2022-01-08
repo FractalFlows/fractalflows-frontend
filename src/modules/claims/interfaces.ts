@@ -98,7 +98,6 @@ export interface KnowledgeBitProps {
 export interface KnowledgeBitVoteProps {
   id: string;
   type: KnowledgeBitVoteTypes;
-  // knowledgeBitId:
 }
 
 export interface ClaimProps {
@@ -111,6 +110,7 @@ export interface ClaimProps {
   attributions?: AttributionProps[];
   knowledgeBits?: KnowledgeBitProps[];
   arguments?: ArgumentProps[];
+  opinions?: OpinionProps[];
   createdAt: Date;
   user: UserProps;
 }
@@ -133,6 +133,7 @@ export interface ArgumentProps {
   summary: string;
   side: ArgumentSides;
   evidences: KnowledgeBitProps[];
+  opinions: OpinionProps[];
   createdAt: Date;
 }
 
@@ -141,4 +142,5 @@ export interface OpinionProps {
   acceptance: number;
   arguments: ArgumentProps[];
   user: UserProps;
+  claim: ClaimProps;
 }

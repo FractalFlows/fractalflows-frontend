@@ -150,13 +150,7 @@ export const Opinion = () => {
       .catch((e) => enqueueSnackbar(e.message, { variant: "error" }))
       .finally(() => setIsLoadingOpinion(false));
   }, [showOpinionId]);
-  console.log(
-    "cons",
-    opinion?.arguments?.filter((x) => {
-      console.log("x", x.side === ArgumentSides.CON);
-      return x.side === ArgumentSides.CON;
-    })
-  );
+
   const cons = opinion?.arguments?.filter(
     (argument) => argument.side === ArgumentSides.CON
   );

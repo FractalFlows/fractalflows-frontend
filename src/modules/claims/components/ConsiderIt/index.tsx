@@ -9,76 +9,10 @@ import { Opinion } from "./Opinion";
 import { Opine } from "./Opine";
 import { useOpinions } from "modules/claims/hooks/useOpinions";
 import { useArguments } from "modules/claims/hooks/useArguments";
-
-const user = {
-  ethAddress: "0xd01159A043d1d6bc575daE358C6046F5Cc08e7E6",
-  email: "yuri.fabris@gmail.com",
-  username: "blocknomad.eth",
-  usernameSource: "ENS",
-  avatar: "https://www.gravatar.com/avatar/49a046a0de6b525d1f41beab756cd89c",
-  avatarSource: "GRAVATAR",
-  __sidename: "User",
-};
-
-const argumentsList = [
-  {
-    id: 34,
-    summary: "My argument",
-    user,
-    side: ArgumentSides.CON,
-    createdAt: new Date(),
-    evidences: [],
-    referrers: [user, user],
-    comments: [],
-  },
-  {
-    id: 36,
-    summary: "My argument 2",
-    user,
-    side: ArgumentSides.CON,
-    createdAt: new Date(),
-    evidences: [],
-    referrers: [user],
-    comments: [],
-  },
-  {
-    id: 38,
-    summary: "My argument3",
-    user,
-    side: ArgumentSides.PRO,
-    createdAt: new Date(),
-    evidences: [],
-    referrers: [user, user],
-    comments: [],
-  },
-];
-
-const discussion = {
-  opinions: [
-    {
-      id: 1,
-      user,
-      arguments: argumentsList,
-      acceptance: 0.2,
-    },
-    {
-      id: 2,
-      user,
-      arguments: argumentsList,
-      acceptance: 0.2,
-    },
-    {
-      id: 3,
-      user,
-      arguments: [argumentsList[0]],
-      acceptance: 1,
-    },
-  ],
-  arguments: argumentsList,
-};
+import { find } from "lodash-es";
 
 export const ConsiderIt = () => {
-  const { isOpining, opinion, showOpinionId } = useOpinions();
+  const { isOpining, userOpinion, opinions, showOpinionId } = useOpinions();
   const { argumentsList } = useArguments();
 
   const filterArguments = (side: ArgumentSides) =>
@@ -86,9 +20,7 @@ export const ConsiderIt = () => {
       (argument) =>
         argument.side === side &&
         (isOpining === false ||
-          opinion.arguments.find(
-            (opinionArgument) => argument.id === opinionArgument.id
-          ) === undefined)
+          find(userOpinion?.arguments, { id: argument.id }) === undefined)
     );
   const cons = filterArguments(ArgumentSides.CON);
   const pros = filterArguments(ArgumentSides.PRO);
@@ -96,7 +28,7 @@ export const ConsiderIt = () => {
   return (
     <Stack alignItems="center">
       <Stack sx={{ width: 700 }}>
-        <Histogram opinions={discussion.opinions} />
+        <Histogram opinions={opinions} />
         <Slider />
       </Stack>
 

@@ -15,7 +15,7 @@ export const HistogramAvatar: FC = ({
     } else {
       return `${acceptance > 0.05 ? "agrees" : "disagrees"} ${(
         Math.abs(acceptance) * 100
-      ).toFixed(2)}`;
+      ).toFixed(2)}%`;
     }
   }, [acceptance]);
 

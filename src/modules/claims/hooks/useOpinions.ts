@@ -1,20 +1,63 @@
+import { gql, useQuery } from "@apollo/client";
+import { filter, find, findIndex, get, map } from "lodash-es";
+
 import { ClaimsService } from "../services/claims";
 import type { ArgumentProps, OpinionProps } from "../interfaces";
 import { ClaimsCache } from "../cache";
-import { gql, useQuery } from "@apollo/client";
 import { apolloClient } from "common/services/apollo/client";
 
 export const saveOpinion = async ({ opinion }: { opinion: OpinionProps }) => {
   const savedOpinion = await ClaimsService.saveOpinion({
     opinion: {
-      ...opinion,
+      id: opinion.id,
+      acceptance: opinion.acceptance,
       arguments: opinion.arguments.map(({ id }) => ({ id })),
       claim: {
         id: opinion.claim.id,
       },
     },
   });
-  ClaimsCache.opinion(savedOpinion);
+
+  if (get(ClaimsCache.userOpinion(), "id")) {
+    const userOpinionIndex = findIndex(ClaimsCache.opinions(), {
+      id: ClaimsCache.userOpinion().id,
+    });
+    const updatedOpinions = [...ClaimsCache.opinions()];
+    updatedOpinions.splice(userOpinionIndex, 1, savedOpinion);
+    ClaimsCache.opinions(updatedOpinions);
+  }
+
+  const updatedArguments = map(ClaimsCache.arguments(), (argument) => {
+    const opinionUsesArgument = find(savedOpinion?.arguments, {
+      id: argument.id,
+    });
+
+    if (opinionUsesArgument) {
+      const opinionAlreadyInArgumentOpinionsList = find(argument.opinions, {
+        id: savedOpinion.id,
+      });
+
+      if (opinionAlreadyInArgumentOpinionsList) {
+        return argument;
+      } else {
+        return {
+          ...argument,
+          opinions: [...argument.opinions, savedOpinion],
+        };
+      }
+    } else {
+      return {
+        ...argument,
+        opinions: filter(
+          argument?.opinions,
+          (opinion) => opinion.id !== savedOpinion.id
+        ),
+      };
+    }
+  });
+
+  ClaimsCache.userOpinion(savedOpinion);
+  ClaimsCache.arguments(updatedArguments);
 
   return savedOpinion;
 };
@@ -23,27 +66,33 @@ export const getOpinion = async ({ id }: { id: string }) =>
   await ClaimsService.getOpinion({ id });
 
 export const setOpinionAcceptance = (acceptance: number) =>
-  ClaimsCache.opinion({
-    ...ClaimsCache.opinion(),
+  ClaimsCache.userOpinion({
+    ...ClaimsCache.userOpinion(),
     acceptance,
   });
 
 export const addArgumentToOpinion = (argument: ArgumentProps) =>
-  ClaimsCache.opinion({
-    ...ClaimsCache.opinion(),
-    arguments: [...ClaimsCache.opinion().arguments, argument],
+  ClaimsCache.userOpinion({
+    ...ClaimsCache.userOpinion(),
+    arguments: [...get(ClaimsCache.userOpinion(), "arguments", []), argument],
   });
 
 export const removeArgumentFromOpinion = (argumentId: string) =>
-  ClaimsCache.opinion({
-    ...ClaimsCache.opinion(),
-    arguments: ClaimsCache.opinion().arguments.filter(
+  ClaimsCache.userOpinion({
+    ...ClaimsCache.userOpinion(),
+    arguments: ClaimsCache.userOpinion().arguments.filter(
       ({ id }: ArgumentProps) => id !== argumentId
     ),
   });
 
-export const setOpinion = (opinion: OpinionProps) =>
-  ClaimsCache.opinion(opinion);
+export const getUserOpinion = async ({ claimSlug }: { claimSlug: string }) => {
+  const userOpinion = await ClaimsService.getUserOpinion({ claimSlug });
+  if (userOpinion) ClaimsCache.userOpinion(userOpinion);
+  return userOpinion;
+};
+
+export const setUserOpinion = (userOpinion: OpinionProps) =>
+  ClaimsCache.userOpinion(userOpinion);
 
 export const setOpinions = (opinions: OpinionProps[]) =>
   ClaimsCache.opinions(opinions);
@@ -56,11 +105,11 @@ export const setShowOpinionId = (opinionId: string) =>
 
 export const useOpinions = () => {
   const {
-    data: { isOpining, opinion, opinions, showOpinionId },
+    data: { isOpining, userOpinion, opinions, showOpinionId },
   } = useQuery(
     gql`
       query Opinion {
-        opinion @client
+        userOpinion @client
         showOpinionId @client
         opinions @client
         isOpining @client
@@ -71,14 +120,15 @@ export const useOpinions = () => {
 
   return {
     saveOpinion,
-    setOpinion,
     getOpinion,
     setOpinionAcceptance,
     addArgumentToOpinion,
     removeArgumentFromOpinion,
     opinions,
     setOpinions,
-    opinion,
+    userOpinion,
+    setUserOpinion,
+    getUserOpinion,
     isOpining,
     showOpinionId,
     setIsOpining,

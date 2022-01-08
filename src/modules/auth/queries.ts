@@ -24,10 +24,3 @@ export const GET_SESSION = gql`
     }
   }
 `;
-
-export const GET_SESSION_FROM_CACHE = gql`
-  query Session {
-    session @client
-    isSignedIn @client
-  }
-`;

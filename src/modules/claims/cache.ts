@@ -7,6 +7,6 @@ export const ClaimsCache = {
   pickedArguments: makeVar([] as ArgumentProps[]),
   opinions: makeVar([] as OpinionProps[]),
   isOpining: makeVar(false),
+  userOpinion: makeVar({} as OpinionProps),
   showOpinionId: makeVar(null),
-  opinion: makeVar({} as OpinionProps),
 };

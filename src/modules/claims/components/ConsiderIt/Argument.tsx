@@ -9,8 +9,8 @@ import { useOpinions } from "modules/claims/hooks/useOpinions";
 // import ArgumentDetails from "./ArgumentDetails";
 
 export enum ArgumentPlacements {
-  PICKED,
-  ALL,
+  OPINION,
+  RANKING,
 }
 
 interface ArgumentCompProps {
@@ -43,8 +43,12 @@ export const Argument: FC<ArgumentCompProps> = ({ argument, placement }) => {
       <Paper
         variant="outlined"
         sx={{ p: 1, cursor: "pointer" }}
-        onDragStart={handleDragStart}
-        draggable={isOpining}
+        {...(placement === ArgumentPlacements.OPINION
+          ? {}
+          : {
+              onDragStart: handleDragStart,
+              draggable: isOpining,
+            })}
       >
         <Stack spacing={1}>
           <Typography variant="body2">{argument?.summary}</Typography>
@@ -55,7 +59,7 @@ export const Argument: FC<ArgumentCompProps> = ({ argument, placement }) => {
         </Stack>
       </Paper>
 
-      {placement === ArgumentPlacements.PICKED ? null : (
+      {placement === ArgumentPlacements.OPINION ? null : (
         <div className={styles.argument__referrers}>
           {argument?.opinions?.map(({ user }, i) => (
             <Avatar

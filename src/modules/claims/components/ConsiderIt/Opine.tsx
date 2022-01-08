@@ -4,14 +4,13 @@ import { Button, Paper, Stack, Typography } from "@mui/material";
 import { ArgumentSides } from "modules/claims/interfaces";
 import { OpineColumn } from "./OpineColumn";
 import styles from "./Opine.module.css";
-import { useArguments } from "modules/claims/hooks/useArguments";
 import { useOpinions } from "modules/claims/hooks/useOpinions";
 import { LoadingButton } from "@mui/lab";
 import { useRouter } from "next/router";
 import { useSnackbar } from "notistack";
 
 export const Opine: FC = () => {
-  const { setIsOpining, opinion, addArgumentToOpinion, saveOpinion } =
+  const { setIsOpining, userOpinion, addArgumentToOpinion, saveOpinion } =
     useOpinions();
   const [isSavingOpinion, setIsSavingOpinion] = useState(false);
   const [isDraggingOver, setIsDraggingOver] = useState(false);
@@ -34,9 +33,9 @@ export const Opine: FC = () => {
   };
   const handleSaveOpinion = async () => {
     setIsSavingOpinion(true);
-    console.log(opinion);
+
     try {
-      await saveOpinion({ opinion });
+      await saveOpinion({ opinion: userOpinion });
       enqueueSnackbar("Your opinion has been succesfully saved!", {
         variant: "success",
       });

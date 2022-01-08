@@ -22,6 +22,7 @@ import {
   GET_USER_KNOWLEDGE_BITS_VOTES,
   GET_ARGUMENTS,
   GET_OPINION,
+  GET_USER_OPINION,
 } from "../queries";
 import type {
   ArgumentProps,
@@ -299,6 +300,21 @@ export const ClaimsService = {
     });
 
     return data.opinion;
+  },
+
+  async getUserOpinion({
+    claimSlug,
+  }: {
+    claimSlug: string;
+  }): Promise<OpinionProps> {
+    const { data } = await apolloClient.query({
+      query: GET_USER_OPINION,
+      variables: {
+        claimSlug,
+      },
+    });
+
+    return data.userOpinion;
   },
 
   async saveOpinion({

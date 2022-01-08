@@ -5,41 +5,13 @@ import { clamp, get } from "lodash-es";
 import styles from "./Slider.module.css";
 import { useOpinions } from "modules/claims/hooks/useOpinions";
 
-// const GiveOpinionBtn = styled.div`
-//   background-color: ${grey800};
-//   border-radius: 4px;
-//   padding: 6px;
-//   color: white;
-//   font-size: 13px;
-//   font-weight: bold;
-//   position: absolute;
-//   white-space: nowrap;
-//   user-select: none;
-//   transform: translateX(-50%);
-//   margin-left: ${franklinDiameter / 2}px;
-//   bottom: -30px;
-//   cursor: pointer;
-//   display: ${(props) => (props.givingOpinion ? "none" : "block")};
-
-//   &:before {
-//     content: " ";
-//     position: absolute;
-//     width: 0;
-//     height: 0;
-//     left: calc(50% - 8px);
-//     top: -16px;
-//     border: 8px solid;
-//     border-color: transparent transparent ${grey800} transparent;
-//   }
-// `;
-
 export const Slider: FC = () => {
-  const { opinion, setOpinionAcceptance, setShowOpinionId } = useOpinions();
+  const { userOpinion, setOpinionAcceptance, setShowOpinionId } = useOpinions();
   const { isOpining, setIsOpining } = useOpinions();
   const [isSliding, setIsSliding] = useState(false);
   const sliderThumb = useRef(null);
   const sliderHandle = useRef(null);
-  const { acceptance } = opinion;
+  const acceptance = get(userOpinion, "acceptance", 0);
   const franklinSmileCurve = acceptance * 10;
 
   const setHandlePosition = (acceptance: number) => {
@@ -60,7 +32,7 @@ export const Slider: FC = () => {
     setHandlePosition(acceptance);
   }, []);
 
-  const stopSlide = useCallback((event) => {
+  const stopSlide = useCallback(() => {
     document.body.removeEventListener("mousemove", moveSlide, false);
     document.body.removeEventListener("touchmove", moveSlide, false);
     document.body.removeEventListener("mouseup", moveSlide, false);
@@ -98,7 +70,8 @@ export const Slider: FC = () => {
 
   useEffect(() => {
     setHandlePosition(acceptance || 0.5);
-  }, []);
+    return () => stopSlide();
+  }, [get(userOpinion, "id")]);
 
   return (
     <div className={styles.slider}>
@@ -149,12 +122,11 @@ export const Slider: FC = () => {
             <Typography variant="h5" className={styles.slider__label}>
               {acceptanceText}
             </Typography>
-          ) : null}
-          {/* <div givingOpinion={isOpining}>{opinionStrength}</SliderLabel> */}
-
-          {/* <GiveOpinionBtn givingOpinion={isOpining}>
-            {hasOpined ? "Update" : "Give"} Your Opinion
-          </GiveOpinionBtn> */}
+          ) : (
+            <div className={styles.slider__cta}>
+              {userOpinion?.id ? "Update" : "Give"} your opinion
+            </div>
+          )}
         </div>
       </div>
     </div>

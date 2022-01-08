@@ -8,6 +8,7 @@ import {
   ClaimProps,
   KnowledgeBitProps,
   KnowledgeBitVoteProps,
+  OpinionProps,
 } from "modules/claims/interfaces";
 import { ClaimsService } from "modules/claims/services/claims";
 import { KnowledgeBits } from "modules/claims/components/KnowledgeBits";
@@ -16,6 +17,9 @@ import { SocialOpinions } from "modules/claims/components/SocialOpinions";
 import { RelatedClaims } from "modules/claims/components/RelatedClaims";
 import { useArguments } from "modules/claims/hooks/useArguments";
 import { useOpinions } from "modules/claims/hooks/useOpinions";
+import { useAuth } from "modules/auth/hooks/useAuth";
+import { useSnackbar } from "notistack";
+import { useRouter } from "next/router";
 
 interface ClaimPageProps {
   data: {
@@ -29,23 +33,35 @@ interface ClaimPageProps {
 const Claim: NextPage<ClaimPageProps> = ({
   data: { claim, relatedClaims, knowledgeBits, userKnowledgeBitsVotes },
 }) => {
+  const { setUserOpinion, setOpinions, getUserOpinion } = useOpinions();
   const { setArguments } = useArguments();
-  const { setOpinion, setOpinions } = useOpinions();
+  const { isSignedIn } = useAuth();
+  const { enqueueSnackbar } = useSnackbar();
+  const router = useRouter();
+  const { slug }: { slug?: string } = router.query;
 
   useEffect(() => {
     setArguments(claim.arguments || []);
     setOpinions(claim.opinions || []);
-    setOpinion(
-      claim.opinion || {
-        acceptance: 0.5,
-        arguments: [],
-        claim: {
-          id: claim.id,
-        },
-      }
-    );
+    setUserOpinion({
+      acceptance: 0.5,
+      arguments: [],
+      claim: {
+        id: claim.id,
+      },
+    });
   }, []);
+
+  useEffect(() => {
+    if (isSignedIn) {
+      getUserOpinion({ claimSlug: slug as string }).catch((e) =>
+        enqueueSnackbar(e.message, { variant: "error" })
+      );
+    }
+  }, [isSignedIn]);
+
   console.log(claim);
+
   return (
     <Box className="container page">
       <Head>
