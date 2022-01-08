@@ -69,7 +69,6 @@ export const Slider: FC = () => {
   }, [acceptance]);
 
   useEffect(() => {
-    console.log("accept", userOpinion.acceptance);
     setHandlePosition(get(userOpinion, "acceptance", 0.5));
     return () => stopSlide();
   }, [get(userOpinion, "id")]);

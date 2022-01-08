@@ -9,7 +9,6 @@ import type {
 export const ClaimsCache = {
   knowledgeBits: makeVar([] as KnowledgeBitProps[]),
   arguments: makeVar([] as ArgumentProps[]),
-  pickedArguments: makeVar([] as ArgumentProps[]),
   opinions: makeVar([] as OpinionProps[]),
   isOpining: makeVar(false),
   userOpinion: makeVar({} as OpinionProps),

@@ -36,10 +36,6 @@
   transition: 0.15s;
 }
 
-/* .slider__frankling--moving {
-    background-color: ${grey600};
-  } */
-
 .slider__label {
   color: var(--fractalflows-colors-primary);
   font-weight: bold;

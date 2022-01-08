@@ -29,6 +29,9 @@ export const createArgument = async ({
   return addedArgument;
 };
 
+export const getArgument = async ({ id }: { id: string }) =>
+  await ClaimsService.getArgument({ id });
+
 export const updateArgument = async ({
   id,
   argument,
@@ -42,12 +45,11 @@ export const setArguments = (argumentsList: ArgumentProps[]) =>
 
 export const useArguments = () => {
   const {
-    data: { arguments: argumentsList, pickedArguments },
+    data: { arguments: argumentsList },
   } = useQuery(
     gql`
       query Arguments {
         arguments @client
-        pickedArguments @client
       }
     `,
     { client: apolloClient }
@@ -56,8 +58,8 @@ export const useArguments = () => {
   return {
     createArgument,
     updateArgument,
+    getArgument,
     setArguments,
     argumentsList,
-    pickedArguments,
   };
 };

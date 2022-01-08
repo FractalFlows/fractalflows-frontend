@@ -24,7 +24,7 @@ export const AvatarWithUsername: FC<AvatarProps> = ({ user, size = 40 }) => (
       </Avatar>
       <Typography
         variant="body1"
-        fontWeight="700"
+        fontWeight="600"
         noWrap
         sx={{ maxWidth: 150 }}
       >

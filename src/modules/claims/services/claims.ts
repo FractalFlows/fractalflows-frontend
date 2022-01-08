@@ -23,6 +23,7 @@ import {
   GET_ARGUMENTS,
   GET_OPINION,
   GET_USER_OPINION,
+  GET_ARGUMENT,
 } from "../queries";
 import type {
   ArgumentProps,
@@ -289,6 +290,17 @@ export const ClaimsService = {
     });
 
     return data.arguments;
+  },
+
+  async getArgument({ id }: { id: string }): Promise<ArgumentProps> {
+    const { data } = await apolloClient.query({
+      query: GET_ARGUMENT,
+      variables: {
+        id,
+      },
+    });
+
+    return data.argument;
   },
 
   async getOpinion({ id }: { id: string }): Promise<OpinionProps> {

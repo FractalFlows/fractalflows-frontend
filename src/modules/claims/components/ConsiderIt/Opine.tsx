@@ -6,7 +6,6 @@ import { OpineColumn } from "./OpineColumn";
 import styles from "./Opine.module.css";
 import { useOpinions } from "modules/claims/hooks/useOpinions";
 import { LoadingButton } from "@mui/lab";
-import { useRouter } from "next/router";
 import { useSnackbar } from "notistack";
 
 export const Opine: FC = () => {
@@ -14,7 +13,6 @@ export const Opine: FC = () => {
     useOpinions();
   const [isSavingOpinion, setIsSavingOpinion] = useState(false);
   const [isDraggingOver, setIsDraggingOver] = useState(false);
-  const router = useRouter();
   const { enqueueSnackbar } = useSnackbar();
 
   const handleDrop = (event: DragEvent) => {

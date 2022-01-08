@@ -52,7 +52,7 @@ interface ArgumentUpsertFormProps {
   operation: UpsertFormOperation;
 }
 
-export const ArgumentUpsertForm: FC<ArgumentUpsertFormProps> = ({
+export const ArgumentCommentUpsertForm: FC<ArgumentUpsertFormProps> = ({
   argument,
   operation,
   handleClose,
@@ -64,16 +64,11 @@ export const ArgumentUpsertForm: FC<ArgumentUpsertFormProps> = ({
   const router = useRouter();
   const { slug: claimSlug }: { slug?: string } = router.query;
   const {
-    control,
     register,
     reset,
     formState: { errors, isSubmitting },
     handleSubmit: handleSubmitHook,
   } = useForm<ArgumentFormProps>({ defaultValues: argumentFormDefaultValues });
-
-  const [evidencesOptions, setEvidencesOptions] = useState<
-    AutocompleteOptionProps[]
-  >([]);
 
   const handleSubmit = async (data: ArgumentFormProps) => {
     const mapArgument = () => ({
@@ -110,65 +105,45 @@ export const ArgumentUpsertForm: FC<ArgumentUpsertFormProps> = ({
     }
   };
 
-  useEffect(() => {
-    const evidencesOptions = filter(knowledgeBits, {
-      side:
-        argument.side === ArgumentSides.CON
-          ? KnowledgeBitSides.REFUTING
-          : KnowledgeBitSides.SUPPORTING,
-    }).map(({ id, name }: KnowledgeBitProps) => ({
-      id,
-      label: name,
-    }));
-
-    setEvidencesOptions(evidencesOptions);
-  }, [knowledgeBits]);
-
   return (
     <form onSubmit={handleSubmitHook(handleSubmit)}>
-      <Stack spacing={3}>
+      <Stack spacing={2}>
         <TextField
-          label="Summary"
+          placeholder="Leave a comment"
           multiline
-          minRows={4}
+          minRows={3}
           maxRows={Infinity}
           fullWidth
           {...registerMui({
             register,
-            name: "summary",
+            name: "content",
             props: {
               required: true,
             },
             errors,
           })}
         ></TextField>
-        <Autocomplete
-          control={control}
-          multiple
-          errors={errors}
-          options={evidencesOptions}
-          label="Evidences"
-          name="evidences"
-        />
 
-        <Stack spacing={1}>
+        <Stack spacing={1} sx={{ alignItems: "flex-start" }}>
           <LoadingButton
             type="submit"
             loading={isSubmitting}
             variant="contained"
           >
-            {KnowledgeBitUpsertFormOperationTexts[operation].submitButton}
+            Save comment
           </LoadingButton>
-          <Button
-            variant="contained"
-            color="secondary"
-            onClick={() => {
-              handleClose();
-              reset(argumentFormDefaultValues);
-            }}
-          >
-            Cancel
-          </Button>
+          {operation === UpsertFormOperation.UPDATE ? (
+            <Button
+              variant="contained"
+              color="secondary"
+              onClick={() => {
+                handleClose();
+                reset(argumentFormDefaultValues);
+              }}
+            >
+              Cancel
+            </Button>
+          ) : null}
         </Stack>
       </Stack>
     </form>

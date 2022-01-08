@@ -1,5 +1,5 @@
-import { DragEvent, FC, MouseEvent, useState } from "react";
-import { Button, Paper, Stack, Typography } from "@mui/material";
+import { DragEvent, FC, MouseEvent, useRef, useState } from "react";
+import { Button, Paper, Popover, Stack, Typography } from "@mui/material";
 
 import { Avatar } from "modules/users/components/Avatar";
 import { formatDate } from "common/utils/format";
@@ -7,6 +7,7 @@ import styles from "./Argument.module.css";
 import { ArgumentProps, ArgumentSides } from "modules/claims/interfaces";
 import { useOpinions } from "modules/claims/hooks/useOpinions";
 import { map, get } from "lodash-es";
+import { ArgumentDetails } from "./ArgumentDetails";
 // import ArgumentDetails from "./ArgumentDetails";
 
 export enum ArgumentPlacements {
@@ -22,6 +23,7 @@ interface ArgumentCompProps {
 export const Argument: FC<ArgumentCompProps> = ({ argument, placement }) => {
   const { isOpining, removeArgumentFromOpinion } = useOpinions();
   const [showDetails, setShowDetails] = useState(false);
+  const detailsAnchor = useRef(null);
 
   const handleDragStart = (event: DragEvent) => {
     event.dataTransfer.setData("argument", JSON.stringify(argument));
@@ -29,6 +31,12 @@ export const Argument: FC<ArgumentCompProps> = ({ argument, placement }) => {
   const handleRemoveClick = (event: MouseEvent) => {
     event.preventDefault();
     removeArgumentFromOpinion(argument.id);
+  };
+  const handleShowDetails = () => {
+    setShowDetails(true);
+  };
+  const handleCloseDetails = () => {
+    setShowDetails(false);
   };
 
   const commentsCount = get(argument, "comments.length", 0);
@@ -43,6 +51,8 @@ export const Argument: FC<ArgumentCompProps> = ({ argument, placement }) => {
     >
       <Paper
         variant="outlined"
+        ref={detailsAnchor}
+        onClick={handleShowDetails}
         sx={{ p: 1, cursor: "pointer" }}
         {...(placement === ArgumentPlacements.OPINION
           ? {}
@@ -55,7 +65,7 @@ export const Argument: FC<ArgumentCompProps> = ({ argument, placement }) => {
           <Typography variant="body1">{argument?.summary}</Typography>
           <Stack direction="row" alignItems="center" sx={{ minHeight: "31px" }}>
             <Typography variant="caption">
-              {formatDate(argument?.createdAt)}, {commentsCount} comment
+              {formatDate(get(argument, "createdAt"))}, {commentsCount} comment
               {commentsCount === 1 ? "" : "s"}
             </Typography>
             <div style={{ flexGrow: 1 }} />
@@ -67,6 +77,31 @@ export const Argument: FC<ArgumentCompProps> = ({ argument, placement }) => {
           </Stack>
         </Stack>
       </Paper>
+
+      <Popover
+        open={showDetails}
+        anchorEl={detailsAnchor.current}
+        onClose={handleCloseDetails}
+        anchorOrigin={{
+          vertical: "bottom",
+          horizontal:
+            get(argument, "side") === ArgumentSides.CON ? "left" : "right",
+        }}
+        transformOrigin={{
+          vertical: "top",
+          horizontal:
+            get(argument, "side") === ArgumentSides.CON ? "left" : "right",
+        }}
+        PaperProps={{
+          elevation: 3,
+          sx: {
+            width: "500px",
+            border: "1px solid rgba(0, 0, 0, 0.12)",
+          },
+        }}
+      >
+        <ArgumentDetails argumentId={get(argument, "id")} />
+      </Popover>
 
       {placement === ArgumentPlacements.OPINION ? null : (
         <div className={styles.argument__referrers}>

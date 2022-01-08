@@ -209,7 +209,7 @@ export const ClaimUpsertForm: FC<ClaimUpsertFormProps> = ({
               ></TextField>
               <Stack spacing={3}>
                 <Box>
-                  <Typography variant="body1" sx={{ fontWeight: 700 }}>
+                  <Typography variant="body1" sx={{ fontWeight: 600 }}>
                     Sources
                   </Typography>
                   <Typography variant="body2">
@@ -338,7 +338,7 @@ export const ClaimUpsertForm: FC<ClaimUpsertFormProps> = ({
               </Stack>
               <Stack spacing={3}>
                 <Box>
-                  <Typography variant="body1" sx={{ fontWeight: 700 }}>
+                  <Typography variant="body1" sx={{ fontWeight: 600 }}>
                     Attributions
                   </Typography>
                   <Typography variant="body2">

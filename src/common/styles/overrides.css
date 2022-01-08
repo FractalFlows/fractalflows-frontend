@@ -7,6 +7,10 @@ form {
   padding: 0;
 }
 
+.MuiChip-root {
+  cursor: inherit;
+}
+
 @media screen and (min-width: 900px) {
   .MuiToolbar-gutters,
   .container {

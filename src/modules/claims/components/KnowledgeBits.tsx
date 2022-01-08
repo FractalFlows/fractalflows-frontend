@@ -129,12 +129,12 @@ export const KnowledgeBits: FC<{
           <Tooltip
             title={
               <>
-                <Typography variant="body1" fontWeight="700">
+                <Typography variant="body1" fontWeight="600">
                   What are Knowledge Bits?
                 </Typography>
                 <br />
                 <Typography variant="body2">
-                  <b>Knowledge bits</b> are numerical bits, files, containing
+                  Knowledge bits are numerical bits, files, containing
                   simulation results, experimental results, detailed analysis,
                   datasets, detailed mathematical formulations, scripts, source
                   code, reviews, reproduction of results, etc. They could also

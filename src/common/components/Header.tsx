@@ -247,7 +247,7 @@ export const Header = () => {
                         variant="body1"
                         noWrap
                         sx={{
-                          fontWeight: 700,
+                          fontWeight: 600,
                           textTransform: "initial",
                           maxWidth: 150,
                         }}

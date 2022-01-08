@@ -66,8 +66,6 @@ const Claim: NextPage<ClaimPageProps> = ({
     }
   }, [isSignedIn]);
 
-  console.log(claim);
-
   return (
     <Box className="container page">
       <Head>
