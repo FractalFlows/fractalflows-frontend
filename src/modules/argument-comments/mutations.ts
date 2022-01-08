@@ -28,3 +28,9 @@ export const UPDATE_ARGUMENT_COMMENT = gql`
     }
   }
 `;
+
+export const DELETE_ARGUMENT_COMMENT = gql`
+  mutation DeleteArgumentComment($id: String!) {
+    deleteArgumentComment(id: $id)
+  }
+`;

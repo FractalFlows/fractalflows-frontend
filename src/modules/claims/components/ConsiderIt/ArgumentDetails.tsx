@@ -3,6 +3,7 @@ import { Chip, Stack, Typography } from "@mui/material";
 import {
   compact,
   concat,
+  filter,
   findIndex,
   get,
   isEmpty,
@@ -52,6 +53,20 @@ export const ArgumentDetails: FC<ArgumentDetailsProps> = ({ argumentId }) => {
     updatedArgument.comments.splice(argumentCommentIndex, 1, argumentComment);
     setArgument(updatedArgument);
   };
+  const handleDeleteArgumentCommentSuccess = (
+    deletedArgumentComment: ArgumentCommentProps
+  ) => {
+    console.log("deleted", deletedArgumentComment);
+    const updatedArgumentComments = filter(
+      argument.comments,
+      (argumentComment) => argumentComment.id !== deletedArgumentComment.id
+    );
+    const updatedArgument = {
+      ...argument,
+      comments: updatedArgumentComments,
+    };
+    setArgument(updatedArgument);
+  };
 
   useEffect(() => {
     setIsLoadingArgument(true);
@@ -90,6 +105,7 @@ export const ArgumentDetails: FC<ArgumentDetailsProps> = ({ argumentId }) => {
               key={get(argumentComment, "id")}
               argumentComment={argumentComment}
               handleUpdate={handleUpdateArgumentCommentSuccess}
+              handleDelete={handleDeleteArgumentCommentSuccess}
             />
           ))}
           {isSignedIn ? (

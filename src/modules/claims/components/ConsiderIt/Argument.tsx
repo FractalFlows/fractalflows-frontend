@@ -97,7 +97,7 @@ export const Argument: FC<ArgumentCompProps> = ({ argument, placement }) => {
           sx: {
             width: "600px",
             border: "1px solid rgba(0, 0, 0, 0.12)",
-            maxHeight: "70vh",
+            maxHeight: "60vh",
           },
         }}
         disableScrollLock
