@@ -1,11 +1,12 @@
-import { useState } from "react";
-import { Paper, Stack, Typography } from "@mui/material";
+import { DragEvent, FC, MouseEvent, useState } from "react";
+import { Button, Paper, Stack, Typography } from "@mui/material";
 
 import { Avatar } from "modules/users/components/Avatar";
 import { formatDate } from "common/utils/format";
 import styles from "./Argument.module.css";
 import { ArgumentProps, ArgumentSides } from "modules/claims/interfaces";
 import { useOpinions } from "modules/claims/hooks/useOpinions";
+import { map, get } from "lodash-es";
 // import ArgumentDetails from "./ArgumentDetails";
 
 export enum ArgumentPlacements {
@@ -19,18 +20,18 @@ interface ArgumentCompProps {
 }
 
 export const Argument: FC<ArgumentCompProps> = ({ argument, placement }) => {
-  // state = {
-  //   showDetails: false,
-  // };
-  const { isOpining } = useOpinions();
+  const { isOpining, removeArgumentFromOpinion } = useOpinions();
   const [showDetails, setShowDetails] = useState(false);
 
-  // const commentsCount = filter({ active: true }, comments).length;
-  const handleDragStart = (event) => {
+  const handleDragStart = (event: DragEvent) => {
     event.dataTransfer.setData("argument", JSON.stringify(argument));
   };
+  const handleRemoveClick = (event: MouseEvent) => {
+    event.preventDefault();
+    removeArgumentFromOpinion(argument.id);
+  };
 
-  const commentsCount = argument?.comments?.length || 0;
+  const commentsCount = get(argument, "comments.length", 0);
 
   return (
     <div
@@ -50,18 +51,26 @@ export const Argument: FC<ArgumentCompProps> = ({ argument, placement }) => {
               draggable: isOpining,
             })}
       >
-        <Stack spacing={1}>
-          <Typography variant="body2">{argument?.summary}</Typography>
-          <Typography variant="caption">
-            {formatDate(argument?.createdAt)}, {commentsCount} comment
-            {commentsCount === 1 ? "" : "s"}
-          </Typography>
+        <Stack>
+          <Typography variant="body1">{argument?.summary}</Typography>
+          <Stack direction="row" alignItems="center" sx={{ minHeight: "31px" }}>
+            <Typography variant="caption">
+              {formatDate(argument?.createdAt)}, {commentsCount} comment
+              {commentsCount === 1 ? "" : "s"}
+            </Typography>
+            <div style={{ flexGrow: 1 }} />
+            {placement === ArgumentPlacements.OPINION ? (
+              <Button size="small" onClick={handleRemoveClick}>
+                Remove
+              </Button>
+            ) : null}
+          </Stack>
         </Stack>
       </Paper>
 
       {placement === ArgumentPlacements.OPINION ? null : (
         <div className={styles.argument__referrers}>
-          {argument?.opinions?.map(({ user }, i) => (
+          {map(argument?.opinions, ({ user }, i) => (
             <Avatar
               key={user.username}
               src={user.avatar}

@@ -47,8 +47,7 @@ export const OpineColumn = ({ side }) => {
         </Stack>
       )}
       <Typography variant="body1">
-        Drag an <b>argument {OpineColumnTexts[side].columnTitle}</b> from the{" "}
-        {OpineColumnTexts[side].columnSide} or
+        Drag an argument from the {OpineColumnTexts[side].columnSide} or
       </Typography>
       {isAddingArgument ? (
         <ArgumentUpsertForm

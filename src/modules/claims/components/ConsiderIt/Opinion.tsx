@@ -158,7 +158,7 @@ export const Opinion = () => {
     (argument) => argument.side === ArgumentSides.PRO
   );
 
-  if (isLoadingOpinion) return <Spinner />;
+  if (isLoadingOpinion) return <Spinner p={0} />;
 
   return (
     <Stack spacing={5}>

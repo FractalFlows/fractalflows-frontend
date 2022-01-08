@@ -61,6 +61,7 @@ export const Opine: FC = () => {
             paddingBottom: 8,
             borderStyle: isDraggingOver ? "solid" : "dashed",
             backgroundColor: isDraggingOver ? "#f5f5f5" : "",
+            borderRadius: "10px",
             borderWidth: 3,
           }}
           className={isDraggingOver ? styles.opine__droparea : ""}

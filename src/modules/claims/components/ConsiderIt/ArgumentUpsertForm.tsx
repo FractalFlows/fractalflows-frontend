@@ -15,11 +15,15 @@ import {
   ArgumentProps,
   ArgumentSides,
   KnowledgeBitProps,
+  KnowledgeBitSides,
 } from "modules/claims/interfaces";
 import { useRouter } from "next/router";
 import { UpsertFormOperation } from "common/interfaces";
 import { mapArray } from "common/utils/mapArray";
 import { useArguments } from "modules/claims/hooks/useArguments";
+import { useKnowledgeBits } from "modules/claims/hooks/useKnowledgeBits";
+import { filter } from "lodash-es";
+import { useOpinions } from "modules/claims/hooks/useOpinions";
 
 interface ArgumentFormProps {
   summary: string;
@@ -55,15 +59,10 @@ export const ArgumentUpsertForm: FC<ArgumentUpsertFormProps> = ({
   operation,
   handleClose,
 }) => {
-  const {
-    addPickedArgument,
-    createArgument,
-    updateArgument,
-    argumentsList,
-    pickedArguments,
-  } = useArguments();
-  const { getKnowledgeBits } = useClaims();
+  const { createArgument, updateArgument } = useArguments();
+  const { addArgumentToOpinion } = useOpinions();
   const { enqueueSnackbar } = useSnackbar();
+  const { knowledgeBits } = useKnowledgeBits();
   const router = useRouter();
   const { slug: claimSlug }: { slug?: string } = router.query;
   const {
@@ -77,7 +76,6 @@ export const ArgumentUpsertForm: FC<ArgumentUpsertFormProps> = ({
   const [evidencesOptions, setEvidencesOptions] = useState<
     AutocompleteOptionProps[]
   >([]);
-  const [evidencesOptionsLoading, setEvidencesOptionsLoading] = useState(false);
 
   const handleSubmit = async (data: ArgumentFormProps) => {
     const mapArgument = () => ({
@@ -87,13 +85,18 @@ export const ArgumentUpsertForm: FC<ArgumentUpsertFormProps> = ({
     });
 
     try {
-      const addedArgument = await (operation === UpsertFormOperation.CREATE
-        ? createArgument({ claimSlug, argument: mapArgument() })
-        : updateArgument({
-            id: argument?.id as string,
-            argument: mapArgument(),
-          }));
-      addPickedArgument(addedArgument);
+      if (operation === UpsertFormOperation.CREATE) {
+        const addedArgument = await createArgument({
+          claimSlug,
+          argument: mapArgument(),
+        });
+        addArgumentToOpinion(addedArgument);
+      } else {
+        await updateArgument({
+          id: argument?.id as string,
+          argument: mapArgument(),
+        });
+      }
       enqueueSnackbar(
         KnowledgeBitUpsertFormOperationTexts[operation].submitButton,
         {
@@ -109,31 +112,19 @@ export const ArgumentUpsertForm: FC<ArgumentUpsertFormProps> = ({
     }
   };
 
-  const getEvidences = useCallback(async () => {
-    setEvidencesOptionsLoading(true);
-
-    try {
-      const evidences = await getKnowledgeBits({
-        claimSlug,
-      });
-      setEvidencesOptions(
-        evidences.map(({ id, name }: KnowledgeBitProps) => ({
-          id,
-          label: name,
-        }))
-      );
-    } catch (e: any) {
-      enqueueSnackbar(e.message, {
-        variant: "error",
-      });
-    } finally {
-      setEvidencesOptionsLoading(false);
-    }
-  }, [enqueueSnackbar, getKnowledgeBits]);
-
   useEffect(() => {
-    getEvidences();
-  }, []);
+    const evidencesOptions = filter(knowledgeBits, {
+      side:
+        argument.side === ArgumentSides.CON
+          ? KnowledgeBitSides.REFUTING
+          : KnowledgeBitSides.SUPPORTING,
+    }).map(({ id, name }: KnowledgeBitProps) => ({
+      id,
+      label: name,
+    }));
+
+    setEvidencesOptions(evidencesOptions);
+  }, [knowledgeBits]);
 
   return (
     <form onSubmit={handleSubmitHook(handleSubmit)}>
@@ -158,13 +149,8 @@ export const ArgumentUpsertForm: FC<ArgumentUpsertFormProps> = ({
           multiple
           errors={errors}
           options={evidencesOptions}
-          loading={evidencesOptionsLoading}
           label="Evidences"
           name="evidences"
-          rules={{
-            required: true,
-            minLength: 1,
-          }}
         />
 
         <Stack spacing={1}>

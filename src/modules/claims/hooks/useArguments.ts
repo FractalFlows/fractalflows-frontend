@@ -4,6 +4,7 @@ import { ClaimsCache } from "../cache";
 import { gql, useQuery } from "@apollo/client";
 import { apolloClient } from "common/services/apollo/client";
 import Claims from "pages/user/claims";
+import { compact, concat } from "lodash-es";
 
 // export const getKnowledgeBit = async ({ id }: { id: string }) =>
 //   await ClaimsService.getKnowledgeBit({ id });
@@ -22,8 +23,9 @@ export const createArgument = async ({
     claimSlug,
     argument,
   });
-  ClaimsCache.arguments([...ClaimsCache.arguments(), addedArgument]);
-
+  ClaimsCache.arguments(
+    compact(concat(ClaimsCache.arguments(), addedArgument))
+  );
   return addedArgument;
 };
 
@@ -34,16 +36,6 @@ export const updateArgument = async ({
   id: string;
   argument: ArgumentProps;
 }) => Promise.resolve();
-
-export const addPickedArgument = (argument: ArgumentProps) =>
-  ClaimsCache.pickedArguments([...ClaimsCache.pickedArguments(), argument]);
-
-export const removePickedArgument = (argumentId: string) =>
-  ClaimsCache.pickedArguments(
-    ClaimsCache.pickedArguments().filter(
-      ({ id }: ArgumentProps) => id !== argumentId
-    )
-  );
 
 export const setArguments = (argumentsList: ArgumentProps[]) =>
   ClaimsCache.arguments(argumentsList);
@@ -65,8 +57,6 @@ export const useArguments = () => {
     createArgument,
     updateArgument,
     setArguments,
-    addPickedArgument,
-    removePickedArgument,
     argumentsList,
     pickedArguments,
   };

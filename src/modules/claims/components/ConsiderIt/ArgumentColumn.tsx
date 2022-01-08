@@ -1,9 +1,10 @@
 import { FC } from "react";
-import { sortBy } from "lodash-es";
+import { isEmpty, map, sortBy } from "lodash-es";
 import { Stack, Typography } from "@mui/material";
 
 import { Argument } from "./Argument";
 import { ArgumentProps } from "modules/claims/interfaces";
+import { NoResults } from "common/components/NoResults";
 
 interface ArgumentColumnProps {
   title: string;
@@ -24,9 +25,15 @@ export const ArgumentColumn: FC<ArgumentColumnProps> = ({
     <Stack spacing={3}>
       <Typography variant="h5">{title}</Typography>
       <Stack spacing={2} sx={{ width: 330 }}>
-        {sortedArgumentsList?.map((argument) => (
-          <Argument key={argument.id} argument={argument} />
-        ))}
+        {isEmpty(sortedArgumentsList) ? (
+          <NoResults p={0} align="left">
+            No arguments
+          </NoResults>
+        ) : (
+          map(sortedArgumentsList, (argument) => (
+            <Argument key={argument.id} argument={argument} />
+          ))
+        )}
       </Stack>
     </Stack>
   );

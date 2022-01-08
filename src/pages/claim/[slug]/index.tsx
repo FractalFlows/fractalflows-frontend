@@ -20,6 +20,10 @@ import { useOpinions } from "modules/claims/hooks/useOpinions";
 import { useAuth } from "modules/auth/hooks/useAuth";
 import { useSnackbar } from "notistack";
 import { useRouter } from "next/router";
+import {
+  setKnowledgeBits,
+  useKnowledgeBits,
+} from "modules/claims/hooks/useKnowledgeBits";
 
 interface ClaimPageProps {
   data: {
@@ -34,6 +38,7 @@ const Claim: NextPage<ClaimPageProps> = ({
   data: { claim, relatedClaims, knowledgeBits, userKnowledgeBitsVotes },
 }) => {
   const { setUserOpinion, setOpinions, getUserOpinion } = useOpinions();
+  const { setKnowledgeBits } = useKnowledgeBits();
   const { setArguments } = useArguments();
   const { isSignedIn } = useAuth();
   const { enqueueSnackbar } = useSnackbar();
@@ -41,6 +46,7 @@ const Claim: NextPage<ClaimPageProps> = ({
   const { slug }: { slug?: string } = router.query;
 
   useEffect(() => {
+    setKnowledgeBits(knowledgeBits || []);
     setArguments(claim.arguments || []);
     setOpinions(claim.opinions || []);
     setUserOpinion({
@@ -71,10 +77,7 @@ const Claim: NextPage<ClaimPageProps> = ({
 
       <Stack spacing={14}>
         <ClaimSummary claim={claim} />
-        <KnowledgeBits
-          knowledgeBits={knowledgeBits}
-          userVotes={userKnowledgeBitsVotes}
-        />
+        <KnowledgeBits userVotes={userKnowledgeBitsVotes} />
         <SocialOpinions />
         <RelatedClaims relatedClaims={relatedClaims} />
       </Stack>

@@ -1,5 +1,5 @@
 import { FC, useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { Typography } from "@mui/material";
+import { Button, Typography } from "@mui/material";
 import { clamp, get } from "lodash-es";
 
 import styles from "./Slider.module.css";
@@ -69,7 +69,8 @@ export const Slider: FC = () => {
   }, [acceptance]);
 
   useEffect(() => {
-    setHandlePosition(acceptance || 0.5);
+    console.log("accept", userOpinion.acceptance);
+    setHandlePosition(get(userOpinion, "acceptance", 0.5));
     return () => stopSlide();
   }, [get(userOpinion, "id")]);
 
@@ -123,9 +124,13 @@ export const Slider: FC = () => {
               {acceptanceText}
             </Typography>
           ) : (
-            <div className={styles.slider__cta}>
+            <Button
+              size="small"
+              variant="contained"
+              className={styles.slider__cta}
+            >
               {userOpinion?.id ? "Update" : "Give"} your opinion
-            </div>
+            </Button>
           )}
         </div>
       </div>

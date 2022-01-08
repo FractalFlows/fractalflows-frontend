@@ -1,5 +1,5 @@
 import { gql, useQuery } from "@apollo/client";
-import { filter, find, findIndex, get, map } from "lodash-es";
+import { filter, find, concat, findIndex, get, map, compact } from "lodash-es";
 
 import { ClaimsService } from "../services/claims";
 import type { ArgumentProps, OpinionProps } from "../interfaces";
@@ -25,6 +25,8 @@ export const saveOpinion = async ({ opinion }: { opinion: OpinionProps }) => {
     const updatedOpinions = [...ClaimsCache.opinions()];
     updatedOpinions.splice(userOpinionIndex, 1, savedOpinion);
     ClaimsCache.opinions(updatedOpinions);
+  } else {
+    ClaimsCache.opinions(compact(concat(ClaimsCache.opinions(), savedOpinion)));
   }
 
   const updatedArguments = map(ClaimsCache.arguments(), (argument) => {
@@ -42,7 +44,7 @@ export const saveOpinion = async ({ opinion }: { opinion: OpinionProps }) => {
       } else {
         return {
           ...argument,
-          opinions: [...argument.opinions, savedOpinion],
+          opinions: compact(concat(argument.opinions, savedOpinion)),
         };
       }
     } else {

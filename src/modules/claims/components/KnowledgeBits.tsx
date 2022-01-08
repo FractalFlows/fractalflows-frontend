@@ -19,6 +19,7 @@ import { KnowledgeBitUpsert } from "./KnowledgeBitUpsert";
 import { NoResults } from "common/components/NoResults";
 import { useClaims } from "../hooks/useClaims";
 import { useRouter } from "next/router";
+import { useKnowledgeBits } from "../hooks/useKnowledgeBits";
 
 enum KnowledgeBitsPanelState {
   CREATING,
@@ -86,8 +87,7 @@ export const KnowledgeBitsPanel: FC<{
         {knowledgeBits.length === 0 &&
         knowledgeBitsPanelState !== KnowledgeBitsPanelState.CREATING ? (
           <NoResults>
-            We couldn&apos;t find any {KnowledgeBitsPanelTexts[side].side}{" "}
-            knowledge bits at this time
+            No {KnowledgeBitsPanelTexts[side].side} knowledge bits as of yet
           </NoResults>
         ) : null}
         {knowledgeBitsPanelState === KnowledgeBitsPanelState.CREATING ? (
@@ -107,9 +107,9 @@ export const KnowledgeBitsPanel: FC<{
 };
 
 export const KnowledgeBits: FC<{
-  knowledgeBits?: KnowledgeBitProps[];
   userVotes?: KnowledgeBitVoteProps[];
-}> = ({ knowledgeBits = [], userVotes = [] }) => {
+}> = ({ userVotes = [] }) => {
+  const { knowledgeBits } = useKnowledgeBits();
   const refutingKnowledgeBits = useMemo(
     () =>
       knowledgeBits.filter(({ side }) => side === KnowledgeBitSides.REFUTING),

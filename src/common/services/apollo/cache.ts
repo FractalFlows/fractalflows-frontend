@@ -19,6 +19,9 @@ const cacheOptions = {
             return [...existing, ...incoming];
           },
         },
+        knowledgeBits: {
+          read: () => ClaimsCache.knowledgeBits(),
+        },
         arguments: {
           read: () => ClaimsCache.arguments(),
         },
