@@ -14,6 +14,7 @@ export const GET_SESSION = gql`
         chainId
       }
       user {
+        id
         ethAddress
         email
         username

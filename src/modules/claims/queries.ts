@@ -156,6 +156,9 @@ export const GET_ARGUMENT = gql`
           username
           avatar
         }
+        argument {
+          id
+        }
       }
     }
   }

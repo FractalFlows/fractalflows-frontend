@@ -1,4 +1,5 @@
 export interface UserProps {
+  id: string;
   username: string;
   avatar?: string;
   ethAddress?: string;

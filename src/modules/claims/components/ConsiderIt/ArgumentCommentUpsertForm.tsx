@@ -1,13 +1,14 @@
 import { FC } from "react";
 import { useSnackbar } from "notistack";
-import { useCallback, useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { LoadingButton } from "@mui/lab";
 import { Button, Stack, TextField } from "@mui/material";
+import { get } from "lodash-es";
 
 import { registerMui } from "common/utils/registerMui";
 import { UpsertFormOperation } from "common/interfaces";
 import { useArgumentComments } from "modules/argument-comments/useArgumentComments";
+import { ArgumentCommentProps } from "modules/argument-comments/interfaces";
 
 const ArgumentCommentUpsertFormOperationTexts = {
   [UpsertFormOperation.CREATE]: {
@@ -27,14 +28,14 @@ interface ArgumentCommentUpsertFormDataProps {
 }
 
 interface ArgumentCommentUpsertFormProps {
-  argumentId: string;
+  argumentComment: ArgumentCommentProps;
   handleClose?: () => any;
-  handleSuccess: () => any;
+  handleSuccess: (prop: ArgumentCommentProps) => any;
   operation: UpsertFormOperation;
 }
 
 export const ArgumentCommentUpsertForm: FC<ArgumentCommentUpsertFormProps> = ({
-  argumentId,
+  argumentComment,
   operation,
   handleSuccess,
   handleClose,
@@ -48,28 +49,28 @@ export const ArgumentCommentUpsertForm: FC<ArgumentCommentUpsertFormProps> = ({
     formState: { errors, isSubmitting },
     handleSubmit: handleSubmitHook,
   } = useForm<ArgumentCommentUpsertFormDataProps>({
-    defaultValues: argumentCommentFormDefaultValues,
+    defaultValues: {
+      content: get(argumentComment, "content", ""),
+    },
   });
 
   const handleSubmit = async (data: ArgumentCommentUpsertFormDataProps) => {
-    const mapArgumentComment = () => ({
-      content: data.content,
-      argument: { id: argumentId },
-    });
-
     try {
-      if (operation === UpsertFormOperation.CREATE) {
-        const addedArgumentComment = await createArgumentComment({
-          argumentComment: mapArgumentComment(),
-        });
-        handleSuccess(addedArgumentComment);
-      } else {
-        const updatedArgumentComment = await updateArgumentComment({
-          id: get(argumentComment, "id"),
-          argumentComment: mapArgumentComment(),
-        });
-        handleSuccess(updatedArgumentComment);
-      }
+      const savedArgumentComment = await (operation ===
+      UpsertFormOperation.CREATE
+        ? createArgumentComment({
+            argumentComment: {
+              content: data.content,
+              argument: { id: get(argumentComment, "argument.id") },
+            },
+          })
+        : updateArgumentComment({
+            argumentComment: {
+              id: get(argumentComment, "id"),
+              content: data.content,
+              argument: { id: get(argumentComment, "argument.id") },
+            },
+          }));
       enqueueSnackbar(
         ArgumentCommentUpsertFormOperationTexts[operation].successFeedback,
         {
@@ -77,6 +78,7 @@ export const ArgumentCommentUpsertForm: FC<ArgumentCommentUpsertFormProps> = ({
         }
       );
       reset(argumentCommentFormDefaultValues);
+      handleSuccess && handleSuccess(savedArgumentComment);
       handleClose && handleClose();
     } catch (e: any) {
       enqueueSnackbar(e.message, {
@@ -104,7 +106,7 @@ export const ArgumentCommentUpsertForm: FC<ArgumentCommentUpsertFormProps> = ({
           })}
         ></TextField>
 
-        <Stack spacing={1} sx={{ alignItems: "flex-start" }}>
+        <Stack direction="row" spacing={1} sx={{ alignItems: "flex-start" }}>
           <LoadingButton
             type="submit"
             loading={isSubmitting}

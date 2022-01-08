@@ -11,6 +11,12 @@ form {
   cursor: inherit;
 }
 
+.MuiButton-root.MuiButton-text.MuiButton--nopadding {
+  padding: 0;
+  min-height: unset;
+  min-width: unset;
+}
+
 @media screen and (min-width: 900px) {
   .MuiToolbar-gutters,
   .container {

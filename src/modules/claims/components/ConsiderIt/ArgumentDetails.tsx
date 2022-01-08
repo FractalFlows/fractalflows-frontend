@@ -1,18 +1,26 @@
 import { FC, useEffect, useState } from "react";
 import { Chip, Stack, Typography } from "@mui/material";
-import { compact, concat, get, isEmpty, map } from "lodash-es";
+import {
+  compact,
+  concat,
+  findIndex,
+  get,
+  isEmpty,
+  map,
+  sortBy,
+} from "lodash-es";
 
 import { ArgumentProps, ArgumentSides } from "modules/claims/interfaces";
 import { useSnackbar } from "notistack";
 import { useArguments } from "modules/claims/hooks/useArguments";
 import { Spinner } from "common/components/Spinner";
 import { NoResults } from "common/components/NoResults";
-import { AuthorBlock } from "modules/users/components/AuthorBlock";
 import { AvatarWithUsername } from "modules/users/components/AvatarWithUsername";
 import { useAuth } from "modules/auth/hooks/useAuth";
 import { ArgumentCommentUpsertForm } from "./ArgumentCommentUpsertForm";
 import { UpsertFormOperation } from "common/interfaces";
 import { ArgumentCommentProps } from "modules/argument-comments/interfaces";
+import { ArgumentComment } from "./ArgumentComment";
 
 interface ArgumentDetailsProps {
   argumentId: string;
@@ -25,11 +33,23 @@ export const ArgumentDetails: FC<ArgumentDetailsProps> = ({ argumentId }) => {
   const { getArgument } = useArguments();
   const { enqueueSnackbar } = useSnackbar();
 
-  const addArgumentComment = (argumentComment: ArgumentCommentProps) => {
+  const handleAddArgumentCommentSuccess = (
+    argumentComment: ArgumentCommentProps
+  ) => {
     const updatedArgument = {
       ...argument,
       comments: compact(concat(argument.comments, argumentComment)),
     };
+    setArgument(updatedArgument);
+  };
+  const handleUpdateArgumentCommentSuccess = (
+    argumentComment: ArgumentCommentProps
+  ) => {
+    const argumentCommentIndex = findIndex(argument.comments, {
+      id: argumentComment.id,
+    });
+    const updatedArgument = Object.assign({}, argument);
+    updatedArgument.comments.splice(argumentCommentIndex, 1, argumentComment);
     setArgument(updatedArgument);
   };
 
@@ -40,8 +60,6 @@ export const ArgumentDetails: FC<ArgumentDetailsProps> = ({ argumentId }) => {
       .catch((e) => enqueueSnackbar(e.message, { variant: "error" }))
       .finally(() => setIsLoadingArgument(false));
   }, [argumentId]);
-
-  console.log(argument);
 
   if (isLoadingArgument) return <Spinner />;
 
@@ -64,21 +82,22 @@ export const ArgumentDetails: FC<ArgumentDetailsProps> = ({ argumentId }) => {
           )}
         </Stack>
       </Stack>
-      <Stack spacing={1}>
+      <Stack spacing={2}>
         <Typography variant="h6">Discuss this point</Typography>
         <Stack spacing={3}>
-          {map(argument.comments, ({ id, user, content, createdAt }) => (
-            <Stack key={id} spacing={1}>
-              <AuthorBlock user={user} createdAt={createdAt} size={20} />
-              <Typography variant="body1">{content}</Typography>
-            </Stack>
+          {map(sortBy(argument.comments, ["createdAt"]), (argumentComment) => (
+            <ArgumentComment
+              key={get(argumentComment, "id")}
+              argumentComment={argumentComment}
+              handleUpdate={handleUpdateArgumentCommentSuccess}
+            />
           ))}
           {isSignedIn ? (
             <Stack spacing={2} sx={{ width: "100%" }}>
-              <AvatarWithUsername user={session.user} size={20} />
+              <AvatarWithUsername user={session.user} size={30} />
               <ArgumentCommentUpsertForm
-                argumentId={get(argument, "id")}
-                handleSuccess={addArgumentComment}
+                argumentComment={{ argument: { id: get(argument, "id") } }}
+                handleSuccess={handleAddArgumentCommentSuccess}
                 operation={UpsertFormOperation.CREATE}
               />
             </Stack>
