@@ -1,0 +1,19 @@
+.argument {
+  position: relative;
+}
+
+.argument__referrers {
+  position: absolute;
+  /* ${props => props.side}: calc(${props =>
+  props.side === 'left' ? '0px' : '100%'} + 15px); */
+  top: 0;
+  /* float: left; */
+}
+
+.argument--cons .argument__referrers {
+  left: -15px;
+}
+
+.argument--pros .argument__referrers {
+  right: -15px;
+}

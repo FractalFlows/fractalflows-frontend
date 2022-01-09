@@ -1,5 +1,4 @@
-import { useState } from "react";
-import { Controller } from "react-hook-form";
+import { Controller, FieldErrors } from "react-hook-form";
 import { debounce, last, get } from "lodash-es";
 import {
   Autocomplete as MuiAutocomplete,
@@ -8,6 +7,7 @@ import {
   Box,
   CircularProgress,
 } from "@mui/material";
+import { getFormErrorHelperText } from "common/utils/getFormErrorHelperText";
 
 export interface AutocompleteOptionProps {
   id?: string;
@@ -17,14 +17,17 @@ export interface AutocompleteOptionProps {
 export interface AutocompleteProps {
   control: any;
   options: AutocompleteOptionProps[];
-  label: string;
+  label?: string;
+  placeholder?: string;
   defaultValue?: string;
   maxTags?: number;
   name: string;
   loading?: boolean;
-  onSearch: (p: any) => any;
+  onSearch?: (p: any) => any;
   multiple?: boolean;
   freeSolo?: boolean;
+  rules?: any;
+  errors: FieldErrors;
   filterOptions?: (option: any) => any;
 }
 
@@ -32,21 +35,17 @@ export const Autocomplete = ({
   control,
   options,
   label,
+  placeholder,
   defaultValue,
   maxTags,
   name,
   loading,
   onSearch,
+  rules,
+  errors,
   ...autocompleteProps
-}: AutocompleteProps) => {
-  const [value, setValue] = useState<
-    | string
-    | AutocompleteOptionProps
-    | (string | AutocompleteOptionProps)[]
-    | null
-  >([]);
-
-  return (
+}: AutocompleteProps) => (
+  <Box>
     <Controller
       render={({ field: { onChange, ...controllerProps } }) => (
         <MuiAutocomplete
@@ -61,9 +60,11 @@ export const Autocomplete = ({
             <TextField
               {...params}
               onChange={debounce((ev) => {
-                onSearch(ev.target.value);
+                onSearch && onSearch(ev.target.value);
               }, 300)}
               label={label}
+              placeholder={placeholder}
+              error={!!get(errors, name)}
               InputProps={{
                 ...params.InputProps,
                 endAdornment: (
@@ -89,21 +90,21 @@ export const Autocomplete = ({
 
               if ((maxTags && data.length <= maxTags) || !maxTags) {
                 onChange(data);
-                setValue(data);
               }
             } else {
               onChange(data);
-              setValue(data);
             }
           }}
           {...autocompleteProps}
           {...controllerProps}
-          value={value}
         />
       )}
       defaultValue={defaultValue}
+      rules={rules}
       name={name}
       control={control}
     />
-  );
-};
+
+    {getFormErrorHelperText(errors, name)}
+  </Box>
+);

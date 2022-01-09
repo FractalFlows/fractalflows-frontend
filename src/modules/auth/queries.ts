@@ -14,6 +14,7 @@ export const GET_SESSION = gql`
         chainId
       }
       user {
+        id
         ethAddress
         email
         username
@@ -22,12 +23,5 @@ export const GET_SESSION = gql`
         avatarSource
       }
     }
-  }
-`;
-
-export const GET_SESSION_FROM_CACHE = gql`
-  query Session {
-    session @client
-    isSignedIn @client
   }
 `;

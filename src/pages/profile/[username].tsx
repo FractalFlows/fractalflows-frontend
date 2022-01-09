@@ -1,13 +1,14 @@
-import { useEffect, useState } from "react";
+import { SyntheticEvent, useState } from "react";
+import { InferGetServerSidePropsType } from "next";
 import { AccountCircle } from "@mui/icons-material";
 import { TabContext, TabList, TabPanel } from "@mui/lab";
 import { Avatar, Box, Paper, Stack, Tab, Typography } from "@mui/material";
-import { useRouter } from "next/router";
 
 import { useUsers } from "modules/users/hooks/useUsers";
 import { ClaimsList } from "modules/claims/components/ClaimsList";
-import { Claim } from "modules/claims/interfaces";
+import type { ClaimProps } from "modules/claims/interfaces";
 import { ProfileProps, UserClaimRelation } from "modules/users/interfaces";
+import { UsersService } from "modules/users/services/users";
 
 const profileTabs: {
   label: string;
@@ -18,24 +19,32 @@ const profileTabs: {
   { label: "Following", value: UserClaimRelation.FOLLOWING },
 ];
 
-const Profile = () => {
-  const router = useRouter();
-  const { username }: { username?: string } = router.query;
+const Profile = (
+  serverProps: InferGetServerSidePropsType<typeof getServerSideProps>
+) => {
   const { getProfile } = useUsers();
   const [activeTab, setActiveTab] = useState<UserClaimRelation>(
     UserClaimRelation.OWN
   );
-  const [profile, setProfile] = useState<ProfileProps>();
-  const [claims, setClaims] = useState<Claim[]>([]);
+  const [loadingClaims, setLoadingClaims] = useState<boolean>(false);
+  const [profile] = useState<ProfileProps>(serverProps.profile);
+  const [claims, setClaims] = useState<ClaimProps[]>(serverProps.userClaims);
 
-  useEffect(() => {
-    if (username) {
-      getProfile({ username, claimsRelation: activeTab }).then((data) => {
-        setProfile(data.profile);
+  const handleTabChange = (ev: SyntheticEvent, tab: UserClaimRelation) => {
+    setActiveTab(tab);
+    setLoadingClaims(true);
+
+    getProfile({
+      username: serverProps.username,
+      claimsRelation: tab,
+    })
+      .then((data) => {
         setClaims(data.userClaims);
+      })
+      .finally(() => {
+        setLoadingClaims(false);
       });
-    }
-  }, [activeTab, username, getProfile]);
+  };
 
   return (
     <Box className="container page">
@@ -85,7 +94,7 @@ const Profile = () => {
           <TabContext value={activeTab}>
             <Paper variant="outlined" sx={{ alignSelf: "start" }}>
               <TabList
-                onChange={(ev, tab) => setActiveTab(tab)}
+                onChange={handleTabChange}
                 variant="scrollable"
                 scrollButtons="auto"
               >
@@ -94,15 +103,14 @@ const Profile = () => {
                 ))}
               </TabList>
             </Paper>
-
             <TabPanel value={UserClaimRelation.OWN}>
-              <ClaimsList claims={claims} />
+              <ClaimsList claims={claims} loading={loadingClaims} />
             </TabPanel>
             <TabPanel value={UserClaimRelation.CONTRIBUTED}>
-              <ClaimsList claims={claims} />
+              <ClaimsList claims={claims} loading={loadingClaims} />
             </TabPanel>
             <TabPanel value={UserClaimRelation.FOLLOWING}>
-              <ClaimsList claims={claims} />
+              <ClaimsList claims={claims} loading={loadingClaims} />
             </TabPanel>
           </TabContext>
         </Stack>
@@ -110,5 +118,19 @@ const Profile = () => {
     </Box>
   );
 };
+
+export async function getServerSideProps(context) {
+  const { username } = context.query;
+  const profile = await UsersService.getProfile({
+    username,
+    claimsRelation: UserClaimRelation.OWN,
+  });
+  return {
+    props: {
+      ...profile,
+      username,
+    },
+  };
+}
 
 export default Profile;

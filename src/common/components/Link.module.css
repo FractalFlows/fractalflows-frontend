@@ -1,0 +1,11 @@
+.text {
+  color: var(--fractalflows-colors-primary);
+}
+
+.text:hover {
+  text-decoration: underline;
+}
+
+.block {
+  display: block;
+}

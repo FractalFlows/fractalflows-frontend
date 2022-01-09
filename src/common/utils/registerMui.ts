@@ -10,7 +10,7 @@ import { FORM_ERRORS } from "common/config/formErrors";
 export interface RegisterMuiProps {
   register: UseFormRegister<any>;
   name: string;
-  props: RegisterOptions;
+  props?: RegisterOptions;
   errors: FieldErrors;
 }
 

@@ -1,0 +1,3 @@
+.opine__droparea * {
+  pointer-events: none;
+}

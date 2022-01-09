@@ -29,7 +29,7 @@ const MyApp = ({
   pageProps,
   emotionCache = clientSideEmotionCache,
 }: CustomAppProps) => {
-  const { getSession } = useAuth();
+  const { getSession, session } = useAuth();
 
   useEffect(() => {
     getSession();
@@ -45,16 +45,11 @@ const MyApp = ({
           </title>
           <meta name="viewport" content="width=device-width,initial-scale=1" />
           <link rel="icon" href="/favicon.png" />
-          <script
+          {/* <script
             src="https://s7.addthis.com/js/300/addthis_widget.js#pubid=ra-58df20a78b820ad8"
             async
             defer
-          ></script>
-          <script
-            src="https://www.google.com/recaptcha/api.js"
-            async
-            defer
-          ></script>
+          ></script> */}
         </Head>
 
         <Script

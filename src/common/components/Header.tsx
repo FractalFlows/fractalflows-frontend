@@ -50,13 +50,15 @@ const StyledInputBase = styled(InputBase)(({ theme }) => ({
   color: "inherit",
   "& .MuiInputBase-input": {
     padding: theme.spacing(1, 1, 1, 0),
-    // vertical padding + font size from searchIcon
     paddingLeft: `calc(1em + ${theme.spacing(4)})`,
     transition: theme.transitions.create("width"),
     width: "100%",
     [theme.breakpoints.up("md")]: {
       width: "20ch",
     },
+  },
+  "& .MuiInputBase-input::placeholder": {
+    opacity: 0.9,
   },
 }));
 
@@ -219,7 +221,7 @@ export const Header = () => {
           </Search>
           <Box sx={{ flexGrow: 1 }} />
           <Box sx={{ display: { xs: "none", md: "flex" } }}>
-            <Stack direction="row" spacing={2}>
+            <Stack direction="row" alignItems="center" spacing={2}>
               <Link href="/claim/new">
                 <Button variant="text" color="primaryContrast">
                   Host new claim
@@ -245,7 +247,7 @@ export const Header = () => {
                         variant="body1"
                         noWrap
                         sx={{
-                          fontWeight: 700,
+                          fontWeight: 600,
                           textTransform: "initial",
                           maxWidth: 150,
                         }}
