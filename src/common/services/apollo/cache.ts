@@ -37,6 +37,9 @@ const cacheOptions = {
         showOpinionId: {
           read: () => ClaimsCache.showOpinionId(),
         },
+        userKnowledgeBitVotes: {
+          read: () => ClaimsCache.userKnowledgeBitVotes(),
+        },
       },
     },
   },

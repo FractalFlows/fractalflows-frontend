@@ -5,15 +5,10 @@ import { deleteClaim } from "./delete";
 import { inviteFriends } from "./inviteFriends";
 import {
   getKnowledgeBit,
-  getKnowledgeBits,
   createKnowledgeBit,
   updateKnowledgeBit,
   deleteKnowledgeBit,
 } from "./knowledgeBit";
-import {
-  saveKnowledgeBitVote,
-  getUserKnowledgeBitsVotes,
-} from "./knowledgeBitVote";
 
 export const useClaims = () => {
   return {
@@ -26,11 +21,8 @@ export const useClaims = () => {
     deleteClaim,
     inviteFriends,
     getKnowledgeBit,
-    getKnowledgeBits,
-    getUserKnowledgeBitsVotes,
     createKnowledgeBit,
     updateKnowledgeBit,
     deleteKnowledgeBit,
-    saveKnowledgeBitVote,
   };
 };

@@ -1,16 +1,10 @@
-import { ClaimsService } from "../services/claims";
-import type { ArgumentProps, CreateArgumentProps } from "../interfaces";
-import { ClaimsCache } from "../cache";
-import { gql, useQuery } from "@apollo/client";
-import { apolloClient } from "common/services/apollo/client";
-import Claims from "pages/user/claims";
 import { compact, concat } from "lodash-es";
+import { gql, useQuery } from "@apollo/client";
 
-// export const getKnowledgeBit = async ({ id }: { id: string }) =>
-//   await ClaimsService.getKnowledgeBit({ id });
-
-// export const getKnowledgeBits = async ({ claimSlug }: { claimSlug: string }) =>
-//   await ClaimsService.getKnowledgeBits({ claimSlug });
+import { ClaimsService } from "../services/claims";
+import type { ArgumentProps } from "../interfaces";
+import { ClaimsCache } from "../cache";
+import { apolloClient } from "common/services/apollo/client";
 
 export const createArgument = async ({
   claimSlug,

@@ -56,12 +56,6 @@ export const GET_CLAIM = gql`
     knowledgeBits(claimSlug: $slug) {
       ...KnowledgeBitFields
     }
-    userKnowledgeBitsVotes(claimSlug: $slug) {
-      type
-      knowledgeBit {
-        id
-      }
-    }
   }
 `;
 
@@ -127,7 +121,8 @@ export const GET_KNOWLEDGE_BITS = gql`
 
 export const GET_USER_KNOWLEDGE_BITS_VOTES = gql`
   query GetKnowledgeBitsVotes($claimSlug: String!) {
-    userKnowledgeBitsVotes(claimSlug: $claimSlug) {
+    userKnowledgeBitVotes(claimSlug: $claimSlug) {
+      id
       type
       knowledgeBit {
         id

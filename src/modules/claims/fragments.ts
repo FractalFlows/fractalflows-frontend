@@ -8,6 +8,7 @@ export const CORE_CLAIM_FIELDS = gql`
     slug
     createdAt
     user {
+      id
       avatar
       username
     }

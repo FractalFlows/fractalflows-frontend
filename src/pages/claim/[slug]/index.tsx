@@ -4,7 +4,6 @@ import type { NextPage } from "next";
 import Head from "next/head";
 
 import {
-  ArgumentSides,
   ClaimProps,
   KnowledgeBitProps,
   KnowledgeBitVoteProps,
@@ -20,25 +19,24 @@ import { useOpinions } from "modules/claims/hooks/useOpinions";
 import { useAuth } from "modules/auth/hooks/useAuth";
 import { useSnackbar } from "notistack";
 import { useRouter } from "next/router";
-import {
-  setKnowledgeBits,
-  useKnowledgeBits,
-} from "modules/claims/hooks/useKnowledgeBits";
+import { useKnowledgeBits } from "modules/claims/hooks/useKnowledgeBits";
+import { useKnowledgeBitsVotes } from "modules/claims/hooks/useKnowledgeBitVotes";
 
 interface ClaimPageProps {
   data: {
     claim: ClaimProps;
     relatedClaims: ClaimProps[];
     knowledgeBits: KnowledgeBitProps[];
-    userKnowledgeBitsVotes: KnowledgeBitVoteProps[];
+    userKnowledgeBitVotes: KnowledgeBitVoteProps[];
   };
 }
 
 const Claim: NextPage<ClaimPageProps> = ({
-  data: { claim, relatedClaims, knowledgeBits, userKnowledgeBitsVotes },
+  data: { claim, relatedClaims, knowledgeBits, userKnowledgeBitVotes },
 }) => {
   const { setUserOpinion, setOpinions, getUserOpinion } = useOpinions();
   const { setKnowledgeBits } = useKnowledgeBits();
+  const { getUserKnowledgeBitVotes } = useKnowledgeBitsVotes();
   const { setArguments } = useArguments();
   const { isSignedIn } = useAuth();
   const { enqueueSnackbar } = useSnackbar();
@@ -59,12 +57,15 @@ const Claim: NextPage<ClaimPageProps> = ({
   }, []);
 
   useEffect(() => {
-    if (isSignedIn) {
-      getUserOpinion({ claimSlug: slug as string }).catch((e) =>
+    if (isSignedIn && slug) {
+      getUserOpinion({ claimSlug: slug }).catch((e) =>
+        enqueueSnackbar(e.message, { variant: "error" })
+      );
+      getUserKnowledgeBitVotes({ claimSlug: slug }).catch((e) =>
         enqueueSnackbar(e.message, { variant: "error" })
       );
     }
-  }, [isSignedIn]);
+  }, [isSignedIn, slug]);
 
   return (
     <Box className="container page">
@@ -75,7 +76,7 @@ const Claim: NextPage<ClaimPageProps> = ({
 
       <Stack spacing={14}>
         <ClaimSummary claim={claim} />
-        <KnowledgeBits userVotes={userKnowledgeBitsVotes} />
+        <KnowledgeBits userVotes={userKnowledgeBitVotes} />
         <SocialOpinions />
         <RelatedClaims relatedClaims={relatedClaims} />
       </Stack>
@@ -88,13 +89,6 @@ export async function getServerSideProps(context) {
   const data = await ClaimsService.getClaim({
     slug,
   });
-
-  // ClaimsService.getKnowledgeBits({
-  //   claimSlug: slug,
-  // }),
-  // ClaimsService.getUserKnowledgeBitsVotes({
-  //   claimSlug: slug,
-  // }),
 
   return {
     props: { data },

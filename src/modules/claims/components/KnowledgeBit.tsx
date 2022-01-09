@@ -21,10 +21,10 @@ import {
   ThumbDownAlt as ThumbDownAltIcon,
   MoreVert as MoreVertIcon,
 } from "@mui/icons-material";
+import { find, get } from "lodash-es";
 
 import {
   KnowledgeBitProps,
-  KnowledgeBitVoteProps,
   KnowledgeBitVoteTypes,
 } from "modules/claims/interfaces";
 import { AvatarWithUsername } from "modules/users/components/AvatarWithUsername";
@@ -34,8 +34,9 @@ import {
 } from "./KnowledgeBitUpsert";
 import { Spinner } from "common/components/Spinner";
 import { useSnackbar } from "notistack";
-import { useClaims } from "../hooks/useClaims";
-import { getKnowledgeBit } from "../hooks/knowledgeBit";
+import { useKnowledgeBitsVotes } from "../hooks/useKnowledgeBitVotes";
+import { useRouter } from "next/router";
+import { useKnowledgeBits } from "../hooks/useKnowledgeBits";
 
 enum KnowledgeBitStates {
   UPDATING,
@@ -46,22 +47,17 @@ enum KnowledgeBitStates {
 
 interface KnowledgeBitComponentProps {
   knowledgeBit: KnowledgeBitProps;
-  userVote: KnowledgeBitVoteProps;
-  handleUserVotesReload: () => any;
 }
 
 export const KnowledgeBit: FC<KnowledgeBitComponentProps> = ({
-  knowledgeBit: preloadedKnowledgeBit,
-  userVote = {},
-  handleUserVotesReload,
+  knowledgeBit,
 }) => {
-  const [knowledgeBit, setKnowledgeBit] = useState<KnowledgeBitProps>(
-    preloadedKnowledgeBit
-  );
-  const { getKnowledgeBit, deleteKnowledgeBit, saveKnowledgeBitVote } =
-    useClaims();
   const [knowledgeBitState, setKnowledgeBitState] =
     useState<KnowledgeBitStates>();
+  const { deleteKnowledgeBit } = useKnowledgeBits();
+  const { userKnowledgeBitVotes, saveKnowledgeBitVote } =
+    useKnowledgeBitsVotes();
+  const router = useRouter();
   const [menuAnchorEl, setMenuAnchorEl] = useState<Element>();
   const isMenuOpen = Boolean(menuAnchorEl);
   const [isDeleting, setIsDeleting] = useState(false);
@@ -117,15 +113,9 @@ export const KnowledgeBit: FC<KnowledgeBitComponentProps> = ({
     try {
       await saveKnowledgeBitVote({
         knowledgeBitId: knowledgeBit?.id as string,
+        claimSlug: get(router.query, "slug") as string,
         type,
       });
-      const [updatedKnowledgeBit] = await Promise.all([
-        getKnowledgeBit({
-          id: knowledgeBit?.id,
-        }),
-        handleUserVotesReload(),
-      ]);
-      setKnowledgeBit(updatedKnowledgeBit);
     } catch (e: any) {
       enqueueSnackbar(e.message, {
         variant: "error",
@@ -134,6 +124,12 @@ export const KnowledgeBit: FC<KnowledgeBitComponentProps> = ({
       setKnowledgeBitState(undefined);
     }
   };
+
+  const userVote = find(
+    userKnowledgeBitVotes,
+    (userKnowledgeBitVote) =>
+      get(userKnowledgeBitVote, "knowledgeBit.id") === knowledgeBit.id
+  );
 
   return (
     <Box>
@@ -171,7 +167,7 @@ export const KnowledgeBit: FC<KnowledgeBitComponentProps> = ({
                 >
                   {knowledgeBitState === KnowledgeBitStates.UPVOTING ? (
                     <CircularProgress size={24} />
-                  ) : userVote.type === KnowledgeBitVoteTypes.UPVOTE ? (
+                  ) : get(userVote, "type") === KnowledgeBitVoteTypes.UPVOTE ? (
                     <ThumbUpAltIcon />
                   ) : (
                     <ThumbUpOffAltIcon />
@@ -190,7 +186,8 @@ export const KnowledgeBit: FC<KnowledgeBitComponentProps> = ({
                 <IconButton>
                   {knowledgeBitState === KnowledgeBitStates.DOWNVOTING ? (
                     <CircularProgress size={24} />
-                  ) : userVote.type === KnowledgeBitVoteTypes.DOWNVOTE ? (
+                  ) : get(userVote, "type") ===
+                    KnowledgeBitVoteTypes.DOWNVOTE ? (
                     <ThumbDownAltIcon />
                   ) : (
                     <ThumbDownOffAltIconIcon />

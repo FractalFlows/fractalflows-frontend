@@ -19,6 +19,7 @@ import {
   GroupAdd as InviteFriendsIcon,
   Notifications as NotificationsIcon,
 } from "@mui/icons-material";
+import { get } from "lodash-es";
 
 import type { ClaimProps } from "modules/claims/interfaces";
 import type { TagProps } from "modules/tags/interfaces";
@@ -29,8 +30,10 @@ import { useClaims } from "../hooks/useClaims";
 import { useSnackbar } from "notistack";
 import { Spinner } from "common/components/Spinner";
 import { InviteFriends } from "./InviteFriends";
+import { useAuth } from "modules/auth/hooks/useAuth";
 
 export const ClaimSummary: FC<{ claim: ClaimProps }> = ({ claim }) => {
+  const { session } = useAuth();
   const [isInviteFriendsDialogOpen, setIsInviteFriendsDialogOpen] =
     useState(false);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
@@ -60,6 +63,8 @@ export const ClaimSummary: FC<{ claim: ClaimProps }> = ({ claim }) => {
   const handleDeleteDialogClose = () => setIsDeleteDialogOpen(false);
   const handleInviteFriendsDialogClose = () =>
     setIsInviteFriendsDialogOpen(false);
+
+  const canManageClaim = get(claim, "user.id") === get(session, "user.id");
 
   return (
     <Stack spacing={3}>
@@ -94,18 +99,23 @@ export const ClaimSummary: FC<{ claim: ClaimProps }> = ({ claim }) => {
             </IconButton>
           </Tooltip>
 
-          <Link href={`/claim/${claim?.slug}/edit`}>
-            <Tooltip title="Edit claim">
-              <IconButton>
-                <EditIcon />
-              </IconButton>
-            </Tooltip>
-          </Link>
-          <Tooltip title="Delete claim">
-            <IconButton onClick={() => setIsDeleteDialogOpen(true)}>
-              <DeleteIcon />
-            </IconButton>
-          </Tooltip>
+          {canManageClaim ? (
+            <>
+              <Link href={`/claim/${claim?.slug}/edit`}>
+                <Tooltip title="Edit claim">
+                  <IconButton>
+                    <EditIcon />
+                  </IconButton>
+                </Tooltip>
+              </Link>
+              <Tooltip title="Delete claim">
+                <IconButton onClick={() => setIsDeleteDialogOpen(true)}>
+                  <DeleteIcon />
+                </IconButton>
+              </Tooltip>
+            </>
+          ) : null}
+
           <Dialog
             open={isDeleteDialogOpen}
             onClose={handleDeleteDialogClose}

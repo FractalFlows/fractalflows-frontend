@@ -162,22 +162,7 @@ export const ClaimsService = {
     return data.knowledgeBit;
   },
 
-  async getKnowledgeBits({
-    claimSlug,
-  }: {
-    claimSlug: string;
-  }): Promise<KnowledgeBitProps[]> {
-    const { data } = await apolloClient.query({
-      query: GET_KNOWLEDGE_BITS,
-      variables: {
-        claimSlug,
-      },
-    });
-
-    return data.knowledgeBits;
-  },
-
-  async getUserKnowledgeBitsVotes({
+  async getUserKnowledgeBitVotes({
     claimSlug,
   }: {
     claimSlug: string;
@@ -189,7 +174,7 @@ export const ClaimsService = {
       },
     });
 
-    return data.userKnowledgeBitsVotes;
+    return data.userKnowledgeBitVotes;
   },
 
   async createKnowledgeBit({

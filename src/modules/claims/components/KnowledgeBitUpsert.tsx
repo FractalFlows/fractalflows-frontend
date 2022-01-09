@@ -15,7 +15,6 @@ import { useRouter } from "next/router";
 import { get, isEmpty } from "lodash-es";
 
 import { Select } from "common/components/Select";
-import { useClaims } from "modules/claims/hooks/useClaims";
 import {
   AttributionProps,
   KnowledgeBitLocations,
@@ -30,6 +29,7 @@ import {
 } from "common/utils/validate";
 import { registerMui } from "common/utils/registerMui";
 import { mapArray } from "common/utils/mapArray";
+import { useKnowledgeBits } from "../hooks/useKnowledgeBits";
 
 const knowledgeBitTypesOptions = [
   {
@@ -153,7 +153,7 @@ export const KnowledgeBitUpsert: FC<KnowledgeBitUpsertProps> = ({
   handleClose,
   operation = KnowledgeBitUpsertFormOperation.CREATE,
 }) => {
-  const { createKnowledgeBit, updateKnowledgeBit } = useClaims();
+  const { createKnowledgeBit, updateKnowledgeBit } = useKnowledgeBits();
   const { enqueueSnackbar } = useSnackbar();
   const router = useRouter();
   const {

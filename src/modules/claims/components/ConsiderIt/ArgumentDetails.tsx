@@ -56,7 +56,6 @@ export const ArgumentDetails: FC<ArgumentDetailsProps> = ({ argumentId }) => {
   const handleDeleteArgumentCommentSuccess = (
     deletedArgumentComment: ArgumentCommentProps
   ) => {
-    console.log("deleted", deletedArgumentComment);
     const updatedArgumentComments = filter(
       argument.comments,
       (argumentComment) => argumentComment.id !== deletedArgumentComment.id

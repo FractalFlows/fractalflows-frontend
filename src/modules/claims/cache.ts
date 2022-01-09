@@ -3,6 +3,7 @@ import { makeVar } from "@apollo/client";
 import type {
   ArgumentProps,
   KnowledgeBitProps,
+  KnowledgeBitVoteProps,
   OpinionProps,
 } from "./interfaces";
 
@@ -13,4 +14,5 @@ export const ClaimsCache = {
   isOpining: makeVar(false),
   userOpinion: makeVar({} as OpinionProps),
   showOpinionId: makeVar(null),
+  userKnowledgeBitVotes: makeVar([] as KnowledgeBitVoteProps[]),
 };

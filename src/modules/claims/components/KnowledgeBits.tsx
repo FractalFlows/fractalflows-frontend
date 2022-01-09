@@ -40,27 +40,16 @@ const KnowledgeBitsPanelTexts = {
 export const KnowledgeBitsPanel: FC<{
   side: KnowledgeBitSides;
   knowledgeBits?: KnowledgeBitProps[];
-  userVotes: KnowledgeBitVoteProps[];
-}> = ({ side, knowledgeBits = [], userVotes: preloadedUserVotes }) => {
-  const { getUserKnowledgeBitsVotes } = useClaims();
+}> = ({ side, knowledgeBits = [] }) => {
   const [knowledgeBitsPanelState, setKnowledgeBitsPanelState] =
     useState<KnowledgeBitsPanelState>();
-  const [userVotes, setUserVotes] =
-    useState<KnowledgeBitVoteProps[]>(preloadedUserVotes);
   const knowledgeBitUpsertRef = useRef(null);
-  const router = useRouter();
 
   const handleAddKnowledgeBit = async () => {
     await setKnowledgeBitsPanelState(KnowledgeBitsPanelState.CREATING);
     knowledgeBitUpsertRef?.current?.scrollIntoView({
       behavior: "smooth",
     });
-  };
-  const handleUserVotesReload = async () => {
-    const updatedUserVotes = await getUserKnowledgeBitsVotes({
-      claimSlug: router.query.slug as string,
-    });
-    setUserVotes(updatedUserVotes);
   };
 
   return (
@@ -75,14 +64,7 @@ export const KnowledgeBitsPanel: FC<{
       </Stack>
       <Stack spacing={1}>
         {knowledgeBits?.map((knowledgeBit) => (
-          <KnowledgeBit
-            knowledgeBit={knowledgeBit}
-            userVote={userVotes?.find(
-              (userVote) => userVote.knowledgeBit.id === knowledgeBit.id
-            )}
-            handleUserVotesReload={handleUserVotesReload}
-            key={knowledgeBit.id}
-          />
+          <KnowledgeBit knowledgeBit={knowledgeBit} key={knowledgeBit.id} />
         ))}
         {knowledgeBits.length === 0 &&
         knowledgeBitsPanelState !== KnowledgeBitsPanelState.CREATING ? (
@@ -106,9 +88,7 @@ export const KnowledgeBitsPanel: FC<{
   );
 };
 
-export const KnowledgeBits: FC<{
-  userVotes?: KnowledgeBitVoteProps[];
-}> = ({ userVotes = [] }) => {
+export const KnowledgeBits: FC = () => {
   const { knowledgeBits } = useKnowledgeBits();
   const refutingKnowledgeBits = useMemo(
     () =>
@@ -161,12 +141,10 @@ export const KnowledgeBits: FC<{
           <KnowledgeBitsPanel
             side={KnowledgeBitSides.REFUTING}
             knowledgeBits={refutingKnowledgeBits}
-            userVotes={userVotes}
           />
           <KnowledgeBitsPanel
             side={KnowledgeBitSides.SUPPORTING}
             knowledgeBits={supportingKnowledgeBits}
-            userVotes={userVotes}
           />
         </Stack>
       </Stack>
