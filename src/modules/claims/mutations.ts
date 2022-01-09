@@ -32,6 +32,8 @@ export const INVITE_FRIENDS = gql`
 `;
 
 export const CREATE_KNOWLEDGE_BIT = gql`
+  ${KNOWLEDGE_BIT_FIELDS}
+
   mutation CreateClaim(
     $claimSlug: String!
     $createKnowledgeBitInput: CreateKnowledgeBitInput!
@@ -40,17 +42,19 @@ export const CREATE_KNOWLEDGE_BIT = gql`
       claimSlug: $claimSlug
       createKnowledgeBitInput: $createKnowledgeBitInput
     ) {
-      id
+      ...KnowledgeBitFields
     }
   }
 `;
 
 export const UPDATE_KNOWLEDGE_BIT = gql`
+  ${KNOWLEDGE_BIT_FIELDS}
+
   mutation UpdateKnowledgeBit(
     $updateKnowledgeBitInput: UpdateKnowledgeBitInput!
   ) {
     updateKnowledgeBit(updateKnowledgeBitInput: $updateKnowledgeBitInput) {
-      id
+      ...KnowledgeBitFields
     }
   }
 `;

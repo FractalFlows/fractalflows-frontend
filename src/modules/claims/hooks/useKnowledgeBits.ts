@@ -2,11 +2,7 @@ import { gql, useQuery } from "@apollo/client";
 import { compact, concat, filter, findIndex, get } from "lodash-es";
 
 import { ClaimsService } from "../services/claims";
-import type {
-  KnowledgeBitProps,
-  KnowledgeBitSides,
-  KnowledgeBitVoteProps,
-} from "../interfaces";
+import type { KnowledgeBitProps } from "../interfaces";
 import { ClaimsCache } from "../cache";
 import { apolloClient } from "common/services/apollo/client";
 
@@ -24,11 +20,8 @@ export const createKnowledgeBit = async ({
     claimSlug,
     knowledgeBit,
   });
-  const completeCreatedKnowledgeBit = await getKnowledgeBit({
-    id: get(createdKnowledgeBit, "id"),
-  });
   const updatedKnowledgeBits = compact(
-    concat(ClaimsCache.knowledgeBits(), completeCreatedKnowledgeBit)
+    concat(ClaimsCache.knowledgeBits(), createdKnowledgeBit)
   );
   ClaimsCache.knowledgeBits(updatedKnowledgeBits);
 
@@ -42,8 +35,10 @@ export const updateKnowledgeBit = async ({
   id: string;
   knowledgeBit: KnowledgeBitProps;
 }) => {
-  await ClaimsService.updateKnowledgeBit({ id, knowledgeBit });
-  const updatedKnowledgeBit = await getKnowledgeBit({ id });
+  const updatedKnowledgeBit = await ClaimsService.updateKnowledgeBit({
+    id,
+    knowledgeBit,
+  });
   const knowledgeBitIndex = findIndex(ClaimsCache.knowledgeBits(), { id });
   const updatedKnowledgeBits = [...ClaimsCache.knowledgeBits()];
   updatedKnowledgeBits.splice(knowledgeBitIndex, 1, updatedKnowledgeBit);
