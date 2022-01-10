@@ -119,63 +119,35 @@ export const Search = () => {
       setIsLoading(false);
     }
   };
-
-  useEffect(() => {
-    const handleFetchMore = async () => {
-      if (totalCount <= offset + limit || isLoadingMore || isLoading) {
-        return;
-      }
-
-      setIsLoadingMore(true);
-
-      try {
-        const updatedOffset = offset + limit;
-        setOffset(offset + limit);
-        const moreSearchedClaims = await searchClaims({
-          term: searchTerm,
-          limit,
-          offset: updatedOffset,
-        });
-        setSearchResults([
-          ...searchResults,
-          ...sortResults(moreSearchedClaims.data),
-        ]);
-        setTotalCount(moreSearchedClaims.totalCount);
-      } catch (e: any) {
-        enqueueSnackbar(e.message, { variant: "error" });
-      } finally {
-        setIsLoadingMore(false);
-      }
-    };
-
-    const infiniteScrollIntersectionObserver = new IntersectionObserver(
-      function (entries) {
-        if (entries[0].intersectionRatio <= 0) return;
-        handleFetchMore();
-      }
-    );
-
-    if (resultsEndEl.current) {
-      infiniteScrollIntersectionObserver?.observe(resultsEndEl.current);
+  const handleFetchMore = async () => {
+    if (totalCount <= offset + limit || isLoadingMore || isLoading) {
+      return;
     }
 
-    return () => infiniteScrollIntersectionObserver.disconnect();
-  }, [
-    totalCount,
-    offset,
-    searchResults,
-    searchTerm,
-    isLoadingMore,
-    isLoading,
-    resultsEndEl,
-    searchClaims,
-    enqueueSnackbar,
-  ]);
+    setIsLoadingMore(true);
+
+    try {
+      const updatedOffset = offset + limit;
+      setOffset(offset + limit);
+      const moreSearchedClaims = await searchClaims({
+        term: searchTerm,
+        limit,
+        offset: updatedOffset,
+      });
+      setSearchResults([
+        ...searchResults,
+        ...sortResults(moreSearchedClaims.data),
+      ]);
+      setTotalCount(moreSearchedClaims.totalCount);
+    } catch (e: any) {
+      enqueueSnackbar(e.message, { variant: "error" });
+    } finally {
+      setIsLoadingMore(false);
+    }
+  };
 
   const getBackdropContent = () => {
-    if (isLoading) {
-      return <Spinner color="primaryContrast" />;
-    } else if (isEmpty(searchResults)) {
+    if (isEmpty(searchResults) && isLoading === false) {
       if (isEmpty(searchTerm)) {
         return null;
       } else {
@@ -193,11 +165,20 @@ export const Search = () => {
     } else {
       return (
         <Stack spacing={3}>
-          <Typography variant="h5">
-            Found {totalCount} result
-            {searchResults.length === 1 ? "" : "s"} for &quot;{searchTerm}&quot;
-          </Typography>
-          <ClaimsList claims={searchResults} />
+          {isLoading === false ? (
+            <Typography variant="h5">
+              Found {totalCount} result
+              {searchResults.length === 1 ? "" : "s"} for &quot;{searchTerm}
+              &quot;
+            </Typography>
+          ) : null}
+          <ClaimsList
+            claims={searchResults}
+            loading={isLoading}
+            loadingMore={isLoadingMore}
+            handleFetchMore={handleFetchMore}
+            spinnerColor="primaryContrast"
+          />
         </Stack>
       );
     }
@@ -232,11 +213,7 @@ export const Search = () => {
           open={showResults}
           onClick={handleBlur}
         >
-          <Box className="container page">
-            {getBackdropContent()}
-            {isLoadingMore ? <Spinner color="primary" /> : null}
-            <div ref={resultsEndEl} />
-          </Box>
+          <Box className="container page">{getBackdropContent()}</Box>
         </Backdrop>
       </Portal>
     </>

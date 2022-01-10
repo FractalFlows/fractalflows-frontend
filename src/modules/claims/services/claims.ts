@@ -33,6 +33,7 @@ import type {
   KnowledgeBitVoteProps,
   KnowledgeBitVoteTypes,
   OpinionProps,
+  PaginatedClaimsProps,
 } from "../interfaces";
 import type { PaginationProps } from "modules/interfaces";
 
@@ -63,7 +64,10 @@ export const ClaimsService = {
     return data.claim;
   },
 
-  async getClaims({ limit, offset }: PaginationProps): Promise<ClaimProps[]> {
+  async getClaims({
+    limit,
+    offset,
+  }: PaginationProps): Promise<PaginatedClaimsProps> {
     const { data } = await apolloClient.query({
       query: GET_CLAIMS,
       variables: {
@@ -78,7 +82,7 @@ export const ClaimsService = {
   async getTrendingClaims({
     limit,
     offset,
-  }: PaginationProps): Promise<ClaimProps[]> {
+  }: PaginationProps): Promise<PaginatedClaimsProps> {
     const { data } = await apolloClient.query({
       query: GET_TRENDING_CLAIMS,
       variables: {
@@ -94,7 +98,7 @@ export const ClaimsService = {
     term,
     limit,
     offset,
-  }: { term: string } & PaginationProps): Promise<ClaimProps[]> {
+  }: { term: string } & PaginationProps): Promise<PaginatedClaimsProps> {
     const { data } = await apolloClient.query({
       query: SEARCH_CLAIMS,
       variables: {

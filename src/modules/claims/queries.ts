@@ -84,7 +84,10 @@ export const GET_CLAIMS = gql`
 
   query GetClaims($offset: Int!, $limit: Int!) {
     claims(offset: $offset, limit: $limit) {
-      ...CoreClaimFields
+      totalCount
+      data {
+        ...CoreClaimFields
+      }
     }
   }
 `;

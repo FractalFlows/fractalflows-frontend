@@ -116,6 +116,11 @@ export interface ClaimProps {
   user: UserProps;
 }
 
+export interface PaginatedClaimsProps {
+  totalCount: number;
+  data: ClaimProps[];
+}
+
 export interface InviteFriendsProps {
   slug: string;
   emails: string[];
