@@ -18,12 +18,12 @@ import {
   GET_CLAIMS,
   GET_TRENDING_CLAIMS,
   GET_KNOWLEDGE_BIT,
-  GET_KNOWLEDGE_BITS,
   GET_USER_KNOWLEDGE_BITS_VOTES,
   GET_ARGUMENTS,
   GET_OPINION,
   GET_USER_OPINION,
   GET_ARGUMENT,
+  SEARCH_CLAIMS,
 } from "../queries";
 import type {
   ArgumentProps,
@@ -88,6 +88,23 @@ export const ClaimsService = {
     });
 
     return data.trendingClaims;
+  },
+
+  async searchClaims({
+    term,
+    limit,
+    offset,
+  }: { term: string } & PaginationProps): Promise<ClaimProps[]> {
+    const { data } = await apolloClient.query({
+      query: SEARCH_CLAIMS,
+      variables: {
+        term,
+        limit,
+        offset,
+      },
+    });
+
+    return data.searchClaims;
   },
 
   async createClaim({ claim }: { claim: ClaimProps }): Promise<ClaimProps> {

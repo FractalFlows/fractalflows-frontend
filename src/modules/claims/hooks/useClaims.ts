@@ -9,6 +9,16 @@ import {
   updateKnowledgeBit,
   deleteKnowledgeBit,
 } from "./knowledgeBit";
+import { ClaimsService } from "../services/claims";
+import { PaginationProps } from "modules/interfaces";
+
+const searchClaims = async ({
+  term,
+  limit,
+  offset,
+}: { term: string } & PaginationProps) => {
+  return await ClaimsService.searchClaims({ term, limit, offset });
+};
 
 export const useClaims = () => {
   return {
@@ -16,6 +26,7 @@ export const useClaims = () => {
     getPartialClaim,
     getClaims,
     getTrendingClaims,
+    searchClaims,
     createClaim,
     updateClaim,
     deleteClaim,

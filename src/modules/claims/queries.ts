@@ -99,6 +99,20 @@ export const GET_TRENDING_CLAIMS = gql`
   }
 `;
 
+export const SEARCH_CLAIMS = gql`
+  ${CORE_CLAIM_FIELDS}
+
+  query SearchClaims($term: String!, $offset: Int!, $limit: Int!) {
+    searchClaims(term: $term, offset: $offset, limit: $limit) {
+      totalCount
+      data {
+        ...CoreClaimFields
+        relevance
+      }
+    }
+  }
+`;
+
 export const GET_KNOWLEDGE_BIT = gql`
   ${KNOWLEDGE_BIT_FIELDS}
 

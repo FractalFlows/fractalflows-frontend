@@ -1,0 +1,229 @@
+import { useCallback, useEffect, useRef, useState } from "react";
+import { styled, alpha } from "@mui/material/styles";
+import InputBase from "@mui/material/InputBase";
+import SearchIcon from "@mui/icons-material/Search";
+import {
+  Backdrop,
+  Box,
+  debounce,
+  Portal,
+  Stack,
+  Typography,
+} from "@mui/material";
+import { useSnackbar } from "notistack";
+import { isEmpty, get, sortBy } from "lodash-es";
+
+import { Spinner } from "./Spinner";
+import { useClaims } from "modules/claims/hooks/useClaims";
+import { ClaimProps } from "modules/claims/interfaces";
+import { ClaimsList } from "modules/claims/components/ClaimsList";
+import { ClassNames } from "@emotion/react";
+
+const SearchInput = styled("div")(({ theme }) => ({
+  position: "relative",
+  borderRadius: theme.shape.borderRadius,
+  backgroundColor: alpha(theme.palette.common.white, 0.15),
+  "&:hover": {
+    backgroundColor: alpha(theme.palette.common.white, 0.25),
+  },
+  marginRight: theme.spacing(2),
+  marginLeft: 0,
+  width: "100%",
+  [theme.breakpoints.up("sm")]: {
+    marginLeft: theme.spacing(3),
+    width: "auto",
+  },
+}));
+
+const SearchIconWrapper = styled("div")(({ theme }) => ({
+  padding: theme.spacing(0, 2),
+  height: "100%",
+  position: "absolute",
+  pointerEvents: "none",
+  display: "flex",
+  alignItems: "center",
+  justifyContent: "center",
+}));
+
+const StyledInputBase = styled(InputBase)(({ theme }) => ({
+  color: "inherit",
+  "& .MuiInputBase-input": {
+    padding: theme.spacing(1, 1, 1, 0),
+    paddingLeft: `calc(1em + ${theme.spacing(4)})`,
+    transition: theme.transitions.create("width"),
+    width: "100%",
+    [theme.breakpoints.up("md")]: {
+      width: "20ch",
+    },
+  },
+  "& .MuiInputBase-input::placeholder": {
+    opacity: 0.9,
+  },
+}));
+
+const limit = 10;
+
+export const Search = () => {
+  const [searchTerm, setSearchTerm] = useState("");
+  const [offset, setOffset] = useState(0);
+  const [totalCount, setTotalCount] = useState(0);
+  const { searchClaims } = useClaims();
+  const [isLoading, setIsLoading] = useState(false);
+  const [isLoadingMore, setIsLoadingMore] = useState(false);
+  const [showResults, setShowResults] = useState(false);
+  const [searchResults, setSearchResults] = useState([] as ClaimProps[]);
+  const { enqueueSnackbar } = useSnackbar();
+  const resultsEndEl = useRef();
+
+  const sortResults = (results: ClaimProps[]) =>
+    sortBy(results, ["relevance"]).reverse();
+  const handleFocus = () => {
+    setShowResults(true);
+    document.body.style.overflowY = "hidden";
+  };
+  const handleBlur = () => {
+    setTimeout(() => {
+      setShowResults(false);
+      document.body.style.overflowY = "overlay";
+    }, 0);
+  };
+  const handleSearch = async (term: string) => {
+    setIsLoading(true);
+    setSearchTerm(term);
+    setOffset(0);
+    setTotalCount(0);
+
+    if (isEmpty(term)) {
+      setIsLoading(false);
+      setSearchResults([]);
+      return;
+    }
+
+    try {
+      const searchedClaims = await searchClaims({ term, limit, offset: 0 });
+      setSearchResults(sortResults(searchedClaims.data));
+      setTotalCount(searchedClaims.totalCount);
+    } catch (e: any) {
+      enqueueSnackbar(e.message, { variant: "error" });
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    const handleFetchMore = async () => {
+      if (totalCount <= offset || isLoadingMore || isLoading) return;
+      setIsLoadingMore(true);
+
+      try {
+        const updatedOffset = offset + limit;
+        setOffset(offset + limit);
+        const moreSearchedClaims = await searchClaims({
+          term: searchTerm,
+          limit,
+          offset: updatedOffset,
+        });
+        setSearchResults([
+          ...searchResults,
+          ...sortResults(moreSearchedClaims.data),
+        ]);
+        setTotalCount(moreSearchedClaims.totalCount);
+      } catch (e: any) {
+        enqueueSnackbar(e.message, { variant: "error" });
+      } finally {
+        setIsLoadingMore(false);
+      }
+    };
+
+    const infiniteScrollIntersectionObserver = new IntersectionObserver(
+      function (entries) {
+        if (entries[0].intersectionRatio <= 0) return;
+        handleFetchMore();
+      }
+    );
+
+    if (resultsEndEl.current) {
+      infiniteScrollIntersectionObserver?.observe(resultsEndEl.current);
+    }
+
+    return () => infiniteScrollIntersectionObserver.disconnect();
+  }, [
+    totalCount,
+    offset,
+    searchResults,
+    searchTerm,
+    isLoadingMore,
+    isLoading,
+    resultsEndEl,
+    searchClaims,
+    enqueueSnackbar,
+  ]);
+
+  const getBackdropContent = () => {
+    if (isLoading) {
+      return <Spinner color="primaryContrast" />;
+    } else if (isEmpty(searchResults)) {
+      if (isEmpty(searchTerm)) {
+        return null;
+      } else {
+        return (
+          <Typography
+            variant="h5"
+            color="primaryContrast"
+            align="center"
+            sx={{ marginTop: 5 }}
+          >
+            No results for &quot;{searchTerm}&quot;
+          </Typography>
+        );
+      }
+    } else {
+      return (
+        <Stack spacing={3}>
+          <Typography variant="h5">
+            Found {totalCount} result
+            {searchResults.length === 1 ? "" : "s"} for &quot;{searchTerm}&quot;
+          </Typography>
+          <ClaimsList claims={searchResults} />
+        </Stack>
+      );
+    }
+  };
+
+  return (
+    <>
+      <SearchInput>
+        <SearchIconWrapper>
+          <SearchIcon />
+        </SearchIconWrapper>
+        <StyledInputBase
+          placeholder="Search claims…"
+          onFocus={handleFocus}
+          onInput={debounce((ev) => {
+            handleSearch(ev.target.value);
+          }, 300)}
+          onBlur={handleBlur}
+          inputProps={{ "aria-label": "search" }}
+        />
+      </SearchInput>
+      <Portal>
+        <Backdrop
+          sx={{
+            color: "#fff",
+            display: "initial",
+            zIndex: 2,
+            overflowY: "auto",
+          }}
+          open={showResults}
+          onClick={handleBlur}
+        >
+          <Box className="container page">
+            {getBackdropContent()}
+            {isLoadingMore ? <Spinner color="primaryContrast" /> : null}
+            <div ref={resultsEndEl} />
+          </Box>
+        </Backdrop>
+      </Portal>
+    </>
+  );
+};
