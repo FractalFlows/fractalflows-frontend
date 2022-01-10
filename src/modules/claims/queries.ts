@@ -94,7 +94,10 @@ export const GET_TRENDING_CLAIMS = gql`
 
   query GetTrendingClaims($offset: Int!, $limit: Int!) {
     trendingClaims(offset: $offset, limit: $limit) {
-      ...CoreClaimFields
+      totalCount
+      data {
+        ...CoreClaimFields
+      }
     }
   }
 `;

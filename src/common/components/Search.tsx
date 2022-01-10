@@ -73,6 +73,7 @@ export const Search = () => {
   const [showResults, setShowResults] = useState(false);
   const [searchResults, setSearchResults] = useState([] as ClaimProps[]);
   const { enqueueSnackbar } = useSnackbar();
+  const searchInputEl = useRef();
   const resultsEndEl = useRef();
 
   const sortResults = (results: ClaimProps[]) =>
@@ -80,14 +81,23 @@ export const Search = () => {
   const handleFocus = () => {
     setShowResults(true);
     document.body.style.overflowY = "hidden";
+    document.body.style.position = "fixed";
   };
   const handleBlur = () => {
     setTimeout(() => {
       setShowResults(false);
       document.body.style.overflowY = "overlay";
+      document.body.style.position = "initial";
     }, 0);
   };
-  const handleSearch = async (term: string) => {
+  const handleKeyDown = (event: KeyboardEvent<any>) => {
+    if (event.key === "Escape" && searchInputEl.current) {
+      return searchInputEl.current.querySelector("input").blur();
+    }
+  };
+  const handleSearch = async (event: InputEvent) => {
+    const term = event?.target?.value;
+
     setIsLoading(true);
     setSearchTerm(term);
     setOffset(0);
@@ -101,8 +111,8 @@ export const Search = () => {
 
     try {
       const searchedClaims = await searchClaims({ term, limit, offset: 0 });
-      setSearchResults(sortResults(searchedClaims.data));
       setTotalCount(searchedClaims.totalCount);
+      setSearchResults(sortResults(searchedClaims.data));
     } catch (e: any) {
       enqueueSnackbar(e.message, { variant: "error" });
     } finally {
@@ -112,7 +122,10 @@ export const Search = () => {
 
   useEffect(() => {
     const handleFetchMore = async () => {
-      if (totalCount <= offset || isLoadingMore || isLoading) return;
+      if (totalCount <= offset + limit || isLoadingMore || isLoading) {
+        return;
+      }
+
       setIsLoadingMore(true);
 
       try {
@@ -199,10 +212,12 @@ export const Search = () => {
         <StyledInputBase
           placeholder="Search claims…"
           onFocus={handleFocus}
-          onInput={debounce((ev) => {
-            handleSearch(ev.target.value);
+          onKeyDown={handleKeyDown}
+          onInput={debounce((event) => {
+            handleSearch(event);
           }, 300)}
           onBlur={handleBlur}
+          ref={searchInputEl}
           inputProps={{ "aria-label": "search" }}
         />
       </SearchInput>
@@ -219,7 +234,7 @@ export const Search = () => {
         >
           <Box className="container page">
             {getBackdropContent()}
-            {isLoadingMore ? <Spinner color="primaryContrast" /> : null}
+            {isLoadingMore ? <Spinner color="primary" /> : null}
             <div ref={resultsEndEl} />
           </Box>
         </Backdrop>

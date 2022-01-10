@@ -25,12 +25,14 @@ interface HomeProps {
   trendingClaims: ClaimProps[];
 }
 
+const limit = 10;
+
 const Home: NextPage<HomeProps> = (serverProps) => {
   const { getTrendingClaims, getClaims } = useClaims();
   const [activeTab, setActiveTab] = useState<HomeTab>(HomeTab.TRENDING);
   const [loadingClaims, setLoadingClaims] = useState<boolean>(false);
   const [claims, setClaims] = useState<ClaimProps[]>(
-    serverProps.trendingClaims
+    serverProps.trendingClaims.data
   );
   const { enqueueSnackbar } = useSnackbar();
 
@@ -38,12 +40,12 @@ const Home: NextPage<HomeProps> = (serverProps) => {
     setActiveTab(tab);
     setLoadingClaims(true);
 
-    const pagination = { limit: 20, offset: 0 };
+    const pagination = { limit, offset: 0 };
 
     if (tab === HomeTab.TRENDING) {
       getTrendingClaims(pagination)
         .then((trendingClaims) => {
-          setClaims(trendingClaims);
+          setClaims(trendingClaims.data);
         })
         .catch((e) => {
           enqueueSnackbar(e.message, {
@@ -161,7 +163,7 @@ const Home: NextPage<HomeProps> = (serverProps) => {
 export async function getServerSideProps() {
   const trendingClaims = await ClaimsService.getTrendingClaims({
     offset: 0,
-    limit: 20,
+    limit,
   });
   return { props: { trendingClaims } };
 }

@@ -16,6 +16,10 @@ export const CORE_CLAIM_FIELDS = gql`
       id
       label
     }
+    knowledgeBits {
+      id
+      side
+    }
   }
 `;
 

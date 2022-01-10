@@ -1,13 +1,25 @@
 import { FC } from "react";
 import { Chip, Paper, Stack, Typography } from "@mui/material";
+import {
+  ArrowUpward as ArrowUpwardIcon,
+  ArrowDownward as ArrowDownwardIcon,
+} from "@mui/icons-material";
+import { isEmpty, get, filter } from "lodash-es";
 
 import { Link } from "common/components/Link";
 import type { ClaimProps } from "../interfaces";
 import { AuthorBlock } from "modules/users/components/AuthorBlock";
 import { TagProps } from "modules/tags/interfaces";
-import { isEmpty } from "lodash-es";
+import { KnowledgeBitSides } from "modules/claims/interfaces";
 
 export const ClaimTile: FC<{ claim: ClaimProps }> = ({ claim }) => {
+  const refutingKnowledgeBitsCount = filter(get(claim, "knowledgeBits"), {
+    side: KnowledgeBitSides.REFUTING,
+  }).length;
+  const supportingKnowledgeBitsCount = filter(get(claim, "knowledgeBits"), {
+    side: KnowledgeBitSides.SUPPORTING,
+  }).length;
+
   return (
     <Link href={`/claim/${claim?.slug}`}>
       <Paper variant="outlined" sx={{ p: 3, width: "100%" }}>
@@ -37,6 +49,22 @@ export const ClaimTile: FC<{ claim: ClaimProps }> = ({ claim }) => {
               ))}
             </Stack>
           )}
+          <Stack direction="row" spacing={3}>
+            <Stack direction="row" spacing={1}>
+              <ArrowDownwardIcon color="error" sx={{ fontSize: 20 }} />
+              <Typography variant="body1">
+                {refutingKnowledgeBitsCount} knowledge bit
+                {refutingKnowledgeBitsCount === 1 ? "" : "s"} refuting it
+              </Typography>
+            </Stack>
+            <Stack direction="row" spacing={1}>
+              <ArrowUpwardIcon color="success" sx={{ fontSize: 20 }} />
+              <Typography variant="body1">
+                {supportingKnowledgeBitsCount} knowledge bit
+                {supportingKnowledgeBitsCount === 1 ? "" : "s"} supporting it
+              </Typography>
+            </Stack>
+          </Stack>
         </Stack>
       </Paper>
     </Link>

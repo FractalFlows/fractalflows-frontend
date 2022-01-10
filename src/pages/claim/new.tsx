@@ -1,5 +1,6 @@
 import type { NextPage } from "next";
 import { isEmpty } from "lodash-es";
+import { Box } from "@mui/material";
 
 import { useAuth } from "modules/auth/hooks/useAuth";
 import { AuthWall } from "common/components/AuthWall";
@@ -13,7 +14,11 @@ const NewClaim: NextPage = () => {
 
   if (isEmpty(session)) return <AuthWall />;
 
-  return <ClaimUpsertForm operation={ClaimUpsertFormOperation.CREATE} />;
+  return (
+    <Box className="container page">
+      <ClaimUpsertForm operation={ClaimUpsertFormOperation.CREATE} />
+    </Box>
+  );
 };
 
 export default NewClaim;
