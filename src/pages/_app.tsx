@@ -17,6 +17,8 @@ import { Header } from "common/components/Header";
 import { Footer } from "common/components/Footer";
 import "common/styles/globals.css";
 import "common/styles/overrides.css";
+import { useRouter } from "next/router";
+import { useApp } from "modules/app/useApp";
 
 const clientSideEmotionCache = createEmotionCache();
 
@@ -29,11 +31,28 @@ const MyApp = ({
   pageProps,
   emotionCache = clientSideEmotionCache,
 }: CustomAppProps) => {
-  const { getSession, session } = useAuth();
+  const { getSession } = useAuth();
+  const { setIsChangingRoutes } = useApp();
+  const router = useRouter();
 
   useEffect(() => {
     getSession();
   }, [getSession]);
+
+  useEffect(() => {
+    const handleRouteChange = () => setIsChangingRoutes(true);
+    const handleRouteChangeEnd = () => setIsChangingRoutes(false);
+
+    router.events.on("routeChangeStart", handleRouteChange);
+    router.events.on("routeChangeComplete", handleRouteChangeEnd);
+    router.events.on("routeChangeError", handleRouteChangeEnd);
+
+    return () => {
+      router.events.off("routeChangeStart", handleRouteChange);
+      router.events.off("routeChangeComplete", handleRouteChangeEnd);
+      router.events.off("routeChangeError", handleRouteChangeEnd);
+    };
+  }, []);
 
   return (
     <ApolloProvider client={apolloClient}>

@@ -1,27 +1,11 @@
-.container {
-  padding: 10px;
-  background-color: var(--fractalflows-colors-background);
-  display: flex;
-  align-items: center;
-  border: var(--fractalflows-border-default);
-  position: sticky;
-  top: 0;
+.header {
+  flex-grow: 1;
+  z-index: 3;
+  position: relative;
 }
 
-@media screen and (min-width: 576px) {
-  .container {
-    padding: 10px var(--fractalflows-pagemargin-sm);
-  }
-}
-
-@media screen and (min-width: 992px) {
-  .container {
-    padding: 10px var(--fractalflows-pagemargin-lg);
-  }
-}
-
-@media screen and (min-width: 1200px) {
-  .container {
-    padding: 10px var(--fractalflows-pagemargin-xl);
-  }
+.header__spinner {
+  position: absolute;
+  top: 100%;
+  width: 100%;
 }

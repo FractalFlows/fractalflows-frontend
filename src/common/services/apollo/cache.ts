@@ -1,4 +1,5 @@
 import { InMemoryCache } from "@apollo/client";
+import { AppCache } from "modules/app/cache";
 
 import { AuthCache } from "modules/auth/cache";
 import { ClaimsCache } from "modules/claims/cache";
@@ -18,6 +19,9 @@ const cacheOptions = {
           merge(existing = [], incoming = []) {
             return [...existing, ...incoming];
           },
+        },
+        isChangingRoutes: {
+          read: () => AppCache.isChangingRoutes(),
         },
         knowledgeBits: {
           read: () => ClaimsCache.knowledgeBits(),

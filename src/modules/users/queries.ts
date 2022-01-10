@@ -13,6 +13,10 @@ export const GET_PROFILE = gql`
       title
       summary
       slug
+      tags {
+        id
+        label
+      }
     }
   }
 `;

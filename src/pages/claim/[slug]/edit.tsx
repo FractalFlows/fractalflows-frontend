@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react";
 import { useSnackbar } from "notistack";
-import { omit } from "lodash-es";
 import { useRouter } from "next/router";
 import type { NextPage } from "next";
 import { isEmpty } from "lodash-es";
@@ -13,7 +12,7 @@ import {
 } from "modules/claims/components/ClaimUpsertForm";
 import { ClaimProps } from "modules/claims/interfaces";
 import { useClaims } from "modules/claims/hooks/useClaims";
-import { CircularProgress } from "@mui/material";
+import { Spinner } from "common/components/Spinner";
 
 const EditClaim: NextPage = () => {
   const { session } = useAuth();
@@ -43,7 +42,7 @@ const EditClaim: NextPage = () => {
       operation={ClaimUpsertFormOperation.UPDATE}
     />
   ) : (
-    <CircularProgress />
+    <Spinner />
   );
 };
 
