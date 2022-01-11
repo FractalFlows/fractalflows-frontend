@@ -17,7 +17,6 @@ export const GET_CLAIM = gql`
       ...CoreClaimFields
       sources {
         id
-        origin
         url
       }
       attributions {
@@ -40,6 +39,9 @@ export const GET_CLAIM = gql`
             avatar
           }
         }
+      }
+      followers {
+        id
       }
       opinions {
         id
@@ -84,7 +86,10 @@ export const GET_CLAIMS = gql`
 
   query GetClaims($offset: Int!, $limit: Int!) {
     claims(offset: $offset, limit: $limit) {
-      ...CoreClaimFields
+      totalCount
+      data {
+        ...CoreClaimFields
+      }
     }
   }
 `;
@@ -94,7 +99,10 @@ export const GET_TRENDING_CLAIMS = gql`
 
   query GetTrendingClaims($offset: Int!, $limit: Int!) {
     trendingClaims(offset: $offset, limit: $limit) {
-      ...CoreClaimFields
+      totalCount
+      data {
+        ...CoreClaimFields
+      }
     }
   }
 `;

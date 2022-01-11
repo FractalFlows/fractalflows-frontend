@@ -20,6 +20,7 @@ import { NoResults } from "common/components/NoResults";
 import { useClaims } from "../hooks/useClaims";
 import { useRouter } from "next/router";
 import { useKnowledgeBits } from "../hooks/useKnowledgeBits";
+import { useAuth } from "modules/auth/hooks/useAuth";
 
 enum KnowledgeBitsPanelState {
   CREATING,
@@ -44,6 +45,7 @@ export const KnowledgeBitsPanel: FC<{
   const [knowledgeBitsPanelState, setKnowledgeBitsPanelState] =
     useState<KnowledgeBitsPanelState>();
   const knowledgeBitUpsertRef = useRef(null);
+  const { requireSignIn } = useAuth();
 
   const handleAddKnowledgeBit = async () => {
     await setKnowledgeBitsPanelState(KnowledgeBitsPanelState.CREATING);
@@ -58,7 +60,10 @@ export const KnowledgeBitsPanel: FC<{
         <Typography variant="h5" component="h3" flexGrow={1}>
           {KnowledgeBitsPanelTexts[side].panelTitle}
         </Typography>
-        <Button variant="contained" onClick={handleAddKnowledgeBit}>
+        <Button
+          variant="contained"
+          onClick={requireSignIn(handleAddKnowledgeBit)}
+        >
           Add
         </Button>
       </Stack>

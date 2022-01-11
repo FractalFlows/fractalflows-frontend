@@ -10,3 +10,9 @@ export enum SignInMethod {
   MAGIC_LINK = "MAGIC_LINK",
   ETHEREUM = "ETHEREUM",
 }
+
+export enum UserRole {
+  NORMAL = "NORMAL",
+  ADMIN = "ADMIN",
+  VALIDATOR = "VALIDATOR",
+}

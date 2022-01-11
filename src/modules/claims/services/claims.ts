@@ -4,6 +4,7 @@ import {
   CREATE_CLAIM,
   UPDATE_CLAIM,
   DELETE_CLAIM,
+  DISABLE_CLAIM,
   INVITE_FRIENDS,
   CREATE_KNOWLEDGE_BIT,
   UPDATE_KNOWLEDGE_BIT,
@@ -11,6 +12,8 @@ import {
   SAVE_KNOWLEDGE_BIT_VOTE,
   CREATE_ARGUMENT,
   SAVE_OPINION,
+  ADD_FOLLOWER_TO_CLAIM,
+  REMOVE_FOLLOWER_FROM_CLAIM,
 } from "../mutations";
 import {
   GET_CLAIM,
@@ -33,6 +36,7 @@ import type {
   KnowledgeBitVoteProps,
   KnowledgeBitVoteTypes,
   OpinionProps,
+  PaginatedClaimsProps,
 } from "../interfaces";
 import type { PaginationProps } from "modules/interfaces";
 
@@ -63,7 +67,10 @@ export const ClaimsService = {
     return data.claim;
   },
 
-  async getClaims({ limit, offset }: PaginationProps): Promise<ClaimProps[]> {
+  async getClaims({
+    limit,
+    offset,
+  }: PaginationProps): Promise<PaginatedClaimsProps> {
     const { data } = await apolloClient.query({
       query: GET_CLAIMS,
       variables: {
@@ -78,7 +85,7 @@ export const ClaimsService = {
   async getTrendingClaims({
     limit,
     offset,
-  }: PaginationProps): Promise<ClaimProps[]> {
+  }: PaginationProps): Promise<PaginatedClaimsProps> {
     const { data } = await apolloClient.query({
       query: GET_TRENDING_CLAIMS,
       variables: {
@@ -94,7 +101,7 @@ export const ClaimsService = {
     term,
     limit,
     offset,
-  }: { term: string } & PaginationProps): Promise<ClaimProps[]> {
+  }: { term: string } & PaginationProps): Promise<PaginatedClaimsProps> {
     const { data } = await apolloClient.query({
       query: SEARCH_CLAIMS,
       variables: {
@@ -147,6 +154,39 @@ export const ClaimsService = {
     });
 
     return data.deleteClaim;
+  },
+
+  async disableClaim({ id }: { id: string }): Promise<boolean> {
+    const { data } = await apolloClient.mutate({
+      mutation: DISABLE_CLAIM,
+      variables: {
+        id,
+      },
+    });
+
+    return data.disableClaim;
+  },
+
+  async addFollowerToClaim({ id }: { id: string }): Promise<boolean> {
+    const { data } = await apolloClient.mutate({
+      mutation: ADD_FOLLOWER_TO_CLAIM,
+      variables: {
+        id,
+      },
+    });
+
+    return data.addFollowerToClaim;
+  },
+
+  async removeFollowerFromClaim({ id }: { id: string }): Promise<boolean> {
+    const { data } = await apolloClient.mutate({
+      mutation: REMOVE_FOLLOWER_FROM_CLAIM,
+      variables: {
+        id,
+      },
+    });
+
+    return data.removeFollowerFromClaim;
   },
 
   async inviteFriends({

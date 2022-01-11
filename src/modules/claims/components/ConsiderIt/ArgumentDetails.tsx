@@ -1,5 +1,5 @@
 import { FC, useEffect, useState } from "react";
-import { Chip, Stack, Typography } from "@mui/material";
+import { Button, Chip, Stack, Typography } from "@mui/material";
 import {
   compact,
   concat,
@@ -22,6 +22,7 @@ import { ArgumentCommentUpsertForm } from "./ArgumentCommentUpsertForm";
 import { UpsertFormOperation } from "common/interfaces";
 import { ArgumentCommentProps } from "modules/argument-comments/interfaces";
 import { ArgumentComment } from "./ArgumentComment";
+import { Link } from "common/components/Link";
 
 interface ArgumentDetailsProps {
   argumentId: string;
@@ -117,7 +118,9 @@ export const ArgumentDetails: FC<ArgumentDetailsProps> = ({ argumentId }) => {
               />
             </Stack>
           ) : (
-            "Login"
+            <Link href="/signin">
+              <Button variant="contained">Sign in to participate</Button>
+            </Link>
           )}
         </Stack>
       </Stack>

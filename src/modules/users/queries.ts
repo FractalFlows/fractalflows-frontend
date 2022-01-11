@@ -1,6 +1,9 @@
 import { gql } from "@apollo/client";
+import { CORE_CLAIM_FIELDS } from "modules/claims/fragments";
 
 export const GET_PROFILE = gql`
+  ${CORE_CLAIM_FIELDS}
+
   query GetProfile($username: String!, $claimsRelation: UserClaimRelation!) {
     profile(username: $username) {
       username
@@ -9,14 +12,7 @@ export const GET_PROFILE = gql`
     }
 
     userClaims(username: $username, relation: $claimsRelation) {
-      id
-      title
-      summary
-      slug
-      tags {
-        id
-        label
-      }
+      ...CoreClaimFields
     }
   }
 `;

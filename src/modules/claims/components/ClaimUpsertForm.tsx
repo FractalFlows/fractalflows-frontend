@@ -172,66 +172,191 @@ export const ClaimUpsertForm: FC<ClaimUpsertFormProps> = ({
   }, []);
 
   return (
-    <Box className="container page">
-      <Stack alignItems="center">
-        <Stack spacing={6}>
-          <Typography variant="h3" component="h1" align="center">
-            {ClaimUpsertFormOperationText[operation].pageTitle}
-          </Typography>
-          <form onSubmit={handleSubmitHook(handleSubmit)}>
+    <Stack alignItems="center">
+      <Stack spacing={6}>
+        <Typography variant="h3" component="h1" align="center">
+          {ClaimUpsertFormOperationText[operation].pageTitle}
+        </Typography>
+        <form onSubmit={handleSubmitHook(handleSubmit)}>
+          <Stack spacing={3}>
+            <TextField
+              label="Title"
+              fullWidth
+              {...registerMui({
+                register,
+                name: "title",
+                props: {
+                  required: true,
+                },
+                errors,
+              })}
+            ></TextField>
+            <TextField
+              label="Summary"
+              multiline
+              minRows={4}
+              maxRows={Infinity}
+              fullWidth
+              {...registerMui({
+                register,
+                name: "summary",
+                props: {
+                  required: true,
+                },
+                errors,
+              })}
+            ></TextField>
             <Stack spacing={3}>
-              <TextField
-                label="Title"
+              <Box>
+                <Typography variant="body1" sx={{ fontWeight: 600 }}>
+                  Sources
+                </Typography>
+                <Typography variant="body2">
+                  It is important to point out all the relevant sources of your
+                  claim.
+                </Typography>
+              </Box>
+              {sourcesFields.map((sourceField, sourceFieldIndex) => {
+                const origin: string = watch(
+                  `sources.${sourceFieldIndex}.origin`
+                );
+                const urlLabels: Record<string, string> = {
+                  doi: "DOI",
+                  other: "Source",
+                };
+                const DeleteSourceButton = ({ display }: any) => (
+                  <Box sx={{ display }}>
+                    <IconButton
+                      size="medium"
+                      aria-label="Delete source"
+                      component="span"
+                      onClick={() => removeSource(sourceFieldIndex)}
+                    >
+                      <DeleteIcon></DeleteIcon>
+                    </IconButton>
+                  </Box>
+                );
+
+                return (
+                  <Stack
+                    direction="row"
+                    alignItems="center"
+                    spacing={2}
+                    key={sourceField.id}
+                  >
+                    <Stack
+                      direction={{ xs: "column", sm: "row" }}
+                      spacing={2}
+                      flexGrow={1}
+                    >
+                      <Select
+                        label="Origin"
+                        name={`sources.${sourceFieldIndex}.origin`}
+                        fullWidth
+                        sx={{ width: { xs: "unset", sm: 150 } }}
+                        options={sourcesOriginOptions}
+                        control={control}
+                        errors={errors}
+                        rules={{
+                          required: true,
+                          deps: [`sources.${sourceFieldIndex}.url`],
+                        }}
+                      />
+                      <TextField
+                        label={urlLabels[origin] || "URL"}
+                        sx={{ flexGrow: 1 }}
+                        {...registerMui({
+                          register,
+                          name: `sources.${sourceFieldIndex}.url`,
+                          props: {
+                            required: true,
+                            validate: {
+                              url: (url: string) => {
+                                if (origin === "website") {
+                                  return validateURL(url);
+                                } else if (
+                                  origin !== "doi" &&
+                                  origin !== "other"
+                                ) {
+                                  return validateURLWithHostname(url, origin);
+                                } else {
+                                  return true;
+                                }
+                              },
+                              doi: (doi: string) =>
+                                origin === "doi" ? validateDOI(doi) : true,
+                            },
+                          },
+                          errors,
+                        })}
+                      ></TextField>
+                      <DeleteSourceButton
+                        display={{ xs: "none", sm: "flex" }}
+                      />
+                    </Stack>
+                    <DeleteSourceButton display={{ xs: "flex", sm: "none" }} />
+                  </Stack>
+                );
+              })}
+              <Button
+                variant="contained"
+                color="secondary"
+                size="small"
                 fullWidth
-                {...registerMui({
-                  register,
-                  name: "title",
-                  props: {
-                    required: true,
-                  },
-                  errors,
-                })}
-              ></TextField>
-              <TextField
-                label="Summary"
-                multiline
-                minRows={4}
-                maxRows={Infinity}
-                fullWidth
-                {...registerMui({
-                  register,
-                  name: "summary",
-                  props: {
-                    required: true,
-                  },
-                  errors,
-                })}
-              ></TextField>
-              <Stack spacing={3}>
-                <Box>
-                  <Typography variant="body1" sx={{ fontWeight: 600 }}>
-                    Sources
-                  </Typography>
-                  <Typography variant="body2">
-                    It is important to point out all the relevant sources of
-                    your claim.
-                  </Typography>
-                </Box>
-                {sourcesFields.map((sourceField, sourceFieldIndex) => {
+                onClick={() => appendSource({ origin: "facebook", url: "" })}
+              >
+                Add source
+              </Button>
+            </Stack>
+            <Stack spacing={3}>
+              <Box>
+                <Typography variant="body1" sx={{ fontWeight: 700 }}>
+                  Tags
+                </Typography>
+                <Typography variant="body2">
+                  Tags are important for better organizing our content please
+                  choose them wisely you have 4 possibilities. Write a tag and
+                  press enter or tab to save it.
+                </Typography>
+              </Box>
+              <Autocomplete
+                control={control}
+                multiple
+                errors={errors}
+                options={tagsOptions}
+                loading={tagsOptionsLoading}
+                label="Tags"
+                name="tags"
+                maxTags={4}
+                freeSolo
+                filterOptions={(option) => option}
+                onSearch={handleTagsSearch}
+              />
+            </Stack>
+            <Stack spacing={3}>
+              <Box>
+                <Typography variant="body1" sx={{ fontWeight: 600 }}>
+                  Attributions
+                </Typography>
+                <Typography variant="body2">
+                  Add an e-mail or Twitter handle profile link to the original
+                  claimant.
+                </Typography>
+              </Box>
+              {attributionsFields.map(
+                (attributionsField, attributionsFieldIndex) => {
                   const origin: string = watch(
-                    `sources.${sourceFieldIndex}.origin`
+                    `attributions.${attributionsFieldIndex}.origin`
                   );
-                  const urlLabels: Record<string, string> = {
-                    doi: "DOI",
-                    other: "Source",
-                  };
-                  const DeleteSourceButton = ({ display }: any) => (
+                  const DeleteAttributionButton = ({ display }: any) => (
                     <Box sx={{ display }}>
                       <IconButton
                         size="medium"
-                        aria-label="Delete source"
+                        aria-label="Delete attribution"
                         component="span"
-                        onClick={() => removeSource(sourceFieldIndex)}
+                        onClick={() =>
+                          removeAttribution(attributionsFieldIndex)
+                        }
                       >
                         <DeleteIcon></DeleteIcon>
                       </IconButton>
@@ -243,7 +368,7 @@ export const ClaimUpsertForm: FC<ClaimUpsertFormProps> = ({
                       direction="row"
                       alignItems="center"
                       spacing={2}
-                      key={sourceField.id}
+                      key={attributionsField.id}
                     >
                       <Stack
                         direction={{ xs: "column", sm: "row" }}
@@ -252,205 +377,76 @@ export const ClaimUpsertForm: FC<ClaimUpsertFormProps> = ({
                       >
                         <Select
                           label="Origin"
-                          name={`sources.${sourceFieldIndex}.origin`}
+                          name={`attributions.${attributionsFieldIndex}.origin`}
                           fullWidth
                           sx={{ width: { xs: "unset", sm: 150 } }}
-                          options={sourcesOriginOptions}
+                          options={attributionsOriginOptions}
                           control={control}
                           errors={errors}
                           rules={{
                             required: true,
-                            deps: [`sources.${sourceFieldIndex}.url`],
+                            deps: [
+                              `attributions.${attributionsFieldIndex}.identifier`,
+                            ],
                           }}
                         />
+
                         <TextField
-                          label={urlLabels[origin] || "URL"}
+                          label={origin === "twitter" ? "Handle" : "Email"}
                           sx={{ flexGrow: 1 }}
                           {...registerMui({
                             register,
-                            name: `sources.${sourceFieldIndex}.url`,
+                            name: `attributions.${attributionsFieldIndex}.identifier`,
                             props: {
                               required: true,
                               validate: {
-                                url: (url: string) => {
-                                  if (origin === "website") {
-                                    return validateURL(url);
-                                  } else if (
-                                    origin !== "doi" &&
-                                    origin !== "other"
-                                  ) {
-                                    return validateURLWithHostname(url, origin);
-                                  } else {
-                                    return true;
-                                  }
-                                },
-                                doi: (doi: string) =>
-                                  origin === "doi" ? validateDOI(doi) : true,
+                                email: (identifier: string) =>
+                                  origin === "email"
+                                    ? validateEmail(identifier)
+                                    : true,
+                                twitterHandle: (identifier: string) =>
+                                  origin === "twitter"
+                                    ? validateTwitterHandle(identifier)
+                                    : true,
                               },
                             },
                             errors,
                           })}
                         ></TextField>
-                        <DeleteSourceButton
+                        <DeleteAttributionButton
                           display={{ xs: "none", sm: "flex" }}
                         />
                       </Stack>
-                      <DeleteSourceButton
+                      <DeleteAttributionButton
                         display={{ xs: "flex", sm: "none" }}
                       />
                     </Stack>
                   );
-                })}
-                <Button
-                  variant="contained"
-                  color="secondary"
-                  size="small"
-                  fullWidth
-                  onClick={() => appendSource({ origin: "facebook", url: "" })}
-                >
-                  Add source
-                </Button>
-              </Stack>
-              <Stack spacing={3}>
-                <Box>
-                  <Typography variant="body1" sx={{ fontWeight: 700 }}>
-                    Tags
-                  </Typography>
-                  <Typography variant="body2">
-                    Tags are important for better organizing our content please
-                    choose them wisely you have 4 possibilities. Write a tag and
-                    press enter or tab to save it.
-                  </Typography>
-                </Box>
-                <Autocomplete
-                  control={control}
-                  multiple
-                  errors={errors}
-                  options={tagsOptions}
-                  loading={tagsOptionsLoading}
-                  label="Tags"
-                  name="tags"
-                  maxTags={4}
-                  freeSolo
-                  filterOptions={(option) => option}
-                  onSearch={handleTagsSearch}
-                />
-              </Stack>
-              <Stack spacing={3}>
-                <Box>
-                  <Typography variant="body1" sx={{ fontWeight: 600 }}>
-                    Attributions
-                  </Typography>
-                  <Typography variant="body2">
-                    Add an e-mail or Twitter handle profile link to the original
-                    claimant.
-                  </Typography>
-                </Box>
-                {attributionsFields.map(
-                  (attributionsField, attributionsFieldIndex) => {
-                    const origin: string = watch(
-                      `attributions.${attributionsFieldIndex}.origin`
-                    );
-                    const DeleteAttributionButton = ({ display }: any) => (
-                      <Box sx={{ display }}>
-                        <IconButton
-                          size="medium"
-                          aria-label="Delete attribution"
-                          component="span"
-                          onClick={() =>
-                            removeAttribution(attributionsFieldIndex)
-                          }
-                        >
-                          <DeleteIcon></DeleteIcon>
-                        </IconButton>
-                      </Box>
-                    );
-
-                    return (
-                      <Stack
-                        direction="row"
-                        alignItems="center"
-                        spacing={2}
-                        key={attributionsField.id}
-                      >
-                        <Stack
-                          direction={{ xs: "column", sm: "row" }}
-                          spacing={2}
-                          flexGrow={1}
-                        >
-                          <Select
-                            label="Origin"
-                            name={`attributions.${attributionsFieldIndex}.origin`}
-                            fullWidth
-                            sx={{ width: { xs: "unset", sm: 150 } }}
-                            options={attributionsOriginOptions}
-                            control={control}
-                            errors={errors}
-                            rules={{
-                              required: true,
-                              deps: [
-                                `attributions.${attributionsFieldIndex}.identifier`,
-                              ],
-                            }}
-                          />
-
-                          <TextField
-                            label={origin === "twitter" ? "Handle" : "Email"}
-                            sx={{ flexGrow: 1 }}
-                            {...registerMui({
-                              register,
-                              name: `attributions.${attributionsFieldIndex}.identifier`,
-                              props: {
-                                required: true,
-                                validate: {
-                                  email: (identifier: string) =>
-                                    origin === "email"
-                                      ? validateEmail(identifier)
-                                      : true,
-                                  twitterHandle: (identifier: string) =>
-                                    origin === "twitter"
-                                      ? validateTwitterHandle(identifier)
-                                      : true,
-                                },
-                              },
-                              errors,
-                            })}
-                          ></TextField>
-                          <DeleteAttributionButton
-                            display={{ xs: "none", sm: "flex" }}
-                          />
-                        </Stack>
-                        <DeleteAttributionButton
-                          display={{ xs: "flex", sm: "none" }}
-                        />
-                      </Stack>
-                    );
-                  }
-                )}
-                <Button
-                  variant="contained"
-                  color="secondary"
-                  size="small"
-                  fullWidth
-                  onClick={() =>
-                    appendAttribution({ origin: "twitter", identifier: "" })
-                  }
-                >
-                  Add attribution
-                </Button>
-              </Stack>
-              <LoadingButton
-                type="submit"
-                loading={isSubmitting}
+                }
+              )}
+              <Button
                 variant="contained"
-                size="large"
+                color="secondary"
+                size="small"
+                fullWidth
+                onClick={() =>
+                  appendAttribution({ origin: "twitter", identifier: "" })
+                }
               >
-                {ClaimUpsertFormOperationText[operation].submitButton}
-              </LoadingButton>
+                Add attribution
+              </Button>
             </Stack>
-          </form>
-        </Stack>
+            <LoadingButton
+              type="submit"
+              loading={isSubmitting}
+              variant="contained"
+              size="large"
+            >
+              {ClaimUpsertFormOperationText[operation].submitButton}
+            </LoadingButton>
+          </Stack>
+        </form>
       </Stack>
-    </Box>
+    </Stack>
   );
 };

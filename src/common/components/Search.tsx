@@ -73,6 +73,7 @@ export const Search = () => {
   const [showResults, setShowResults] = useState(false);
   const [searchResults, setSearchResults] = useState([] as ClaimProps[]);
   const { enqueueSnackbar } = useSnackbar();
+  const searchInputEl = useRef();
   const resultsEndEl = useRef();
 
   const sortResults = (results: ClaimProps[]) =>
@@ -80,14 +81,23 @@ export const Search = () => {
   const handleFocus = () => {
     setShowResults(true);
     document.body.style.overflowY = "hidden";
+    document.body.style.position = "fixed";
   };
   const handleBlur = () => {
     setTimeout(() => {
       setShowResults(false);
       document.body.style.overflowY = "overlay";
+      document.body.style.position = "initial";
     }, 0);
   };
-  const handleSearch = async (term: string) => {
+  const handleKeyDown = (event: KeyboardEvent<any>) => {
+    if (event.key === "Escape" && searchInputEl.current) {
+      return searchInputEl.current.querySelector("input").blur();
+    }
+  };
+  const handleSearch = async (event: InputEvent) => {
+    const term = event?.target?.value;
+
     setIsLoading(true);
     setSearchTerm(term);
     setOffset(0);
@@ -101,68 +111,43 @@ export const Search = () => {
 
     try {
       const searchedClaims = await searchClaims({ term, limit, offset: 0 });
-      setSearchResults(sortResults(searchedClaims.data));
       setTotalCount(searchedClaims.totalCount);
+      setSearchResults(sortResults(searchedClaims.data));
     } catch (e: any) {
       enqueueSnackbar(e.message, { variant: "error" });
     } finally {
       setIsLoading(false);
     }
   };
-
-  useEffect(() => {
-    const handleFetchMore = async () => {
-      if (totalCount <= offset || isLoadingMore || isLoading) return;
-      setIsLoadingMore(true);
-
-      try {
-        const updatedOffset = offset + limit;
-        setOffset(offset + limit);
-        const moreSearchedClaims = await searchClaims({
-          term: searchTerm,
-          limit,
-          offset: updatedOffset,
-        });
-        setSearchResults([
-          ...searchResults,
-          ...sortResults(moreSearchedClaims.data),
-        ]);
-        setTotalCount(moreSearchedClaims.totalCount);
-      } catch (e: any) {
-        enqueueSnackbar(e.message, { variant: "error" });
-      } finally {
-        setIsLoadingMore(false);
-      }
-    };
-
-    const infiniteScrollIntersectionObserver = new IntersectionObserver(
-      function (entries) {
-        if (entries[0].intersectionRatio <= 0) return;
-        handleFetchMore();
-      }
-    );
-
-    if (resultsEndEl.current) {
-      infiniteScrollIntersectionObserver?.observe(resultsEndEl.current);
+  const handleFetchMore = async () => {
+    if (totalCount <= offset + limit || isLoadingMore || isLoading) {
+      return;
     }
 
-    return () => infiniteScrollIntersectionObserver.disconnect();
-  }, [
-    totalCount,
-    offset,
-    searchResults,
-    searchTerm,
-    isLoadingMore,
-    isLoading,
-    resultsEndEl,
-    searchClaims,
-    enqueueSnackbar,
-  ]);
+    setIsLoadingMore(true);
+
+    try {
+      const updatedOffset = offset + limit;
+      setOffset(offset + limit);
+      const moreSearchedClaims = await searchClaims({
+        term: searchTerm,
+        limit,
+        offset: updatedOffset,
+      });
+      setSearchResults([
+        ...searchResults,
+        ...sortResults(moreSearchedClaims.data),
+      ]);
+      setTotalCount(moreSearchedClaims.totalCount);
+    } catch (e: any) {
+      enqueueSnackbar(e.message, { variant: "error" });
+    } finally {
+      setIsLoadingMore(false);
+    }
+  };
 
   const getBackdropContent = () => {
-    if (isLoading) {
-      return <Spinner color="primaryContrast" />;
-    } else if (isEmpty(searchResults)) {
+    if (isEmpty(searchResults) && isLoading === false) {
       if (isEmpty(searchTerm)) {
         return null;
       } else {
@@ -180,11 +165,20 @@ export const Search = () => {
     } else {
       return (
         <Stack spacing={3}>
-          <Typography variant="h5">
-            Found {totalCount} result
-            {searchResults.length === 1 ? "" : "s"} for &quot;{searchTerm}&quot;
-          </Typography>
-          <ClaimsList claims={searchResults} />
+          {isLoading === false ? (
+            <Typography variant="h5">
+              Found {totalCount} result
+              {searchResults.length === 1 ? "" : "s"} for &quot;{searchTerm}
+              &quot;
+            </Typography>
+          ) : null}
+          <ClaimsList
+            claims={searchResults}
+            loading={isLoading}
+            loadingMore={isLoadingMore}
+            handleFetchMore={handleFetchMore}
+            spinnerColor="primaryContrast"
+          />
         </Stack>
       );
     }
@@ -199,10 +193,12 @@ export const Search = () => {
         <StyledInputBase
           placeholder="Search claims…"
           onFocus={handleFocus}
-          onInput={debounce((ev) => {
-            handleSearch(ev.target.value);
+          onKeyDown={handleKeyDown}
+          onInput={debounce((event) => {
+            handleSearch(event);
           }, 300)}
           onBlur={handleBlur}
+          ref={searchInputEl}
           inputProps={{ "aria-label": "search" }}
         />
       </SearchInput>
@@ -217,11 +213,7 @@ export const Search = () => {
           open={showResults}
           onClick={handleBlur}
         >
-          <Box className="container page">
-            {getBackdropContent()}
-            {isLoadingMore ? <Spinner color="primaryContrast" /> : null}
-            <div ref={resultsEndEl} />
-          </Box>
+          <Box className="container page">{getBackdropContent()}</Box>
         </Backdrop>
       </Portal>
     </>

@@ -21,6 +21,7 @@ import { Link } from "common/components/Link";
 import { Search } from "./Search";
 import styles from "./Header.module.css";
 import { useApp } from "modules/app/useApp";
+import { useRouter } from "next/router";
 
 export const Header = () => {
   const { isChangingRoutes } = useApp();
@@ -98,7 +99,7 @@ export const Header = () => {
         <Link href="/claim/new">
           <MenuItem>Host new claim</MenuItem>
         </Link>
-        <MenuItem>Become a validator</MenuItem>
+        {/* <MenuItem>Become a validator</MenuItem> */}
       </Box>
     </Menu>
   );
@@ -123,7 +124,7 @@ export const Header = () => {
       <Link href="/claim/new">
         <MenuItem>Host new claim</MenuItem>
       </Link>
-      <MenuItem>Become a validator</MenuItem>
+      {/* <MenuItem>Become a validator</MenuItem> */}
       {isSignedIn
         ? null
         : [
@@ -179,9 +180,9 @@ export const Header = () => {
                   Host new claim
                 </Button>
               </Link>
-              <Button variant="text" color="primaryContrast">
+              {/* <Button variant="text" color="primaryContrast">
                 Become a validator
-              </Button>
+              </Button> */}
               {isSignedIn ? (
                 <>
                   <Divider orientation="vertical" flexItem />

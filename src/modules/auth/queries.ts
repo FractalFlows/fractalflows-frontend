@@ -21,6 +21,7 @@ export const GET_SESSION = gql`
         usernameSource
         avatar
         avatarSource
+        role
       }
     }
   }

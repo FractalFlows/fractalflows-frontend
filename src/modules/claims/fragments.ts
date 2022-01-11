@@ -16,6 +16,10 @@ export const CORE_CLAIM_FIELDS = gql`
       id
       label
     }
+    knowledgeBits {
+      id
+      side
+    }
   }
 `;
 
@@ -35,6 +39,7 @@ export const KNOWLEDGE_BIT_FIELDS = gql`
       identifier
     }
     user {
+      id
       avatar
       username
     }

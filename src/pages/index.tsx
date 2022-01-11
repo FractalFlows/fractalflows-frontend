@@ -25,47 +25,74 @@ interface HomeProps {
   trendingClaims: ClaimProps[];
 }
 
+const limit = 10;
+
 const Home: NextPage<HomeProps> = (serverProps) => {
   const { getTrendingClaims, getClaims } = useClaims();
   const [activeTab, setActiveTab] = useState<HomeTab>(HomeTab.TRENDING);
-  const [loadingClaims, setLoadingClaims] = useState<boolean>(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const [isLoadingMore, setIsLoadingMore] = useState(false);
+  const [totalCount, setTotalCount] = useState(0);
+  const [offset, setOffset] = useState(0);
   const [claims, setClaims] = useState<ClaimProps[]>(
-    serverProps.trendingClaims
+    serverProps.trendingClaims.data
   );
   const { enqueueSnackbar } = useSnackbar();
 
-  const handleTabChange = (ev: SyntheticEvent, tab: HomeTab) => {
+  const handleTabChange = async (ev: SyntheticEvent, tab: HomeTab) => {
     setActiveTab(tab);
-    setLoadingClaims(true);
+    setIsLoading(true);
+    setClaims([]);
+    setTotalCount(0);
+    setOffset(0);
 
-    const pagination = { limit: 20, offset: 0 };
+    const pagination = { limit, offset: 0 };
 
     if (tab === HomeTab.TRENDING) {
-      getTrendingClaims(pagination)
-        .then((trendingClaims) => {
-          setClaims(trendingClaims);
-        })
-        .catch((e) => {
-          enqueueSnackbar(e.message, {
-            variant: "error",
-          });
-        })
-        .finally(() => {
-          setLoadingClaims(false);
+      try {
+        const trendingClaims = await getTrendingClaims(pagination);
+        setClaims(trendingClaims.data);
+        setTotalCount(trendingClaims.totalCount);
+      } catch (e) {
+        enqueueSnackbar(e.message, {
+          variant: "error",
         });
+      } finally {
+        setIsLoading(false);
+      }
     } else {
-      getClaims(pagination)
-        .then((claims) => {
-          setClaims(claims);
-        })
-        .catch((e) => {
-          enqueueSnackbar(e.message, {
-            variant: "error",
-          });
-        })
-        .finally(() => {
-          setLoadingClaims(false);
+      try {
+        const allClaims = await getClaims(pagination);
+        setClaims(allClaims.data);
+        setTotalCount(allClaims.totalCount);
+      } catch (e) {
+        enqueueSnackbar(e.message, {
+          variant: "error",
         });
+      } finally {
+        setIsLoading(false);
+      }
+    }
+  };
+  const handleFetchMore = async () => {
+    if (totalCount <= offset + limit || isLoadingMore || isLoading) {
+      return;
+    }
+
+    setIsLoadingMore(true);
+
+    try {
+      const updatedOffset = offset + limit;
+      setOffset(offset + limit);
+      const allClaims = await getClaims({ limit, offset: updatedOffset });
+      setClaims([...claims, ...allClaims.data]);
+      setTotalCount(allClaims.totalCount);
+    } catch (e) {
+      enqueueSnackbar(e.message, {
+        variant: "error",
+      });
+    } finally {
+      setIsLoadingMore(false);
     }
   };
 
@@ -133,23 +160,38 @@ const Home: NextPage<HomeProps> = (serverProps) => {
       <Box className="container" sx={{ py: 12 }}>
         <Stack spacing={{ xs: 3, md: 4 }} className="horizontal-tabs">
           <TabContext value={activeTab}>
-            <Paper variant="outlined" sx={{ alignSelf: "start" }}>
-              <TabList
-                onChange={handleTabChange}
-                variant="scrollable"
-                scrollButtons="auto"
-              >
-                {homeTabs.map(({ label, value }) => (
-                  <Tab label={label} value={value} key={value} />
-                ))}
-              </TabList>
-            </Paper>
+            <Stack
+              direction="row"
+              sx={{ alignItems: "center", justifyContent: "space-between" }}
+            >
+              <Paper variant="outlined" sx={{ alignSelf: "start" }}>
+                <TabList
+                  onChange={handleTabChange}
+                  variant="scrollable"
+                  scrollButtons="auto"
+                >
+                  {homeTabs.map(({ label, value }) => (
+                    <Tab label={label} value={value} key={value} />
+                  ))}
+                </TabList>
+              </Paper>
+              {activeTab === HomeTab.ALL && claims.length > 0 ? (
+                <Typography variant="body1">
+                  Showing {claims.length} of {totalCount}
+                </Typography>
+              ) : null}
+            </Stack>
 
             <TabPanel value={HomeTab.TRENDING}>
-              <ClaimsList claims={claims} loading={loadingClaims} />
+              <ClaimsList claims={claims} loading={isLoading} />
             </TabPanel>
             <TabPanel value={HomeTab.ALL}>
-              <ClaimsList claims={claims} loading={loadingClaims} />
+              <ClaimsList
+                claims={claims}
+                loading={isLoading}
+                loadingMore={isLoadingMore}
+                handleFetchMore={handleFetchMore}
+              />
             </TabPanel>
           </TabContext>
         </Stack>
@@ -161,7 +203,7 @@ const Home: NextPage<HomeProps> = (serverProps) => {
 export async function getServerSideProps() {
   const trendingClaims = await ClaimsService.getTrendingClaims({
     offset: 0,
-    limit: 20,
+    limit,
   });
   return { props: { trendingClaims } };
 }

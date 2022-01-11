@@ -4,6 +4,7 @@ import { clamp, get } from "lodash-es";
 
 import styles from "./Slider.module.css";
 import { useOpinions } from "modules/claims/hooks/useOpinions";
+import { useAuth } from "modules/auth/hooks/useAuth";
 
 export const Slider: FC = () => {
   const { userOpinion, setOpinionAcceptance, setShowOpinionId } = useOpinions();
@@ -13,6 +14,7 @@ export const Slider: FC = () => {
   const sliderHandle = useRef(null);
   const acceptance = get(userOpinion, "acceptance", 0);
   const franklinSmileCurve = acceptance * 10;
+  const { requireSignIn } = useAuth();
 
   const setHandlePosition = (acceptance: number) => {
     if (sliderHandle.current) {
@@ -82,7 +84,7 @@ export const Slider: FC = () => {
         }`}
       >
         <div
-          onMouseDown={handleSlideStart}
+          onMouseDown={requireSignIn(handleSlideStart)}
           onTouchStart={handleSlideStart}
           ref={sliderHandle}
           className={styles.slider__handle}

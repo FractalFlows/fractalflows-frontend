@@ -13,6 +13,7 @@ import {
 import { ClaimProps } from "modules/claims/interfaces";
 import { useClaims } from "modules/claims/hooks/useClaims";
 import { Spinner } from "common/components/Spinner";
+import { Box } from "@mui/material";
 
 const EditClaim: NextPage = () => {
   const { session } = useAuth();
@@ -36,13 +37,17 @@ const EditClaim: NextPage = () => {
 
   if (isEmpty(session)) return <AuthWall />;
 
-  return claim ? (
-    <ClaimUpsertForm
-      claim={claim}
-      operation={ClaimUpsertFormOperation.UPDATE}
-    />
-  ) : (
-    <Spinner />
+  return (
+    <Box className="container page">
+      {claim ? (
+        <ClaimUpsertForm
+          claim={claim}
+          operation={ClaimUpsertFormOperation.UPDATE}
+        />
+      ) : (
+        <Spinner p={0} />
+      )}
+    </Box>
   );
 };
 
