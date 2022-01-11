@@ -25,6 +25,24 @@ export const DELETE_CLAIM = gql`
   }
 `;
 
+export const DISABLE_CLAIM = gql`
+  mutation DisableClaim($id: String!) {
+    disableClaim(id: $id)
+  }
+`;
+
+export const ADD_FOLLOWER_TO_CLAIM = gql`
+  mutation AddFollowerToClaim($id: String!) {
+    addFollowerToClaim(id: $id)
+  }
+`;
+
+export const REMOVE_FOLLOWER_FROM_CLAIM = gql`
+  mutation RemoveFollowerFromClaim($id: String!) {
+    removeFollowerFromClaim(id: $id)
+  }
+`;
+
 export const INVITE_FRIENDS = gql`
   mutation InviteFriends($inviteFriendsInput: InviteFriendsInput!) {
     inviteFriends(inviteFriendsInput: $inviteFriendsInput)

@@ -111,6 +111,7 @@ export interface ClaimProps {
   attributions?: AttributionProps[];
   knowledgeBits?: KnowledgeBitProps[];
   arguments?: ArgumentProps[];
+  followers?: UserProps[];
   opinions?: OpinionProps[];
   createdAt: Date;
   user: UserProps;

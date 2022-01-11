@@ -12,14 +12,26 @@ import {
   DialogTitle,
   DialogActions,
   Button,
+  CircularProgress,
 } from "@mui/material";
 import {
   Edit as EditIcon,
   Delete as DeleteIcon,
   GroupAdd as InviteFriendsIcon,
   Notifications as NotificationsIcon,
+  NotificationsOff as NotificationsOffIcon,
+  ReportProblem as DisableIcon,
 } from "@mui/icons-material";
-import { get } from "lodash-es";
+import {
+  compact,
+  concat,
+  filter,
+  find,
+  get,
+  isEmpty,
+  map,
+  remove,
+} from "lodash-es";
 
 import type { ClaimProps } from "modules/claims/interfaces";
 import type { TagProps } from "modules/tags/interfaces";
@@ -31,14 +43,24 @@ import { useSnackbar } from "notistack";
 import { Spinner } from "common/components/Spinner";
 import { InviteFriends } from "./InviteFriends";
 import { useAuth } from "modules/auth/hooks/useAuth";
+import { UserRole } from "modules/auth/interfaces";
 
-export const ClaimSummary: FC<{ claim: ClaimProps }> = ({ claim }) => {
+export const ClaimSummary: FC<{ claim: ClaimProps }> = (props) => {
+  const [claim, setClaim] = useState(props.claim);
   const { session } = useAuth();
   const [isInviteFriendsDialogOpen, setIsInviteFriendsDialogOpen] =
     useState(false);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
-  const { deleteClaim } = useClaims();
+  const [isDisableDialogOpen, setIsDisableDialogOpen] = useState(false);
+  const [isDisabling, setIsDisabling] = useState(false);
+  const [isTogglingNotifications, setIsTogglingNotifications] = useState(false);
+  const {
+    deleteClaim,
+    disableClaim,
+    addFollowerToClaim,
+    removeFollowerFromClaim,
+  } = useClaims();
   const router = useRouter();
   const { enqueueSnackbar } = useSnackbar();
 
@@ -60,11 +82,108 @@ export const ClaimSummary: FC<{ claim: ClaimProps }> = ({ claim }) => {
       setIsDeleting(false);
     }
   };
+  const handleDisableDialogClose = () => setIsDisableDialogOpen(false);
+  const handleDisable = async () => {
+    setIsDisabling(true);
+
+    try {
+      await disableClaim({ id: claim?.id as string });
+      setIsDisableDialogOpen(false);
+      enqueueSnackbar("This claim has been sucesfully disabled!", {
+        variant: "success",
+      });
+      router.push("/");
+    } catch (e) {
+      enqueueSnackbar(e.message, {
+        variant: "error",
+      });
+    } finally {
+      setIsDisabling(false);
+    }
+  };
   const handleDeleteDialogClose = () => setIsDeleteDialogOpen(false);
   const handleInviteFriendsDialogClose = () =>
     setIsInviteFriendsDialogOpen(false);
+  const handleFollow = async () => {
+    setIsTogglingNotifications(true);
+
+    try {
+      await addFollowerToClaim({ id: claim?.id as string });
+      enqueueSnackbar("The notifications have been sucesfully enabled!", {
+        variant: "success",
+      });
+      const updatedClaim = {
+        ...claim,
+        followers: compact(concat(claim.followers, session.user)),
+      };
+      setClaim(updatedClaim);
+    } catch (e) {
+      enqueueSnackbar(e.message, {
+        variant: "error",
+      });
+    } finally {
+      setIsTogglingNotifications(false);
+    }
+  };
+  const handleUnfollow = async () => {
+    setIsTogglingNotifications(true);
+
+    try {
+      await removeFollowerFromClaim({ id: claim?.id as string });
+      enqueueSnackbar("The notifications have been sucesfully disabled!", {
+        variant: "success",
+      });
+      const updatedClaim = {
+        ...claim,
+        followers: filter(
+          claim.followers,
+          ({ id }) => id !== get(session, "user.id")
+        ),
+      };
+      setClaim(updatedClaim);
+    } catch (e) {
+      enqueueSnackbar(e.message, {
+        variant: "error",
+      });
+    } finally {
+      setIsTogglingNotifications(false);
+    }
+  };
 
   const canManageClaim = get(claim, "user.id") === get(session, "user.id");
+  const isFollowing = find(
+    get(claim, "followers"),
+    ({ id }) => id === get(session, "user.id")
+  );
+
+  const getNotificationsContent = () => {
+    if (isTogglingNotifications) {
+      return (
+        <IconButton>
+          <CircularProgress size={24} />
+        </IconButton>
+      );
+    } else if (isFollowing) {
+      return (
+        <Tooltip title="Stop following this claim" onClick={handleUnfollow}>
+          <IconButton>
+            <NotificationsOffIcon />
+          </IconButton>
+        </Tooltip>
+      );
+    } else {
+      return (
+        <Tooltip
+          title="Follow this claim to receive notifications whenever it is updated"
+          onClick={handleFollow}
+        >
+          <IconButton>
+            <NotificationsIcon />
+          </IconButton>
+        </Tooltip>
+      );
+    }
+  };
 
   return (
     <Stack spacing={3}>
@@ -93,11 +212,8 @@ export const ClaimSummary: FC<{ claim: ClaimProps }> = ({ claim }) => {
             open={isInviteFriendsDialogOpen}
             handleClose={handleInviteFriendsDialogClose}
           />
-          <Tooltip title="Follow this claim to receive notifications whenever it is updated">
-            <IconButton>
-              <NotificationsIcon />
-            </IconButton>
-          </Tooltip>
+
+          {getNotificationsContent()}
 
           {canManageClaim ? (
             <>
@@ -115,6 +231,36 @@ export const ClaimSummary: FC<{ claim: ClaimProps }> = ({ claim }) => {
               </Tooltip>
             </>
           ) : null}
+
+          {get(session, "user.role") === UserRole.ADMIN ? (
+            <Tooltip title="Disable this claim">
+              <IconButton onClick={() => setIsDisableDialogOpen(true)}>
+                <DisableIcon />
+              </IconButton>
+            </Tooltip>
+          ) : null}
+
+          <Dialog
+            open={isDisableDialogOpen}
+            onClose={handleDisableDialogClose}
+            fullWidth
+            maxWidth="xs"
+            aria-labelledby="disable-claim-dialog-title"
+          >
+            <DialogTitle id="disable-claim-dialog-title">
+              Disable this claim?
+            </DialogTitle>
+            {isDisabling ? (
+              <Spinner />
+            ) : (
+              <DialogActions>
+                <Button onClick={handleDisableDialogClose}>Cancel</Button>
+                <Button onClick={handleDisable} autoFocus>
+                  Disable
+                </Button>
+              </DialogActions>
+            )}
+          </Dialog>
 
           <Dialog
             open={isDeleteDialogOpen}
@@ -141,11 +287,31 @@ export const ClaimSummary: FC<{ claim: ClaimProps }> = ({ claim }) => {
       </Stack>
       <Divider></Divider>
       <Typography variant="body1">{claim?.summary}</Typography>
-      <Stack direction="row" spacing={1}>
-        {claim?.tags?.map(({ id, label }: TagProps) => (
-          <Chip key={id} label={label} />
-        ))}
-      </Stack>
+      {isEmpty(claim?.tags) ? null : (
+        <Stack direction="row" spacing={1}>
+          {claim?.tags?.map(({ id, label }: TagProps) => (
+            <Chip key={id} label={label} />
+          ))}
+        </Stack>
+      )}
+      {isEmpty(claim?.sources) ? null : (
+        <Stack spacing={1} alignItems="flex-start">
+          <Typography variant="body1" fontWeight="600">
+            Sources
+          </Typography>
+          <ul>
+            {map(claim?.sources, ({ id, url }) => (
+              <li>
+                <a href={url} rel="noreferrer" className="styled-link">
+                  <Typography variant="body1" sx={{ display: "inline" }}>
+                    {url}
+                  </Typography>
+                </a>
+              </li>
+            ))}
+          </ul>
+        </Stack>
+      )}
     </Stack>
   );
 };

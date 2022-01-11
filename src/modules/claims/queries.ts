@@ -17,7 +17,6 @@ export const GET_CLAIM = gql`
       ...CoreClaimFields
       sources {
         id
-        origin
         url
       }
       attributions {
@@ -40,6 +39,9 @@ export const GET_CLAIM = gql`
             avatar
           }
         }
+      }
+      followers {
+        id
       }
       opinions {
         id

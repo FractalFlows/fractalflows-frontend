@@ -20,6 +20,18 @@ const searchClaims = async ({
   return await ClaimsService.searchClaims({ term, limit, offset });
 };
 
+const disableClaim = async ({ id }: { id: string }) => {
+  return await ClaimsService.disableClaim({ id });
+};
+
+const addFollowerToClaim = async ({ id }: { id: string }) => {
+  return await ClaimsService.addFollowerToClaim({ id });
+};
+
+const removeFollowerFromClaim = async ({ id }: { id: string }) => {
+  return await ClaimsService.removeFollowerFromClaim({ id });
+};
+
 export const useClaims = () => {
   return {
     getClaim,
@@ -30,6 +42,9 @@ export const useClaims = () => {
     createClaim,
     updateClaim,
     deleteClaim,
+    disableClaim,
+    addFollowerToClaim,
+    removeFollowerFromClaim,
     inviteFriends,
     getKnowledgeBit,
     createKnowledgeBit,
