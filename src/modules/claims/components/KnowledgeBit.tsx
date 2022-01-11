@@ -37,6 +37,8 @@ import { useSnackbar } from "notistack";
 import { useKnowledgeBitsVotes } from "../hooks/useKnowledgeBitVotes";
 import { useRouter } from "next/router";
 import { useKnowledgeBits } from "../hooks/useKnowledgeBits";
+import { useAuth } from "modules/auth/hooks/useAuth";
+import { UserRole } from "modules/users/interfaces";
 
 enum KnowledgeBitStates {
   UPDATING,
@@ -62,6 +64,7 @@ export const KnowledgeBit: FC<KnowledgeBitComponentProps> = ({
   const isMenuOpen = Boolean(menuAnchorEl);
   const [isDeleting, setIsDeleting] = useState(false);
   const { enqueueSnackbar } = useSnackbar();
+  const { session, requireSignIn } = useAuth();
 
   const handleMenuOpen = (event: SyntheticEvent) => {
     event.preventDefault();
@@ -124,6 +127,9 @@ export const KnowledgeBit: FC<KnowledgeBitComponentProps> = ({
       setKnowledgeBitState(undefined);
     }
   };
+  const canManageKnowledgeBit =
+    get(knowledgeBit, "user.id") === get(session, "user.id") ||
+    get(session, "user.role") === UserRole.ADMIN;
 
   const userVote = find(
     userKnowledgeBitVotes,
@@ -140,9 +146,11 @@ export const KnowledgeBit: FC<KnowledgeBitComponentProps> = ({
               <Typography variant="body1">{knowledgeBit?.name}</Typography>
               <AvatarWithUsername user={knowledgeBit?.user} size={20} />
             </Stack>
-            <IconButton onClick={handleMenuOpen}>
-              <MoreVertIcon />
-            </IconButton>
+            {canManageKnowledgeBit ? (
+              <IconButton onClick={handleMenuOpen}>
+                <MoreVertIcon />
+              </IconButton>
+            ) : null}
             <Menu
               id="long-menu"
               anchorEl={menuAnchorEl}
@@ -163,7 +171,10 @@ export const KnowledgeBit: FC<KnowledgeBitComponentProps> = ({
             <Stack alignItems="center">
               <Tooltip title="Upvote">
                 <IconButton
-                  onClick={(ev) => handleVote(ev, KnowledgeBitVoteTypes.UPVOTE)}
+                  onClick={requireSignIn(
+                    (ev) => handleVote(ev, KnowledgeBitVoteTypes.UPVOTE),
+                    (ev) => ev.preventDefault()
+                  )}
                 >
                   {knowledgeBitState === KnowledgeBitStates.UPVOTING ? (
                     <CircularProgress size={24} />
@@ -179,11 +190,13 @@ export const KnowledgeBit: FC<KnowledgeBitComponentProps> = ({
               </Typography>
             </Stack>
             <Stack alignItems="center">
-              <Tooltip
-                title="Downvote"
-                onClick={(ev) => handleVote(ev, KnowledgeBitVoteTypes.DOWNVOTE)}
-              >
-                <IconButton>
+              <Tooltip title="Downvote">
+                <IconButton
+                  onClick={requireSignIn(
+                    (ev) => handleVote(ev, KnowledgeBitVoteTypes.DOWNVOTE),
+                    (ev) => ev.preventDefault()
+                  )}
+                >
                   {knowledgeBitState === KnowledgeBitStates.DOWNVOTING ? (
                     <CircularProgress size={24} />
                   ) : get(userVote, "type") ===

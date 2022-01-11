@@ -39,6 +39,7 @@ export const KNOWLEDGE_BIT_FIELDS = gql`
       identifier
     }
     user {
+      id
       avatar
       username
     }

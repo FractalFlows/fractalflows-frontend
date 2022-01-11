@@ -17,6 +17,12 @@ export enum UserClaimRelation {
   FOLLOWING = "FOLLOWING",
 }
 
+export enum UserRole {
+  NORMAL = "NORMAL",
+  ADMIN = "ADMIN",
+  VALIDATOR = "VALIDATOR",
+}
+
 export interface GetProfileProps {
   username: string;
   claimsRelation: UserClaimRelation;

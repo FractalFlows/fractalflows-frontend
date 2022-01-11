@@ -47,7 +47,7 @@ import { UserRole } from "modules/auth/interfaces";
 
 export const ClaimSummary: FC<{ claim: ClaimProps }> = (props) => {
   const [claim, setClaim] = useState(props.claim);
-  const { session } = useAuth();
+  const { session, requireSignIn } = useAuth();
   const [isInviteFriendsDialogOpen, setIsInviteFriendsDialogOpen] =
     useState(false);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
@@ -150,12 +150,14 @@ export const ClaimSummary: FC<{ claim: ClaimProps }> = (props) => {
     }
   };
 
-  const canManageClaim = get(claim, "user.id") === get(session, "user.id");
+  const canManageClaim =
+    get(claim, "user.id") === get(session, "user.id") ||
+    get(session, "user.role") === UserRole.ADMIN;
   const isFollowing = find(
     get(claim, "followers"),
     ({ id }) => id === get(session, "user.id")
   );
-
+  console.log(get(session, "user.role") === UserRole.ADMIN);
   const getNotificationsContent = () => {
     if (isTogglingNotifications) {
       return (
@@ -175,7 +177,7 @@ export const ClaimSummary: FC<{ claim: ClaimProps }> = (props) => {
       return (
         <Tooltip
           title="Follow this claim to receive notifications whenever it is updated"
-          onClick={handleFollow}
+          onClick={requireSignIn(handleFollow)}
         >
           <IconButton>
             <NotificationsIcon />
@@ -204,7 +206,9 @@ export const ClaimSummary: FC<{ claim: ClaimProps }> = (props) => {
         <Box flexGrow="1" />
         <Stack direction="row">
           <Tooltip title="Invite friends to participate in this claim">
-            <IconButton onClick={() => setIsInviteFriendsDialogOpen(true)}>
+            <IconButton
+              onClick={requireSignIn(() => setIsInviteFriendsDialogOpen(true))}
+            >
               <InviteFriendsIcon />
             </IconButton>
           </Tooltip>

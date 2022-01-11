@@ -21,6 +21,7 @@ import { Link } from "common/components/Link";
 import { Search } from "./Search";
 import styles from "./Header.module.css";
 import { useApp } from "modules/app/useApp";
+import { useRouter } from "next/router";
 
 export const Header = () => {
   const { isChangingRoutes } = useApp();
