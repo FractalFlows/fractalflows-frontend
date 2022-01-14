@@ -157,7 +157,6 @@ export const ClaimSummary: FC<{ claim: ClaimProps }> = (props) => {
     get(claim, "followers"),
     ({ id }) => id === get(session, "user.id")
   );
-  console.log(get(session, "user.role") === UserRole.ADMIN);
   const getNotificationsContent = () => {
     if (isTogglingNotifications) {
       return (
@@ -244,6 +243,15 @@ export const ClaimSummary: FC<{ claim: ClaimProps }> = (props) => {
             </Tooltip>
           ) : null}
 
+          {get(claim, "user.username") ===
+          process.env.NEXT_PUBLIC_FRACTALFLOWS_BOT_USERNAME ? (
+            <Link href={`/claim/${claim?.slug}/own`}>
+              <Button variant="contained" sx={{ marginLeft: 2 }}>
+                Own this claim
+              </Button>
+            </Link>
+          ) : null}
+
           <Dialog
             open={isDisableDialogOpen}
             onClose={handleDisableDialogClose}
@@ -305,7 +313,7 @@ export const ClaimSummary: FC<{ claim: ClaimProps }> = (props) => {
           </Typography>
           <ul>
             {map(claim?.sources, ({ id, url }) => (
-              <li>
+              <li key={id}>
                 <a href={url} rel="noreferrer" className="styled-link">
                   <Typography variant="body1" sx={{ display: "inline" }}>
                     {url}

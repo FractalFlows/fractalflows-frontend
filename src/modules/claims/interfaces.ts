@@ -115,6 +115,8 @@ export interface ClaimProps {
   opinions?: OpinionProps[];
   createdAt: Date;
   user: UserProps;
+  tweetId: string;
+  tweetOwner: string;
 }
 
 export interface PaginatedClaimsProps {

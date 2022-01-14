@@ -31,7 +31,6 @@ export const AuthWall = () => {
   });
   const { enqueueSnackbar } = useSnackbar();
   const router = useRouter();
-  console.log(router);
   const handleMagicLinkFormSubmit = async ({ email }: MagicLinkFormProps) => {
     try {
       await sendMagicLink({ email });

@@ -67,6 +67,7 @@ export const GET_PARTIAL_CLAIM = gql`
   query GetPartialClaim($slug: String!) {
     claim(slug: $slug) {
       ...CoreClaimFields
+      tweetOwner
       sources {
         id
         origin
