@@ -22,6 +22,7 @@ export const GET_SESSION = gql`
         avatar
         avatarSource
         role
+        twitter
       }
     }
   }

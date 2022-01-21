@@ -44,9 +44,9 @@ enum ClaimCallbackOperations {
   REQUEST_OWNERSHIP = "REQUEST_OWNERSHIP",
 }
 
-export const ClaimSummary: FC<{ claim: ClaimProps }> = (props) => {
-  const [claim, setClaim] = useState(props.claim);
+export const ClaimSummary: FC = (props) => {
   const { session, requireSignIn } = useAuth();
+  const { claim, setClaim, requestClaimOwnership } = useClaims();
   const [isInviteFriendsDialogOpen, setIsInviteFriendsDialogOpen] =
     useState(false);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
@@ -161,7 +161,12 @@ export const ClaimSummary: FC<{ claim: ClaimProps }> = (props) => {
       setIsConnectTwitterAccountDialogOpen(true);
     } else {
       try {
+        await requestClaimOwnership({ id: claim.id });
+        enqueueSnackbar("Your are now the owner of this claim!", {
+          variant: "success",
+        });
       } catch (e: any) {
+        enqueueSnackbar(e?.message || e, { variant: "error" });
       } finally {
         setIsRequestingOwnership(false);
       }
@@ -212,7 +217,7 @@ export const ClaimSummary: FC<{ claim: ClaimProps }> = (props) => {
   };
 
   useEffect(() => {
-    if (router.isReady && router.query.callbackOperation) {
+    if (router.isReady && claim?.id && router.query.callbackOperation) {
       if (
         router.query.callbackOperation ===
         ClaimCallbackOperations.REQUEST_OWNERSHIP
@@ -220,9 +225,9 @@ export const ClaimSummary: FC<{ claim: ClaimProps }> = (props) => {
         handleRequestOwnership();
       }
 
-      // router.replace(window.location.href);
+      router.replace(window.location.pathname, undefined, { shallow: true });
     }
-  }, [router.isReady]);
+  }, [router.isReady, claim?.id]);
 
   return (
     <Stack spacing={3}>
@@ -317,7 +322,7 @@ export const ClaimSummary: FC<{ claim: ClaimProps }> = (props) => {
             aria-labelledby="connect-twitter-account-dialog-title"
           >
             <DialogTitle id="connect-twitter-account-dialog-title">
-              Connect Twitter account
+              Connect your Twitter account
             </DialogTitle>
             <DialogContent>
               <Stack spacing={2}>

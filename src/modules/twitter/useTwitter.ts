@@ -21,10 +21,10 @@ export const validateOAuth = async ({
     oauthToken,
     oauthVerifier,
   });
-  AuthCache.sessionVar({
-    ...AuthCache.sessionVar,
+  AuthCache.session({
+    ...AuthCache.session,
     user: {
-      ...AuthCache.sessionVar().user,
+      ...AuthCache.session().user,
       twitter: twitterUsername,
     },
   });

@@ -14,6 +14,7 @@ import {
   SAVE_OPINION,
   ADD_FOLLOWER_TO_CLAIM,
   REMOVE_FOLLOWER_FROM_CLAIM,
+  REQUEST_CLAIM_OWNERSHIP,
 } from "../mutations";
 import {
   GET_CLAIM,
@@ -187,6 +188,17 @@ export const ClaimsService = {
     });
 
     return data.removeFollowerFromClaim;
+  },
+
+  async requestOwnership({ id }: { id: string }): Promise<boolean> {
+    const { data } = await apolloClient.mutate({
+      mutation: REQUEST_CLAIM_OWNERSHIP,
+      variables: {
+        id,
+      },
+    });
+
+    return data.requestClaimOwnership;
   },
 
   async inviteFriends({

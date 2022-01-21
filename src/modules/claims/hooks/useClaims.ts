@@ -1,3 +1,5 @@
+import { gql, useQuery } from "@apollo/client";
+
 import { getClaim, getPartialClaim, getClaims, getTrendingClaims } from "./get";
 import { createClaim } from "./create";
 import { updateClaim } from "./update";
@@ -11,6 +13,10 @@ import {
 } from "./knowledgeBit";
 import { ClaimsService } from "../services/claims";
 import { PaginationProps } from "modules/interfaces";
+import { ClaimsCache } from "../cache";
+import { ClaimProps } from "../interfaces";
+import { apolloClient } from "common/services/apollo/client";
+import { AuthCache } from "modules/auth/cache";
 
 const searchClaims = async ({
   term,
@@ -32,9 +38,33 @@ const removeFollowerFromClaim = async ({ id }: { id: string }) => {
   return await ClaimsService.removeFollowerFromClaim({ id });
 };
 
+const requestClaimOwnership = async ({ id }: { id: string }) => {
+  const result = await ClaimsService.requestOwnership({ id });
+  ClaimsCache.claim({
+    ...ClaimsCache.claim(),
+    user: AuthCache.session().user,
+  });
+  return result;
+};
+
+const setClaim = (claim: ClaimProps) => ClaimsCache.claim(claim);
+
 export const useClaims = () => {
+  const {
+    data: { claim },
+  } = useQuery(
+    gql`
+      query Claim {
+        claim @client
+      }
+    `,
+    { client: apolloClient }
+  );
+
   return {
+    claim,
     getClaim,
+    setClaim,
     getPartialClaim,
     getClaims,
     getTrendingClaims,
@@ -46,6 +76,7 @@ export const useClaims = () => {
     addFollowerToClaim,
     removeFollowerFromClaim,
     inviteFriends,
+    requestClaimOwnership,
     getKnowledgeBit,
     createKnowledgeBit,
     updateKnowledgeBit,
