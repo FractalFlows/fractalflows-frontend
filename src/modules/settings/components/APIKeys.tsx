@@ -58,7 +58,7 @@ export const APIKeys = () => {
       );
     } catch (e: any) {
       setAPIKeyState(undefined);
-      enqueueSnackbar(e.message, {
+      enqueueSnackbar(e?.message, {
         variant: "error",
       });
     }
@@ -77,7 +77,7 @@ export const APIKeys = () => {
         variant: "success",
       });
     } catch (e: any) {
-      enqueueSnackbar(e.message, {
+      enqueueSnackbar(e?.message, {
         variant: "error",
       });
     } finally {
@@ -115,8 +115,8 @@ export const APIKeys = () => {
             : undefined
         );
       })
-      .catch((e) =>
-        enqueueSnackbar(e.message, {
+      .catch((e: any) =>
+        enqueueSnackbar(e?.message, {
           variant: "error",
         })
       );

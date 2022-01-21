@@ -31,13 +31,12 @@ export const AuthWall = () => {
   });
   const { enqueueSnackbar } = useSnackbar();
   const router = useRouter();
-  console.log(router);
   const handleMagicLinkFormSubmit = async ({ email }: MagicLinkFormProps) => {
     try {
       await sendMagicLink({ email });
       setHasMagicLinkBeenSent(true);
     } catch (e: any) {
-      enqueueSnackbar(e.message, {
+      enqueueSnackbar(e?.message, {
         variant: "error",
       });
     }
@@ -49,7 +48,7 @@ export const AuthWall = () => {
     try {
       await signInWithEthereum(signInCallback);
     } catch (e: any) {
-      enqueueSnackbar(e.message || e, {
+      enqueueSnackbar(e?.message || e, {
         variant: "error",
       });
     } finally {

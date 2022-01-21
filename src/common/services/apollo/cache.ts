@@ -9,10 +9,10 @@ const cacheOptions = {
     Query: {
       fields: {
         session: {
-          read: () => AuthCache.sessionVar(),
+          read: () => AuthCache.session(),
         },
         isSignedIn: {
-          read: () => AuthCache.isSignedInVar(),
+          read: () => AuthCache.isSignedIn(),
         },
         trendingClaims: {
           keyArgs: false,
@@ -22,6 +22,9 @@ const cacheOptions = {
         },
         isChangingRoutes: {
           read: () => AppCache.isChangingRoutes(),
+        },
+        claim: {
+          read: () => ClaimsCache.claim(),
         },
         knowledgeBits: {
           read: () => ClaimsCache.knowledgeBits(),

@@ -30,7 +30,8 @@ export const ClaimTile: FC<{ claim: ClaimProps }> = ({ claim }) => {
             </Typography>
             {claim?.user ? (
               <AuthorBlock
-                user={claim.user}
+                user={claim?.user}
+                origin={claim?.origin}
                 createdAt={claim?.createdAt}
                 size={25}
               />

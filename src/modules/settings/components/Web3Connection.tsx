@@ -37,7 +37,7 @@ export const Web3Connection = () => {
         variant: "success",
       });
     } catch (e: any) {
-      enqueueSnackbar(e.message || e, {
+      enqueueSnackbar(e?.message || e, {
         variant: "error",
       });
     } finally {

@@ -38,8 +38,8 @@ export const Opine: FC = () => {
         variant: "success",
       });
       setIsOpining(false);
-    } catch (e) {
-      enqueueSnackbar(e.message, {
+    } catch (e: any) {
+      enqueueSnackbar(e?.message, {
         variant: "error",
       });
     } finally {

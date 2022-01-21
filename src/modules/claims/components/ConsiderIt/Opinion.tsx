@@ -147,7 +147,7 @@ export const Opinion = () => {
     setIsLoadingOpinion(true);
     getOpinion({ id: showOpinionId })
       .then((data) => setOpinion(data))
-      .catch((e) => enqueueSnackbar(e.message, { variant: "error" }))
+      .catch((e: any) => enqueueSnackbar(e?.message, { variant: "error" }))
       .finally(() => setIsLoadingOpinion(false));
   }, [showOpinionId]);
 

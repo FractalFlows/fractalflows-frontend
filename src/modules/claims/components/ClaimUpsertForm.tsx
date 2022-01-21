@@ -143,7 +143,7 @@ export const ClaimUpsertForm: FC<ClaimUpsertFormProps> = ({
       });
       router.push(`/claim/${slug}`);
     } catch (e: any) {
-      enqueueSnackbar(e.message, {
+      enqueueSnackbar(e?.message, {
         variant: "error",
       });
     }
@@ -157,7 +157,7 @@ export const ClaimUpsertForm: FC<ClaimUpsertFormProps> = ({
         const tags = await searchTags({ term });
         setTagsOptions(tags.map(({ id, label }: TagProps) => ({ id, label })));
       } catch (e: any) {
-        enqueueSnackbar(e.message, {
+        enqueueSnackbar(e?.message, {
           variant: "error",
         });
       } finally {

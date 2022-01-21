@@ -21,6 +21,7 @@ import { useSnackbar } from "notistack";
 import { useRouter } from "next/router";
 import { useKnowledgeBits } from "modules/claims/hooks/useKnowledgeBits";
 import { useKnowledgeBitsVotes } from "modules/claims/hooks/useKnowledgeBitVotes";
+import { useClaims } from "modules/claims/hooks/useClaims";
 
 interface ClaimPageProps {
   data: {
@@ -37,6 +38,7 @@ const Claim: NextPage<ClaimPageProps> = ({
   const { setUserOpinion, setOpinions, getUserOpinion } = useOpinions();
   const { setKnowledgeBits } = useKnowledgeBits();
   const { getUserKnowledgeBitVotes } = useKnowledgeBitsVotes();
+  const { setClaim } = useClaims();
   const { setArguments } = useArguments();
   const { isSignedIn } = useAuth();
   const { enqueueSnackbar } = useSnackbar();
@@ -44,6 +46,7 @@ const Claim: NextPage<ClaimPageProps> = ({
   const { slug }: { slug?: string } = router.query;
 
   useEffect(() => {
+    setClaim(claim);
     setKnowledgeBits(knowledgeBits || []);
     setArguments(claim.arguments || []);
     setOpinions(claim.opinions || []);
@@ -58,11 +61,11 @@ const Claim: NextPage<ClaimPageProps> = ({
 
   useEffect(() => {
     if (isSignedIn && slug) {
-      getUserOpinion({ claimSlug: slug }).catch((e) =>
-        enqueueSnackbar(e.message, { variant: "error" })
+      getUserOpinion({ claimSlug: slug }).catch((e: any) =>
+        enqueueSnackbar(e?.message, { variant: "error" })
       );
-      getUserKnowledgeBitVotes({ claimSlug: slug }).catch((e) =>
-        enqueueSnackbar(e.message, { variant: "error" })
+      getUserKnowledgeBitVotes({ claimSlug: slug }).catch((e: any) =>
+        enqueueSnackbar(e?.message, { variant: "error" })
       );
     }
   }, [isSignedIn, slug]);
@@ -75,7 +78,7 @@ const Claim: NextPage<ClaimPageProps> = ({
       </Head>
 
       <Stack spacing={14}>
-        <ClaimSummary claim={claim} />
+        <ClaimSummary />
         <KnowledgeBits userVotes={userKnowledgeBitVotes} />
         <SocialOpinions />
         <RelatedClaims relatedClaims={relatedClaims} />

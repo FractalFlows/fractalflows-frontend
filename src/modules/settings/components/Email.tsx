@@ -36,7 +36,7 @@ export const Email = () => {
         variant: "success",
       });
     } catch (e: any) {
-      enqueueSnackbar(e.message, {
+      enqueueSnackbar(e?.message, {
         variant: "error",
       });
     }

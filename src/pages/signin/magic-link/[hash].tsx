@@ -30,7 +30,7 @@ const MagicLinkVerification = () => {
             router.push("/");
           }, 3000);
         })
-        .catch((e) => {
+        .catch((e: any) => {
           setMagicLinkVerificationStatus(MagicLinkVerificationStatus.FAILED);
           setMagicLinkVerificationError(e);
         });

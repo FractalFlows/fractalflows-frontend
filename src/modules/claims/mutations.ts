@@ -43,6 +43,12 @@ export const REMOVE_FOLLOWER_FROM_CLAIM = gql`
   }
 `;
 
+export const REQUEST_CLAIM_OWNERSHIP = gql`
+  mutation RequestClaimOwnership($id: String!) {
+    requestClaimOwnership(id: $id)
+  }
+`;
+
 export const INVITE_FRIENDS = gql`
   mutation InviteFriends($inviteFriendsInput: InviteFriendsInput!) {
     inviteFriends(inviteFriendsInput: $inviteFriendsInput)

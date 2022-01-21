@@ -101,6 +101,11 @@ export interface KnowledgeBitVoteProps {
   type: KnowledgeBitVoteTypes;
 }
 
+export enum ClaimOrigins {
+  FRACTALFLOWS = "FRACTALFLOWS",
+  TWITTER = "Twitter",
+}
+
 export interface ClaimProps {
   id?: string;
   title: string;
@@ -115,6 +120,9 @@ export interface ClaimProps {
   opinions?: OpinionProps[];
   createdAt: Date;
   user: UserProps;
+  tweetId?: string;
+  tweetOwner?: string;
+  origin?: ClaimOrigins;
 }
 
 export interface PaginatedClaimsProps {

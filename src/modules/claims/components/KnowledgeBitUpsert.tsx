@@ -206,7 +206,7 @@ export const KnowledgeBitUpsert: FC<KnowledgeBitUpsertProps> = ({
       );
       handleClose();
     } catch (e: any) {
-      enqueueSnackbar(e.message, {
+      enqueueSnackbar(e?.message, {
         variant: "error",
       });
     }

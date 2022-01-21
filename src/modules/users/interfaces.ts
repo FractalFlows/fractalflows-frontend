@@ -3,6 +3,7 @@ export interface UserProps {
   username: string;
   avatar?: string;
   ethAddress?: string;
+  twitter?: string;
 }
 
 export interface ProfileProps {

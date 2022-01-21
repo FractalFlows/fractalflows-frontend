@@ -83,7 +83,7 @@ export const Header = () => {
       <Link href={`/profile/${user?.username}`}>
         <MenuItem onClick={handleMenuClose}>Profile</MenuItem>
       </Link>
-      <Link href="/settings">
+      <Link href="/settings/profile">
         <MenuItem onClick={handleMenuClose}>Settings</MenuItem>
       </Link>
       <MenuItem

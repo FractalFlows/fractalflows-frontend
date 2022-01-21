@@ -55,7 +55,7 @@ export const ArgumentComment: FC<ArgumentCommentComponentProps> = ({
       });
       handleDelete && handleDelete(argumentComment);
     } catch (e: any) {
-      enqueueSnackbar(e.message, {
+      enqueueSnackbar(e?.message, {
         variant: "error",
       });
     } finally {
