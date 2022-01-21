@@ -1,6 +1,7 @@
 .hero {
   background-image: url(/images/background.png);
   background-position: bottom;
+  background-size: cover;
   width: 100%;
   padding-top: 10vh;
   padding-bottom: 10vh;
