@@ -27,8 +27,8 @@ const EditClaim: NextPage = () => {
     if (slug) {
       getPartialClaim({ slug })
         .then((data) => setClaim(data))
-        .catch((e) =>
-          enqueueSnackbar(e.message, {
+        .catch((e: any) =>
+          enqueueSnackbar(e?.message, {
             variant: "error",
           })
         );

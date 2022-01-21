@@ -1,4 +1,4 @@
-import { FC, useState } from "react";
+import { FC, useEffect, useState } from "react";
 import { useRouter } from "next/router";
 import {
   Typography,
@@ -13,6 +13,7 @@ import {
   DialogActions,
   Button,
   CircularProgress,
+  DialogContent,
 } from "@mui/material";
 import {
   Edit as EditIcon,
@@ -22,16 +23,7 @@ import {
   NotificationsOff as NotificationsOffIcon,
   ReportProblem as DisableIcon,
 } from "@mui/icons-material";
-import {
-  compact,
-  concat,
-  filter,
-  find,
-  get,
-  isEmpty,
-  map,
-  remove,
-} from "lodash-es";
+import { compact, concat, filter, find, get, isEmpty, map } from "lodash-es";
 
 import type { ClaimProps } from "modules/claims/interfaces";
 import type { TagProps } from "modules/tags/interfaces";
@@ -44,6 +36,13 @@ import { Spinner } from "common/components/Spinner";
 import { InviteFriends } from "./InviteFriends";
 import { useAuth } from "modules/auth/hooks/useAuth";
 import { UserRole } from "modules/auth/interfaces";
+import { ConnectTwitter } from "common/components/ConnectTwitter";
+import styles from "./Summary.module.css";
+import { LoadingButton } from "@mui/lab";
+
+enum ClaimCallbackOperations {
+  REQUEST_OWNERSHIP = "REQUEST_OWNERSHIP",
+}
 
 export const ClaimSummary: FC<{ claim: ClaimProps }> = (props) => {
   const [claim, setClaim] = useState(props.claim);
@@ -54,6 +53,11 @@ export const ClaimSummary: FC<{ claim: ClaimProps }> = (props) => {
   const [isDeleting, setIsDeleting] = useState(false);
   const [isDisableDialogOpen, setIsDisableDialogOpen] = useState(false);
   const [isDisabling, setIsDisabling] = useState(false);
+  const [isRequestingOwnership, setIsRequestingOwnership] = useState(false);
+  const [
+    isConnectTwitterAccountDialogOpen,
+    setIsConnectTwitterAccountDialogOpen,
+  ] = useState(false);
   const [isTogglingNotifications, setIsTogglingNotifications] = useState(false);
   const {
     deleteClaim,
@@ -74,8 +78,8 @@ export const ClaimSummary: FC<{ claim: ClaimProps }> = (props) => {
         variant: "success",
       });
       router.push("/");
-    } catch (e) {
-      enqueueSnackbar(e.message, {
+    } catch (e: any) {
+      enqueueSnackbar(e?.message, {
         variant: "error",
       });
     } finally {
@@ -93,8 +97,8 @@ export const ClaimSummary: FC<{ claim: ClaimProps }> = (props) => {
         variant: "success",
       });
       router.push("/");
-    } catch (e) {
-      enqueueSnackbar(e.message, {
+    } catch (e: any) {
+      enqueueSnackbar(e?.message, {
         variant: "error",
       });
     } finally {
@@ -117,8 +121,8 @@ export const ClaimSummary: FC<{ claim: ClaimProps }> = (props) => {
         followers: compact(concat(claim.followers, session.user)),
       };
       setClaim(updatedClaim);
-    } catch (e) {
-      enqueueSnackbar(e.message, {
+    } catch (e: any) {
+      enqueueSnackbar(e?.message, {
         variant: "error",
       });
     } finally {
@@ -141,8 +145,8 @@ export const ClaimSummary: FC<{ claim: ClaimProps }> = (props) => {
         ),
       };
       setClaim(updatedClaim);
-    } catch (e) {
-      enqueueSnackbar(e.message, {
+    } catch (e: any) {
+      enqueueSnackbar(e?.message, {
         variant: "error",
       });
     } finally {
@@ -150,9 +154,30 @@ export const ClaimSummary: FC<{ claim: ClaimProps }> = (props) => {
     }
   };
 
+  const handleRequestOwnership = async () => {
+    setIsRequestingOwnership(true);
+
+    if (isEmpty(get(session, "user.twitter"))) {
+      setIsConnectTwitterAccountDialogOpen(true);
+    } else {
+      try {
+      } catch (e: any) {
+      } finally {
+        setIsRequestingOwnership(false);
+      }
+    }
+  };
+  const handleConnectTwitterAccountDialogClose = () => {
+    setIsConnectTwitterAccountDialogOpen(false);
+    setIsRequestingOwnership(false);
+  };
+
   const canManageClaim =
     get(claim, "user.id") === get(session, "user.id") ||
     get(session, "user.role") === UserRole.ADMIN;
+  const canRequestOwnership =
+    isEmpty(get(session, "user.twitter")) ||
+    get(claim, "tweetOwner") === get(session, "user.twitter");
   const isFollowing = find(
     get(claim, "followers"),
     ({ id }) => id === get(session, "user.id")
@@ -186,6 +211,19 @@ export const ClaimSummary: FC<{ claim: ClaimProps }> = (props) => {
     }
   };
 
+  useEffect(() => {
+    if (router.isReady && router.query.callbackOperation) {
+      if (
+        router.query.callbackOperation ===
+        ClaimCallbackOperations.REQUEST_OWNERSHIP
+      ) {
+        handleRequestOwnership();
+      }
+
+      // router.replace(window.location.href);
+    }
+  }, [router.isReady]);
+
   return (
     <Stack spacing={3}>
       <Typography variant="h3" component="h1">
@@ -199,6 +237,7 @@ export const ClaimSummary: FC<{ claim: ClaimProps }> = (props) => {
       >
         <AuthorBlock
           user={claim?.user}
+          origin={claim?.origin}
           createdAt={claim?.createdAt}
           size={40}
         />
@@ -245,12 +284,60 @@ export const ClaimSummary: FC<{ claim: ClaimProps }> = (props) => {
 
           {get(claim, "user.username") ===
           process.env.NEXT_PUBLIC_FRACTALFLOWS_BOT_USERNAME ? (
-            <Link href={`/claim/${claim?.slug}/own`}>
-              <Button variant="contained" sx={{ marginLeft: 2 }}>
-                Own this claim
-              </Button>
-            </Link>
+            <Tooltip
+              title={
+                canRequestOwnership === false
+                  ? `Only the original tweet owner, @${get(
+                      claim,
+                      "tweetOwner"
+                    )}, can request ownership over this claim`
+                  : ""
+              }
+            >
+              {/* This extra div is necessary to make the pointer-events work and active the tooltip when the button is disabled */}
+              <div>
+                <LoadingButton
+                  variant="contained"
+                  sx={{ marginLeft: 2 }}
+                  loading={isRequestingOwnership}
+                  onClick={requireSignIn(handleRequestOwnership)}
+                  disabled={canRequestOwnership === false}
+                >
+                  Request ownership
+                </LoadingButton>
+              </div>
+            </Tooltip>
           ) : null}
+
+          <Dialog
+            open={isConnectTwitterAccountDialogOpen}
+            onClose={handleConnectTwitterAccountDialogClose}
+            fullWidth
+            maxWidth="xs"
+            aria-labelledby="connect-twitter-account-dialog-title"
+          >
+            <DialogTitle id="connect-twitter-account-dialog-title">
+              Connect Twitter account
+            </DialogTitle>
+            <DialogContent>
+              <Stack spacing={2}>
+                <Typography variant="body1">
+                  In order to request ownership over this claim, you&apos;ll
+                  need to connect your Twitter account to prove you are the
+                  original tweet owner,{" "}
+                  <strong>@{get(claim, "tweetOwner")}</strong>.
+                </Typography>
+                <ConnectTwitter
+                  callbackOperation={ClaimCallbackOperations.REQUEST_OWNERSHIP}
+                />
+              </Stack>
+            </DialogContent>
+            <DialogActions>
+              <Button onClick={handleConnectTwitterAccountDialogClose}>
+                Cancel
+              </Button>
+            </DialogActions>
+          </Dialog>
 
           <Dialog
             open={isDisableDialogOpen}
@@ -311,7 +398,7 @@ export const ClaimSummary: FC<{ claim: ClaimProps }> = (props) => {
           <Typography variant="body1" fontWeight="600">
             Sources
           </Typography>
-          <ul>
+          <ul className={styles.sources}>
             {map(claim?.sources, ({ id, url }) => (
               <li key={id}>
                 <a href={url} rel="noreferrer" className="styled-link">

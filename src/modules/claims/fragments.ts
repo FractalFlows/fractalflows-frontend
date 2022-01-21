@@ -6,6 +6,7 @@ export const CORE_CLAIM_FIELDS = gql`
     title
     summary
     slug
+    origin
     createdAt
     user {
       id

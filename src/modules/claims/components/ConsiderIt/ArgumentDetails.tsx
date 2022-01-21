@@ -72,7 +72,7 @@ export const ArgumentDetails: FC<ArgumentDetailsProps> = ({ argumentId }) => {
     setIsLoadingArgument(true);
     getArgument({ id: argumentId })
       .then((data) => setArgument(data))
-      .catch((e) => enqueueSnackbar(e.message, { variant: "error" }))
+      .catch((e: any) => enqueueSnackbar(e?.message, { variant: "error" }))
       .finally(() => setIsLoadingArgument(false));
   }, [argumentId]);
 

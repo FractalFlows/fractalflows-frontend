@@ -15,6 +15,7 @@ export const GET_CLAIM = gql`
   query GetClaim($slug: String!) {
     claim(slug: $slug) {
       ...CoreClaimFields
+      tweetOwner
       sources {
         id
         url

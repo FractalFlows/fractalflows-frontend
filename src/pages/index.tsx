@@ -53,8 +53,8 @@ const Home: NextPage<HomeProps> = (serverProps) => {
         const trendingClaims = await getTrendingClaims(pagination);
         setClaims(trendingClaims.data);
         setTotalCount(trendingClaims.totalCount);
-      } catch (e) {
-        enqueueSnackbar(e.message, {
+      } catch (e: any) {
+        enqueueSnackbar(e?.message, {
           variant: "error",
         });
       } finally {
@@ -65,8 +65,8 @@ const Home: NextPage<HomeProps> = (serverProps) => {
         const allClaims = await getClaims(pagination);
         setClaims(allClaims.data);
         setTotalCount(allClaims.totalCount);
-      } catch (e) {
-        enqueueSnackbar(e.message, {
+      } catch (e: any) {
+        enqueueSnackbar(e?.message, {
           variant: "error",
         });
       } finally {
@@ -87,8 +87,8 @@ const Home: NextPage<HomeProps> = (serverProps) => {
       const allClaims = await getClaims({ limit, offset: updatedOffset });
       setClaims([...claims, ...allClaims.data]);
       setTotalCount(allClaims.totalCount);
-    } catch (e) {
-      enqueueSnackbar(e.message, {
+    } catch (e: any) {
+      enqueueSnackbar(e?.message, {
         variant: "error",
       });
     } finally {

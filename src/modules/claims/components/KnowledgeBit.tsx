@@ -91,7 +91,7 @@ export const KnowledgeBit: FC<KnowledgeBitComponentProps> = ({
         variant: "success",
       });
     } catch (e: any) {
-      enqueueSnackbar(e.message, {
+      enqueueSnackbar(e?.message, {
         variant: "error",
       });
     } finally {
@@ -120,7 +120,7 @@ export const KnowledgeBit: FC<KnowledgeBitComponentProps> = ({
         type,
       });
     } catch (e: any) {
-      enqueueSnackbar(e.message, {
+      enqueueSnackbar(e?.message, {
         variant: "error",
       });
     } finally {

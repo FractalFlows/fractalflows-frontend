@@ -58,11 +58,11 @@ const Claim: NextPage<ClaimPageProps> = ({
 
   useEffect(() => {
     if (isSignedIn && slug) {
-      getUserOpinion({ claimSlug: slug }).catch((e) =>
-        enqueueSnackbar(e.message, { variant: "error" })
+      getUserOpinion({ claimSlug: slug }).catch((e: any) =>
+        enqueueSnackbar(e?.message, { variant: "error" })
       );
-      getUserKnowledgeBitVotes({ claimSlug: slug }).catch((e) =>
-        enqueueSnackbar(e.message, { variant: "error" })
+      getUserKnowledgeBitVotes({ claimSlug: slug }).catch((e: any) =>
+        enqueueSnackbar(e?.message, { variant: "error" })
       );
     }
   }, [isSignedIn, slug]);

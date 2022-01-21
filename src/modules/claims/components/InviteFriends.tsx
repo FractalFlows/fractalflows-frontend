@@ -64,7 +64,7 @@ export const InviteFriends: FC<InviteFriendsProps> = ({
       reset(defaultValues);
       handleClose();
     } catch (e: any) {
-      enqueueSnackbar(e.message, {
+      enqueueSnackbar(e?.message, {
         variant: "error",
       });
     }

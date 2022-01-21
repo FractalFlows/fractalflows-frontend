@@ -81,7 +81,7 @@ export const ArgumentCommentUpsertForm: FC<ArgumentCommentUpsertFormProps> = ({
       handleSuccess && handleSuccess(savedArgumentComment);
       handleClose && handleClose();
     } catch (e: any) {
-      enqueueSnackbar(e.message, {
+      enqueueSnackbar(e?.message, {
         variant: "error",
       });
     }

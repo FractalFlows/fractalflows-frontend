@@ -8,7 +8,7 @@ export const getSession = async () => {
     const session = await AuthService.getSession();
     AuthCache.sessionVar(session);
     AuthCache.isSignedInVar(true);
-  } catch (e) {
+  } catch (e: any) {
     AuthCache.sessionVar({} as Session);
     AuthCache.isSignedInVar(false);
   }
@@ -19,7 +19,7 @@ export const reloadSession = async () => {
     const session = await AuthService.getSession();
     AuthCache.sessionVar(session);
     AuthCache.isSignedInVar(true);
-  } catch (e) {
+  } catch (e: any) {
     AuthCache.sessionVar({} as Session);
     AuthCache.isSignedInVar(false);
   }

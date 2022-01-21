@@ -114,7 +114,7 @@ export const Search = () => {
       setTotalCount(searchedClaims.totalCount);
       setSearchResults(sortResults(searchedClaims.data));
     } catch (e: any) {
-      enqueueSnackbar(e.message, { variant: "error" });
+      enqueueSnackbar(e?.message, { variant: "error" });
     } finally {
       setIsLoading(false);
     }
@@ -140,7 +140,7 @@ export const Search = () => {
       ]);
       setTotalCount(moreSearchedClaims.totalCount);
     } catch (e: any) {
-      enqueueSnackbar(e.message, { variant: "error" });
+      enqueueSnackbar(e?.message, { variant: "error" });
     } finally {
       setIsLoadingMore(false);
     }
