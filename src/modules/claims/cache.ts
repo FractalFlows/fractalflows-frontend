@@ -15,6 +15,6 @@ export const ClaimsCache = {
   opinions: makeVar([] as OpinionProps[]),
   isOpining: makeVar(false),
   userOpinion: makeVar({} as OpinionProps),
-  showOpinionId: makeVar(null),
+  showOpinionId: makeVar(""),
   userKnowledgeBitVotes: makeVar([] as KnowledgeBitVoteProps[]),
 };

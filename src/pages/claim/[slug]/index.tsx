@@ -2,6 +2,7 @@ import { useEffect } from "react";
 import { Box, Stack } from "@mui/material";
 import type { NextPage } from "next";
 import Head from "next/head";
+import { map, get } from "lodash-es";
 
 import {
   ClaimProps,
@@ -22,42 +23,43 @@ import { useRouter } from "next/router";
 import { useKnowledgeBits } from "modules/claims/hooks/useKnowledgeBits";
 import { useKnowledgeBitsVotes } from "modules/claims/hooks/useKnowledgeBitVotes";
 import { useClaims } from "modules/claims/hooks/useClaims";
+import { Spinner } from "common/components/Spinner";
 
 interface ClaimPageProps {
-  data: {
-    claim: ClaimProps;
-    relatedClaims: ClaimProps[];
-    knowledgeBits: KnowledgeBitProps[];
-    userKnowledgeBitVotes: KnowledgeBitVoteProps[];
-  };
+  claim: ClaimProps;
+  relatedClaims: ClaimProps[];
+  knowledgeBits: KnowledgeBitProps[];
+  userKnowledgeBitVotes: KnowledgeBitVoteProps[];
 }
 
-const Claim: NextPage<ClaimPageProps> = ({
-  data: { claim, relatedClaims, knowledgeBits, userKnowledgeBitVotes },
-}) => {
+interface ClaimParamsProps {
+  slug: string;
+}
+
+const Claim: NextPage<ClaimPageProps> = (serverProps) => {
   const { setUserOpinion, setOpinions, getUserOpinion } = useOpinions();
   const { setKnowledgeBits } = useKnowledgeBits();
   const { getUserKnowledgeBitVotes } = useKnowledgeBitsVotes();
-  const { setClaim } = useClaims();
+  const { setClaim, claim } = useClaims();
   const { setArguments } = useArguments();
   const { isSignedIn } = useAuth();
   const { enqueueSnackbar } = useSnackbar();
   const router = useRouter();
-  const { slug }: { slug?: string } = router.query;
+  const { slug }: ClaimParamsProps = router.query;
 
   useEffect(() => {
-    setClaim(claim);
-    setKnowledgeBits(knowledgeBits || []);
-    setArguments(claim.arguments || []);
-    setOpinions(claim.opinions || []);
+    setClaim(get(serverProps, "claim"));
+    setKnowledgeBits(get(serverProps, "knowledgeBits", []));
+    setArguments(get(serverProps, "claim.arguments", []));
+    setOpinions(get(serverProps, "claim.opinions", []));
     setUserOpinion({
       acceptance: 0.5,
       arguments: [],
       claim: {
-        id: claim.id,
+        id: get(serverProps, "claim.id", ""),
       },
     });
-  }, []);
+  }, [serverProps]);
 
   useEffect(() => {
     if (isSignedIn && slug) {
@@ -77,24 +79,43 @@ const Claim: NextPage<ClaimPageProps> = ({
         <meta property="og:title" content={claim?.title} />
       </Head>
 
-      <Stack spacing={14}>
-        <ClaimSummary />
-        <KnowledgeBits userVotes={userKnowledgeBitVotes} />
-        <SocialOpinions />
-        <RelatedClaims relatedClaims={relatedClaims} />
-      </Stack>
+      {router.isFallback ? (
+        <Spinner />
+      ) : (
+        <Stack spacing={14}>
+          <ClaimSummary />
+          <KnowledgeBits />
+          <SocialOpinions />
+          <RelatedClaims relatedClaims={get(serverProps, "relatedClaims")} />
+        </Stack>
+      )}
     </Box>
   );
 };
 
-export async function getServerSideProps(context) {
-  const { slug } = context.query;
+export async function getStaticProps({ params }: { params: ClaimParamsProps }) {
+  const { slug } = params;
   const data = await ClaimsService.getClaim({
     slug,
   });
 
   return {
-    props: { data },
+    props: data,
+    revalidate: 10,
+  };
+}
+
+export async function getStaticPaths() {
+  const trendingClaims = await ClaimsService.getTrendingClaims({
+    offset: 0,
+    limit: 10,
+  });
+
+  return {
+    paths: map(get(trendingClaims, "data"), ({ slug }: ClaimProps) => ({
+      params: { slug },
+    })),
+    fallback: true,
   };
 }
 

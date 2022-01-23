@@ -1,5 +1,4 @@
-import { SyntheticEvent, useState } from "react";
-import { InferGetServerSidePropsType } from "next";
+import { FC, SyntheticEvent, useEffect, useState } from "react";
 import { AccountCircle } from "@mui/icons-material";
 import { TabContext, TabList, TabPanel } from "@mui/lab";
 import { Avatar, Box, Paper, Stack, Tab, Typography } from "@mui/material";
@@ -9,6 +8,11 @@ import { ClaimsList } from "modules/claims/components/ClaimsList";
 import type { ClaimProps } from "modules/claims/interfaces";
 import { ProfileProps, UserClaimRelation } from "modules/users/interfaces";
 import { UsersService } from "modules/users/services/users";
+import { Spinner } from "common/components/Spinner";
+import { useRouter } from "next/router";
+import Head from "next/head";
+import { ClaimsService } from "modules/claims/services/claims";
+import { get, map } from "lodash-es";
 
 const profileTabs: {
   label: string;
@@ -19,15 +23,14 @@ const profileTabs: {
   { label: "Following", value: UserClaimRelation.FOLLOWING },
 ];
 
-const Profile = (
-  serverProps: InferGetServerSidePropsType<typeof getServerSideProps>
-) => {
+const Profile: FC<any> = (serverProps) => {
+  const { isFallback } = useRouter();
   const { getProfile } = useUsers();
   const [activeTab, setActiveTab] = useState<UserClaimRelation>(
     UserClaimRelation.OWN
   );
   const [loadingClaims, setLoadingClaims] = useState<boolean>(false);
-  const [profile] = useState<ProfileProps>(serverProps.profile);
+  const [profile, setProfile] = useState<ProfileProps>(serverProps.profile);
   const [claims, setClaims] = useState<ClaimProps[]>(serverProps.userClaims);
 
   const handleTabChange = (ev: SyntheticEvent, tab: UserClaimRelation) => {
@@ -46,8 +49,26 @@ const Profile = (
       });
   };
 
+  useEffect(() => {
+    setProfile(serverProps.profile);
+    setClaims(serverProps.userClaims);
+  }, [serverProps]);
+
+  if (isFallback) {
+    return (
+      <Box className="container page">
+        <Spinner />
+      </Box>
+    );
+  }
+
   return (
     <Box className="container page">
+      <Head>
+        <title>{profile?.username}</title>
+        <meta property="og:title" content={profile?.username} />
+      </Head>
+
       <Stack spacing={5}>
         <Stack
           direction={{ xs: "column", md: "row" }}
@@ -119,17 +140,33 @@ const Profile = (
   );
 };
 
-export async function getServerSideProps(context) {
-  const { username } = context.query;
+export async function getStaticProps({ params }) {
+  const { username } = params;
   const profile = await UsersService.getProfile({
     username,
     claimsRelation: UserClaimRelation.OWN,
   });
+
   return {
     props: {
       ...profile,
       username,
     },
+    revalidate: 10,
+  };
+}
+
+export async function getStaticPaths() {
+  const trendingClaims = await ClaimsService.getTrendingClaims({
+    offset: 0,
+    limit: 10,
+  });
+
+  return {
+    paths: map(get(trendingClaims, "data"), ({ user }: ClaimProps) => ({
+      params: { username: user.username },
+    })),
+    fallback: true,
   };
 }
 

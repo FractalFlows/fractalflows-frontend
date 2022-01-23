@@ -200,12 +200,18 @@ const Home: NextPage<HomeProps> = (serverProps) => {
   );
 };
 
-export async function getServerSideProps() {
+export async function getStaticProps() {
   const trendingClaims = await ClaimsService.getTrendingClaims({
     offset: 0,
     limit,
   });
-  return { props: { trendingClaims } };
+
+  return {
+    props: {
+      trendingClaims,
+    },
+    revalidate: 10,
+  };
 }
 
 export default Home;
