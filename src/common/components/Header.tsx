@@ -22,6 +22,7 @@ import { Search } from "./Search";
 import styles from "./Header.module.css";
 import { useApp } from "modules/app/useApp";
 import { useRouter } from "next/router";
+import { Container } from "@mui/material";
 
 export const Header = () => {
   const { isChangingRoutes } = useApp();
@@ -158,100 +159,103 @@ export const Header = () => {
   );
 
   return (
-    <Box className={styles.header}>
+    <div className={styles.header}>
       <AppBar position="sticky">
-        <Toolbar>
-          <Link href="/">
-            <Typography
-              variant="h6"
-              noWrap
-              component="div"
-              sx={{ display: { xs: "none", sm: "block" }, fontWeight: 700 }}
-            >
-              Fractal Flows
-            </Typography>
-          </Link>
-          <Search />
-          <Box sx={{ flexGrow: 1 }} />
-          <Box sx={{ display: { xs: "none", md: "flex" } }}>
-            <Stack direction="row" alignItems="center" spacing={2}>
-              <Link href="/claim/new">
-                <Button variant="text" color="primaryContrast">
-                  Host new claim
-                </Button>
-              </Link>
-              {/* <Button variant="text" color="primaryContrast">
+        <Container fixed>
+          <Toolbar disableGutters>
+            <Link href="/">
+              <Typography
+                variant="h6"
+                noWrap
+                component="div"
+                sx={{ display: { xs: "none", sm: "block" }, fontWeight: 700 }}
+              >
+                Fractal Flows
+              </Typography>
+            </Link>
+            <Search />
+            <Box sx={{ flexGrow: 1 }} />
+            <Box sx={{ display: { xs: "none", md: "flex" } }}>
+              <Stack direction="row" alignItems="center" spacing={2}>
+                <Link href="/claim/new">
+                  <Button variant="text" color="primaryContrast">
+                    Host new claim
+                  </Button>
+                </Link>
+                {/* <Button variant="text" color="primaryContrast">
                 Become a validator
               </Button> */}
+                {isSignedIn ? (
+                  <>
+                    <Divider orientation="vertical" flexItem />
+                    <Button
+                      variant="text"
+                      onClick={handleProfileMenuOpen}
+                      color="primaryContrast"
+                      aria-label="account of current user"
+                      aria-controls={menuId}
+                      aria-haspopup="true"
+                    >
+                      <Stack direction="row" spacing={1} alignItems="center">
+                        {userAvatar}
+                        <Typography
+                          variant="body1"
+                          noWrap
+                          sx={{
+                            fontWeight: 600,
+                            textTransform: "initial",
+                            maxWidth: 150,
+                          }}
+                          title={user?.username}
+                        >
+                          {user?.username}
+                        </Typography>
+                      </Stack>
+                    </Button>
+                  </>
+                ) : (
+                  <Link href="/signin">
+                    <Button variant="contained" color="primaryContrast">
+                      Sign in
+                    </Button>
+                  </Link>
+                )}
+              </Stack>
+            </Box>
+            <Box sx={{ display: { xs: "flex", md: "none" } }}>
               {isSignedIn ? (
                 <>
-                  <Divider orientation="vertical" flexItem />
-                  <Button
-                    variant="text"
+                  <IconButton
                     onClick={handleProfileMenuOpen}
-                    color="primaryContrast"
                     aria-label="account of current user"
                     aria-controls={menuId}
                     aria-haspopup="true"
                   >
-                    <Stack direction="row" spacing={1} alignItems="center">
-                      {userAvatar}
-                      <Typography
-                        variant="body1"
-                        noWrap
-                        sx={{
-                          fontWeight: 600,
-                          textTransform: "initial",
-                          maxWidth: 150,
-                        }}
-                        title={user?.username}
-                      >
-                        {user?.username}
-                      </Typography>
-                    </Stack>
-                  </Button>
+                    {userAvatar}
+                  </IconButton>
                 </>
               ) : (
-                <Link href="/signin">
-                  <Button variant="contained" color="primaryContrast">
-                    Sign in
-                  </Button>
-                </Link>
-              )}
-            </Stack>
-          </Box>
-          <Box sx={{ display: { xs: "flex", md: "none" } }}>
-            {isSignedIn ? (
-              <>
                 <IconButton
-                  onClick={handleProfileMenuOpen}
-                  aria-label="account of current user"
-                  aria-controls={menuId}
+                  aria-label="show more"
+                  aria-controls={mobileMenuId}
                   aria-haspopup="true"
+                  onClick={handleMobileMenuOpen}
+                  color="inherit"
                 >
-                  {userAvatar}
+                  <MoreIcon />
                 </IconButton>
-              </>
-            ) : (
-              <IconButton
-                aria-label="show more"
-                aria-controls={mobileMenuId}
-                aria-haspopup="true"
-                onClick={handleMobileMenuOpen}
-                color="inherit"
-              >
-                <MoreIcon />
-              </IconButton>
-            )}
-          </Box>
-        </Toolbar>
+              )}
+            </Box>
+          </Toolbar>
+        </Container>
       </AppBar>
+
       <LinearProgress
         className={styles.header__spinner}
         sx={isChangingRoutes ? {} : { display: "none" }}
       />
       {renderMobileMenu}
       {renderMenu}
-    </Box>
+    </div>
   );
 };

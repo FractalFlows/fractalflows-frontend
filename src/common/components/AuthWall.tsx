@@ -9,6 +9,7 @@ import { registerMui } from "common/utils/registerMui";
 import { validateEmail } from "common/utils/validate";
 import { useAuth } from "modules/auth/hooks/useAuth";
 import { SignInMethod } from "modules/auth/interfaces";
+import { Container } from "@mui/material";
 
 interface MagicLinkFormProps {
   email: string;
@@ -70,7 +71,7 @@ export const AuthWall = () => {
   };
 
   return (
-    <Box className="container page">
+    <Container className="page">
       <Stack spacing={5}>
         <Stack spacing={2}>
           <Typography variant="h3" component="h1" align="center">
@@ -158,6 +159,6 @@ export const AuthWall = () => {
           )}
         </Box>
       </Stack>
-    </Box>
+    </Container>
   );
 };

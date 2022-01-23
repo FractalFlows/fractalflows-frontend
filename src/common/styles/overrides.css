@@ -18,7 +18,7 @@ form {
 }
 
 @media screen and (min-width: 900px) {
-  .MuiToolbar-gutters,
+  /* .MuiToolbar-gutters, */
   .container {
     padding-right: var(--fractalflows-gutter-page-lg);
     padding-left: var(--fractalflows-gutter-page-lg);
@@ -35,7 +35,7 @@ form {
 }
 
 @media screen and (min-width: 1200px) {
-  .MuiToolbar-gutters,
+  /* .MuiToolbar-gutters, */
   .container {
     padding-right: var(--fractalflows-gutter-page-xl);
     padding-left: var(--fractalflows-gutter-page-xl);

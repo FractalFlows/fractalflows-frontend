@@ -13,6 +13,7 @@ import { useRouter } from "next/router";
 import Head from "next/head";
 import { ClaimsService } from "modules/claims/services/claims";
 import { get, map } from "lodash-es";
+import { Container } from "@mui/material";
 
 const profileTabs: {
   label: string;
@@ -56,14 +57,14 @@ const Profile: FC<any> = (serverProps) => {
 
   if (isFallback) {
     return (
-      <Box className="container page">
+      <Container className="page">
         <Spinner />
-      </Box>
+      </Container>
     );
   }
 
   return (
-    <Box className="container page">
+    <Container className="page">
       <Head>
         <title>{profile?.username}</title>
         <meta property="og:title" content={profile?.username} />
@@ -136,7 +137,7 @@ const Profile: FC<any> = (serverProps) => {
           </TabContext>
         </Stack>
       </Stack>
-    </Box>
+    </Container>
   );
 };
 

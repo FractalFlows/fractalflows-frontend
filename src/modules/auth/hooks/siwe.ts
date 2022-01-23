@@ -18,7 +18,7 @@ export const signInWithEthereum = async (callback: () => any) => {
       .then(({ chainId }) => chainId)}`,
     uri: document.location.origin,
     version: "1",
-    statement: `I accept the Fractal Flows Terms of Service: ${window.location.origin}/tos`,
+    statement: "Fractal Flows sign in",
     type: SignatureType.PERSONAL_SIGNATURE,
     nonce,
   });

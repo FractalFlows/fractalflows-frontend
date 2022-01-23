@@ -13,6 +13,7 @@ import { Profile } from "modules/settings/components/Profile";
 import { useAuth } from "modules/auth/hooks/useAuth";
 import { AuthWall } from "common/components/AuthWall";
 import { useRouter } from "next/router";
+import { Container } from "@mui/material";
 
 const settingsTabs = [
   { label: "Profile", value: "profile" },
@@ -43,7 +44,7 @@ const Settings = () => {
   if (isEmpty(session)) return <AuthWall />;
 
   return (
-    <Box className="container page">
+    <Container className="page">
       <Stack spacing={5}>
         <Typography variant="h3" component="h1">
           Settings
@@ -85,7 +86,7 @@ const Settings = () => {
           </TabContext>
         </Stack>
       </Stack>
-    </Box>
+    </Container>
   );
 };
 
