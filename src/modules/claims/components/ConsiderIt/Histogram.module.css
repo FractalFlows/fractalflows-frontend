@@ -1,0 +1,16 @@
+.histogram {
+  position: relative;
+  transition: 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.histogram--blurred {
+  opacity: 0.35;
+}
+
+.histogram--claim-tile {
+  /* background-color: #f6f6f6; */
+  border-bottom: 1px solid var(--fractalflows-colors-border);
+}

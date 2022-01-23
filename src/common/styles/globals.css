@@ -13,6 +13,7 @@
   --fractalflows-colors-background: white;
   --fractalflows-colors-textprimary: #757575;
   --fractalflows-colors-textsecondary: #757575;
+  --fractalflows-colors-border: rgba(0, 0, 0, 0.12);
 
   --fractalflows-border-default: 1px solid #ddd;
 }
