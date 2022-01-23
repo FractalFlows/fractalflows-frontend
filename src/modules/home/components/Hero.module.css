@@ -3,6 +3,7 @@
   padding-bottom: 10vh;
   overflow: hidden;
   position: relative;
+  background-color: var(--fractalflows-colors-primary);
 }
 
 .hero__background {

@@ -107,6 +107,8 @@ const Home: NextPage<HomeProps> = (serverProps) => {
           layout="fill"
           objectFit="cover"
           objectPosition="bottom"
+          priority
+          quality={100}
         />
         <Box sx={{ px: "15px" }} className={styles.hero__content}>
           <Stack spacing={8} alignItems="center">
