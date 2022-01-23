@@ -1,10 +1,10 @@
-import { providers } from "ethers";
-
 import { InfuraUtils } from "../../utils/infura";
 
 export const InfuraService = {
-  getProvider: (chainId: string) =>
-    new providers.JsonRpcProvider(
+  getProvider: async (chainId: string) => {
+    const { providers } = await import("ethers");
+
+    return new providers.JsonRpcProvider(
       {
         allowGzip: true,
         url: `${InfuraUtils.getUrl(chainId)}/${
@@ -17,5 +17,6 @@ export const InfuraService = {
         },
       },
       Number.parseInt(chainId)
-    ),
+    );
+  },
 };

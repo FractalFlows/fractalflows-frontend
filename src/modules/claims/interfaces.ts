@@ -158,5 +158,5 @@ export interface OpinionProps {
   acceptance: number;
   arguments: ArgumentProps[];
   user: UserProps;
-  claim: ClaimProps;
+  claim: Partial<ClaimProps>;
 }

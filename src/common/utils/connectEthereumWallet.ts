@@ -1,16 +1,17 @@
-import { ethers } from "ethers";
-import Web3Modal from "web3modal";
-import WalletConnect from "@walletconnect/web3-provider";
-
 interface ConnectEthereumWalletResultProps {
   address: string;
   ens?: string;
   avatar?: string;
-  ethersProvider: ethers.providers.Web3Provider;
+  ethersProvider: any;
 }
 
 export const connectEthereumWallet =
   async (): Promise<ConnectEthereumWalletResultProps> => {
+    const { ethers } = await import("ethers");
+    const Web3Modal = (await import("web3modal")).default;
+    const WalletConnect = (await import("@walletconnect/web3-provider"))
+      .default;
+
     const providerOptions = {
       walletconnect: {
         package: WalletConnect,

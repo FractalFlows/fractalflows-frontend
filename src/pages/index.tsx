@@ -1,3 +1,4 @@
+import Image from "next/image";
 import { SyntheticEvent, useState } from "react";
 import type { NextPage } from "next";
 import { Box, Button, Paper, Stack, Tab, Typography } from "@mui/material";
@@ -99,7 +100,15 @@ const Home: NextPage<HomeProps> = (serverProps) => {
   return (
     <>
       <Box className={`container ${styles.hero}`}>
-        <Box sx={{ px: "15px" }}>
+        <Image
+          src="/images/hero.png"
+          alt="Hero background"
+          className={styles.hero__background}
+          layout="fill"
+          objectFit="cover"
+          objectPosition="bottom"
+        />
+        <Box sx={{ px: "15px" }} className={styles.hero__content}>
           <Stack spacing={8} alignItems="center">
             <Stack spacing={2}>
               <Typography
@@ -200,12 +209,18 @@ const Home: NextPage<HomeProps> = (serverProps) => {
   );
 };
 
-export async function getServerSideProps() {
+export async function getStaticProps() {
   const trendingClaims = await ClaimsService.getTrendingClaims({
     offset: 0,
     limit,
   });
-  return { props: { trendingClaims } };
+
+  return {
+    props: {
+      trendingClaims,
+    },
+    revalidate: 10,
+  };
 }
 
 export default Home;

@@ -14,6 +14,7 @@ import { useArgumentComments } from "modules/argument-comments/useArgumentCommen
 import { useAuth } from "modules/auth/hooks/useAuth";
 
 import { AuthorBlock } from "modules/users/components/AuthorBlock";
+import { UserRole } from "modules/users/interfaces";
 import { useSnackbar } from "notistack";
 import { FC, useState } from "react";
 import { ArgumentCommentUpsertForm } from "./ArgumentCommentUpsertForm";
@@ -42,7 +43,8 @@ export const ArgumentComment: FC<ArgumentCommentComponentProps> = ({
     useState<ArgumentCommentStates>();
 
   const canManageArgumentComment = (userId: string) =>
-    isSignedIn && userId === get(session, "user.id");
+    (isSignedIn && userId === get(session, "user.id")) ||
+    get(session, "user.role") === UserRole.ADMIN;
 
   const handleDeleteDialogClose = () => setArgumentCommentState(undefined);
   const handleDeleteDialogConfirmation = async () => {

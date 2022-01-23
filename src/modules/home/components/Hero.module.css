@@ -1,8 +1,18 @@
 .hero {
-  background-image: url(/images/background.png);
-  background-position: bottom;
-  background-size: cover;
-  width: 100%;
   padding-top: 10vh;
   padding-bottom: 10vh;
+  overflow: hidden;
+  position: relative;
+}
+
+.hero__background {
+  position: relative;
+  pointer-events: none;
+  user-select: none;
+  z-index: 0;
+}
+
+.hero__content {
+  position: relative;
+  z-index: 1;
 }
