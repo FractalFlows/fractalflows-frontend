@@ -44,14 +44,6 @@ export const GET_CLAIM = gql`
       followers {
         id
       }
-      opinions {
-        id
-        acceptance
-        user {
-          username
-          avatar
-        }
-      }
     }
     relatedClaims(slug: $slug) {
       ...CoreClaimFields

@@ -21,6 +21,14 @@ export const CORE_CLAIM_FIELDS = gql`
       id
       side
     }
+    opinions {
+      id
+      acceptance
+      user {
+        username
+        avatar
+      }
+    }
   }
 `;
 
