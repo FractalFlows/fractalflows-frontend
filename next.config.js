@@ -15,4 +15,7 @@ module.exports = {
     // !! WARN !!
     ignoreBuildErrors: true,
   },
+  images: {
+    formats: ['image/avif', 'image/webp'],
+  },
 }
