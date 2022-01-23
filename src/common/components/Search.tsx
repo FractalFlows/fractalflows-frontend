@@ -18,6 +18,7 @@ import { useClaims } from "modules/claims/hooks/useClaims";
 import { ClaimProps } from "modules/claims/interfaces";
 import { ClaimsList } from "modules/claims/components/ClaimsList";
 import { ClassNames } from "@emotion/react";
+import { Container } from "@mui/material";
 
 const SearchInput = styled("div")(({ theme }) => ({
   position: "relative",
@@ -213,7 +214,7 @@ export const Search = () => {
           open={showResults}
           onClick={handleBlur}
         >
-          <Box className="container page">{getBackdropContent()}</Box>
+          <Container className="page">{getBackdropContent()}</Container>
         </Backdrop>
       </Portal>
     </>

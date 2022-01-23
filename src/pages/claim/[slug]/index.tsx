@@ -24,6 +24,7 @@ import { useKnowledgeBits } from "modules/claims/hooks/useKnowledgeBits";
 import { useKnowledgeBitsVotes } from "modules/claims/hooks/useKnowledgeBitVotes";
 import { useClaims } from "modules/claims/hooks/useClaims";
 import { Spinner } from "common/components/Spinner";
+import { Container } from "@mui/material";
 
 interface ClaimPageProps {
   claim: ClaimProps;
@@ -73,7 +74,7 @@ const Claim: NextPage<ClaimPageProps> = (serverProps) => {
   }, [isSignedIn, slug]);
 
   return (
-    <Box className="container page">
+    <Container className="page">
       <Head>
         <title>{claim?.title}</title>
         <meta property="og:title" content={claim?.title} />
@@ -89,7 +90,7 @@ const Claim: NextPage<ClaimPageProps> = (serverProps) => {
           <RelatedClaims relatedClaims={get(serverProps, "relatedClaims")} />
         </Stack>
       )}
-    </Box>
+    </Container>
   );
 };
 
