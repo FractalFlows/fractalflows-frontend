@@ -169,7 +169,6 @@ export async function getStaticProps({ params }) {
   const { username } = params;
   const profile = await UsersService.getProfile({
     username,
-    claimsRelation: UserClaimRelation.OWN,
   });
 
   return {
