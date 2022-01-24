@@ -5,7 +5,7 @@ import type { GetProfileProps, ProfileProps } from "../interfaces";
 import type { ClaimProps } from "modules/claims/interfaces";
 
 export const UsersService = {
-  async getProfile({ username, claimsRelation }: GetProfileProps): Promise<{
+  async getProfile({ username }: GetProfileProps): Promise<{
     profile: ProfileProps;
     userClaims: ClaimProps[];
   }> {
@@ -13,7 +13,6 @@ export const UsersService = {
       query: GET_PROFILE,
       variables: {
         username,
-        claimsRelation,
       },
     });
 

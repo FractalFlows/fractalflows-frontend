@@ -115,6 +115,36 @@ export const SEARCH_CLAIMS = gql`
   }
 `;
 
+export const GET_USER_CLAIMS = gql`
+  ${CORE_CLAIM_FIELDS}
+
+  query GetUserClaims($username: String!) {
+    userClaims(username: $username) {
+      ...CoreClaimFields
+    }
+  }
+`;
+
+export const GET_USER_CONTRIBUTED_CLAIMS = gql`
+  ${CORE_CLAIM_FIELDS}
+
+  query GetUserContributedClaims($username: String!) {
+    userContributedClaims(username: $username) {
+      ...CoreClaimFields
+    }
+  }
+`;
+
+export const GET_USER_FOLLOWING_CLAIMS = gql`
+  ${CORE_CLAIM_FIELDS}
+
+  query GetUserFollowngClaims($username: String!) {
+    userFollowingClaims(username: $username) {
+      ...CoreClaimFields
+    }
+  }
+`;
+
 export const GET_KNOWLEDGE_BIT = gql`
   ${KNOWLEDGE_BIT_FIELDS}
 

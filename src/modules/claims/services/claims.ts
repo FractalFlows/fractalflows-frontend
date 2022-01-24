@@ -28,6 +28,9 @@ import {
   GET_USER_OPINION,
   GET_ARGUMENT,
   SEARCH_CLAIMS,
+  GET_USER_CLAIMS,
+  GET_USER_CONTRIBUTED_CLAIMS,
+  GET_USER_FOLLOWING_CLAIMS,
 } from "../queries";
 import type {
   ArgumentProps,
@@ -113,6 +116,51 @@ export const ClaimsService = {
     });
 
     return data.searchClaims;
+  },
+
+  async getUserClaims({
+    username,
+  }: {
+    username: string;
+  }): Promise<ClaimProps[]> {
+    const { data } = await apolloClient.query({
+      query: GET_USER_CLAIMS,
+      variables: {
+        username,
+      },
+    });
+
+    return data.userClaims;
+  },
+
+  async getUserContributedClaims({
+    username,
+  }: {
+    username: string;
+  }): Promise<ClaimProps[]> {
+    const { data } = await apolloClient.query({
+      query: GET_USER_CONTRIBUTED_CLAIMS,
+      variables: {
+        username,
+      },
+    });
+
+    return data.userContributedClaims;
+  },
+
+  async getUserFollowingClaims({
+    username,
+  }: {
+    username: string;
+  }): Promise<ClaimProps[]> {
+    const { data } = await apolloClient.query({
+      query: GET_USER_FOLLOWING_CLAIMS,
+      variables: {
+        username,
+      },
+    });
+
+    return data.userFollowingClaims;
   },
 
   async createClaim({ claim }: { claim: ClaimProps }): Promise<ClaimProps> {
