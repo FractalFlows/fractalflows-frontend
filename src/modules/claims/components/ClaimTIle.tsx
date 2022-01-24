@@ -29,7 +29,11 @@ export const ClaimTile: FC<{ claim: ClaimProps }> = ({ claim }) => {
             {claim?.title}
           </Typography>
 
-          <Stack direction={{ xs: "column", md: "row" }} spacing={4}>
+          <Stack
+            direction={{ xs: "column", md: "row" }}
+            sx={{ alignItems: { xs: "", md: "center" } }}
+            spacing={4}
+          >
             <Stack spacing={2} flexGrow={1}>
               {claim?.user ? (
                 <AuthorBlock
@@ -73,7 +77,7 @@ export const ClaimTile: FC<{ claim: ClaimProps }> = ({ claim }) => {
                 </Stack>
               </Stack>
             </Stack>
-            <Stack sx={{ width: 300 }}>
+            <Stack sx={{ width: 300, flexShrink: 0 }}>
               <Histogram
                 opinions={claim.opinions}
                 height={100}
