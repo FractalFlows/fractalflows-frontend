@@ -27,7 +27,7 @@ export const ConsiderIt = () => {
 
   return (
     <Stack alignItems="center">
-      <Stack sx={{ width: 700 }}>
+      <Stack sx={{ width: { xs: "100%", md: 700 } }}>
         <Histogram opinions={opinions} />
         <Slider />
       </Stack>
@@ -35,7 +35,15 @@ export const ConsiderIt = () => {
       {showOpinionId ? (
         <Opinion />
       ) : (
-        <Stack direction="row" spacing={5}>
+        <Stack
+          direction={{ xs: "column", md: "row" }}
+          spacing={5}
+          sx={{
+            width: { xs: "100%", md: "700px", lg: "initial" },
+            flexWrap: { xs: "wrap", lg: "initial" },
+            justifyContent: { xs: "center", lg: "initial" },
+          }}
+        >
           <ArgumentColumn
             side={ArgumentSides.CON}
             title={`${isOpining ? "Others'" : "Top"} arguments against`}

@@ -24,7 +24,7 @@ export const ArgumentColumn: FC<ArgumentColumnProps> = ({
   return (
     <Stack spacing={3}>
       <Typography variant="h5">{title}</Typography>
-      <Stack spacing={2} sx={{ width: 330 }}>
+      <Stack spacing={2} sx={{ width: { xs: "100%", md: 330 } }}>
         {isEmpty(sortedArgumentsList) ? (
           <NoResults p={0} align="left">
             No arguments

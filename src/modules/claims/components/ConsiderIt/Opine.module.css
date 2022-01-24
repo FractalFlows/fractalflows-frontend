@@ -1,3 +1,48 @@
+.opine {
+  order: -1;
+  margin: 0 0 40px !important;
+}
+
+.opine__grid {
+  display: grid;
+  column-gap: 40px;
+  row-gap: 20px;
+  grid-template-columns: 1fr;
+}
+
+.opine__grid > :nth-child(2) {
+  margin-bottom: 50px;
+}
+
+@media screen and (min-width: 900px) {
+  .opine__grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .opine__grid > :nth-child(2) {
+    order: 2;
+  }
+
+  .opine__grid > :nth-child(3) {
+    order: 1;
+  }
+
+  .opine__grid > :nth-child(4) {
+    order: 3;
+  }
+
+  .opine__grid > *:nth-child(2) {
+    margin-bottom: initial;
+  }
+}
+
+@media screen and (min-width: 1200px) {
+  .opine {
+    order: 0;
+    margin: 0 0 0 40px !important;
+  }
+}
+
 .opine__droparea * {
   pointer-events: none;
 }

@@ -1,5 +1,5 @@
 import { FC, useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { Button, Typography } from "@mui/material";
+import { Box, Button, Stack, Typography } from "@mui/material";
 import { clamp, get } from "lodash-es";
 
 import styles from "./Slider.module.css";
@@ -25,11 +25,16 @@ export const Slider: FC = () => {
   const moveSlide = useCallback((event) => {
     event.preventDefault();
 
-    if (!sliderThumb.current) return;
+    if (
+      !sliderThumb.current ||
+      (isNaN(event.clientX) && event.touches.length === 0)
+    )
+      return;
 
     const { offsetWidth, offsetLeft } = sliderThumb.current;
+    const position = event.clientX || event.touches[0].pageX;
     const acceptance =
-      clamp(event.clientX - offsetLeft, 0, offsetWidth) / offsetWidth;
+      clamp(position - offsetLeft, 0, offsetWidth) / offsetWidth;
     setOpinionAcceptance(acceptance);
     setHandlePosition(acceptance);
   }, []);
@@ -120,21 +125,39 @@ export const Slider: FC = () => {
             </svg>
           </div>
 
-          {isOpining ? (
-            <Typography variant="h5" className={styles.slider__label}>
-              {acceptanceText}
-            </Typography>
-          ) : (
-            <Button
-              size="small"
-              variant="contained"
-              className={styles.slider__cta}
-            >
-              {userOpinion?.id ? "Update" : "Give"} your opinion
-            </Button>
-          )}
+          <Box sx={{ display: { xs: "none", md: "initial" } }}>
+            {isOpining ? (
+              <Typography variant="h5" className={styles.slider__label}>
+                {acceptanceText}
+              </Typography>
+            ) : (
+              <Button
+                size="small"
+                variant="contained"
+                className={styles.slider__cta}
+              >
+                {userOpinion?.id ? "Update" : "Give"} your opinion
+              </Button>
+            )}
+          </Box>
         </div>
       </div>
+      <Stack sx={{ display: { md: "none" }, mt: 5 }} alignItems="center">
+        {isOpining ? (
+          <Typography
+            variant="h5"
+            color="primary"
+            align="center"
+            fontWeight={600}
+          >
+            {acceptanceText}
+          </Typography>
+        ) : (
+          <Button size="medium" variant="contained" onClick={handleSlideStart}>
+            {userOpinion?.id ? "Update" : "Give"} your opinion
+          </Button>
+        )}
+      </Stack>
     </div>
   );
 };

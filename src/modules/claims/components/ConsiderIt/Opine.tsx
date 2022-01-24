@@ -1,5 +1,5 @@
 import { DragEvent, FC, SyntheticEvent, useState } from "react";
-import { Button, Paper, Stack, Typography } from "@mui/material";
+import { Box, Button, Paper, Stack, Typography } from "@mui/material";
 
 import { ArgumentSides } from "modules/claims/interfaces";
 import { OpineColumn } from "./OpineColumn";
@@ -48,13 +48,13 @@ export const Opine: FC = () => {
   };
 
   return (
-    // This extra div is necessary to make the sticky position work
-    <div>
+    // This extra wrapper is necessary to give the sticky position room to move
+    <Box className={styles.opine}>
       <Stack spacing={2} sx={{ position: "sticky", top: "20px" }}>
         <Paper
           variant="outlined"
           sx={{
-            width: 700,
+            width: { xs: "100%", md: 700 },
             p: 3,
             paddingBottom: 8,
             borderStyle: isDraggingOver ? "solid" : "dashed",
@@ -68,17 +68,10 @@ export const Opine: FC = () => {
           onDragEnter={handleDragEnter}
           onDragLeave={handleDragLeave}
         >
-          <div
-            style={{
-              display: "grid",
-              columnGap: "40px",
-              rowGap: "20px",
-              gridTemplateColumns: "repeat(2, 1fr)",
-            }}
-          >
+          <div className={styles.opine__grid}>
             <Typography variant="h5">Give your arguments against</Typography>
-            <Typography variant="h5">Give your arguments for</Typography>
             <OpineColumn side={ArgumentSides.CON} />
+            <Typography variant="h5">Give your arguments for</Typography>
             <OpineColumn side={ArgumentSides.PRO} />
           </div>
         </Paper>
@@ -99,6 +92,6 @@ export const Opine: FC = () => {
           Skip to results
         </Button>
       </Stack>
-    </div>
+    </Box>
   );
 };

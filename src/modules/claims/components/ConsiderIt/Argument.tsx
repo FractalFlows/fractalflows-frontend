@@ -20,13 +20,21 @@ interface ArgumentCompProps {
   placement: ArgumentPlacements;
 }
 
-export const Argument: FC<ArgumentCompProps> = ({ argument, placement }) => {
-  const { isOpining, removeArgumentFromOpinion } = useOpinions();
+export const Argument: FC<ArgumentCompProps> = ({
+  argument,
+  placement = ArgumentPlacements.RANKING,
+}) => {
+  const { isOpining, addArgumentToOpinion, removeArgumentFromOpinion } =
+    useOpinions();
   const [showDetails, setShowDetails] = useState(false);
   const detailsAnchor = useRef(null);
 
   const handleDragStart = (event: DragEvent) => {
     event.dataTransfer.setData("argument", JSON.stringify(argument));
+  };
+  const handleAddClick = (event: MouseEvent) => {
+    event.preventDefault();
+    addArgumentToOpinion(argument);
   };
   const handleRemoveClick = (event: MouseEvent) => {
     event.preventDefault();
@@ -72,6 +80,15 @@ export const Argument: FC<ArgumentCompProps> = ({ argument, placement }) => {
             {placement === ArgumentPlacements.OPINION ? (
               <Button size="small" onClick={handleRemoveClick}>
                 Remove
+              </Button>
+            ) : null}
+            {placement === ArgumentPlacements.RANKING && isOpining ? (
+              <Button
+                size="small"
+                onClick={handleAddClick}
+                sx={{ display: { lg: "none" } }}
+              >
+                Add to opinion
               </Button>
             ) : null}
           </Stack>
