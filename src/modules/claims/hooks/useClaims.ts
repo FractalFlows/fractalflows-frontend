@@ -26,6 +26,18 @@ const searchClaims = async ({
   return await ClaimsService.searchClaims({ term, limit, offset });
 };
 
+const getUserClaims = async ({ username }: { username: string }) => {
+  return await ClaimsService.getUserClaims({ username });
+};
+
+const getUserContributedClaims = async ({ username }: { username: string }) => {
+  return await ClaimsService.getUserContributedClaims({ username });
+};
+
+const getUserFollowingClaims = async ({ username }: { username: string }) => {
+  return await ClaimsService.getUserFollowingClaims({ username });
+};
+
 const disableClaim = async ({ id }: { id: string }) => {
   return await ClaimsService.disableClaim({ id });
 };
@@ -69,6 +81,9 @@ export const useClaims = () => {
     getClaims,
     getTrendingClaims,
     searchClaims,
+    getUserClaims,
+    getUserContributedClaims,
+    getUserFollowingClaims,
     createClaim,
     updateClaim,
     deleteClaim,

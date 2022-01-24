@@ -7,15 +7,17 @@ import d3 from "d3";
 import { OpinionProps } from "modules/claims/interfaces";
 
 export function normalizeAcceptance(opinions: OpinionProps[]) {
-  return opinions.map((opinion) => {
-    const { acceptance } = opinion;
+  return (
+    opinions?.map((opinion) => {
+      const { acceptance } = opinion;
 
-    return {
-      ...opinion,
-      acceptance:
-        acceptance >= 0.5 ? (acceptance - 0.5) * 2 : -(0.5 - acceptance) * 2,
-    };
-  });
+      return {
+        ...opinion,
+        acceptance:
+          acceptance >= 0.5 ? (acceptance - 0.5) * 2 : -(0.5 - acceptance) * 2,
+      };
+    }) || []
+  );
 }
 
 export function positionAvatars(
