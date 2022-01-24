@@ -13,8 +13,9 @@
 .slider__thumb {
   background-color: #e0e0e0;
   height: var(--fractalflows-considerit-thumb-height);
-  width: 100%;
   position: relative;
+  margin-left: calc(var(--fractalflows-considerit-franklin-diameter) / 2);
+  margin-right: calc(var(--fractalflows-considerit-franklin-diameter) / 2);
 }
 
 .slider__thumb--moving {
