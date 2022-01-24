@@ -11,7 +11,7 @@ interface AvatarProps {
 }
 
 export const AvatarWithUsername: FC<AvatarProps> = ({ user, size = 40 }) => (
-  <Link href={`/user/${user?.username}`}>
+  <Link href={`/user/${user?.username}/claims`}>
     <Stack direction="row" alignItems="center" spacing={1}>
       <Avatar
         src={user?.avatar}

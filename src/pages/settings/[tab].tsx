@@ -37,7 +37,7 @@ const Settings = () => {
 
   useEffect(() => {
     if (router.isReady) {
-      setActiveTab(router.query.tab as string);
+      setActiveTab((router.query.tab as string).toLowerCase());
     }
   }, [router.isReady]);
 

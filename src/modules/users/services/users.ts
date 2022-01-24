@@ -2,13 +2,9 @@ import { apolloClient } from "common/services/apollo/client";
 
 import { GET_PROFILE } from "../queries";
 import type { GetProfileProps, ProfileProps } from "../interfaces";
-import type { ClaimProps } from "modules/claims/interfaces";
 
 export const UsersService = {
-  async getProfile({ username }: GetProfileProps): Promise<{
-    profile: ProfileProps;
-    userClaims: ClaimProps[];
-  }> {
+  async getProfile({ username }: GetProfileProps): Promise<ProfileProps> {
     const { data } = await apolloClient.query({
       query: GET_PROFILE,
       variables: {
@@ -16,6 +12,6 @@ export const UsersService = {
       },
     });
 
-    return data;
+    return data.profile;
   },
 };
