@@ -18,7 +18,7 @@ const FooterIconsItem: FC<{
     // style={{ backgroundColor: bgColor }}
     title={title}
   >
-    <IconButton size="large" aria-label="upload picture" component="span">
+    <IconButton size="large" component="span">
       <i className={`fab fa-${icon}`} />
     </IconButton>
   </a>

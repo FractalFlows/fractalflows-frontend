@@ -19,15 +19,26 @@ export const AuthorBlock: FC<AuthorBlockProps> = ({
   createdAt,
   size,
 }) => (
-  <Stack direction="row" alignItems="center">
+  <Stack
+    direction={{ xs: "column", sm: "row" }}
+    alignItems={{ xs: "left", sm: "center" }}
+    spacing={{ xs: 0, sm: 1 }}
+  >
     <AvatarWithUsername user={user} size={size} />
-    {origin && origin !== ClaimOrigins.FRACTALFLOWS ? (
-      <Typography variant="body1">&nbsp;via {ClaimOrigins[origin]}</Typography>
-    ) : null}
-    {createdAt ? (
-      <Typography variant="body2" color="textSecondary">
-        &nbsp;&nbsp;&nbsp;{formatDate(createdAt)}
-      </Typography>
-    ) : null}
+    <Stack
+      direction="row"
+      alignItems="center"
+      spacing={1}
+      sx={{ paddingLeft: { xs: `${size + 8}px`, sm: 0 } }}
+    >
+      {origin && origin !== ClaimOrigins.FRACTALFLOWS ? (
+        <Typography variant="body1">via {ClaimOrigins[origin]}</Typography>
+      ) : null}
+      {createdAt ? (
+        <Typography variant="body2" color="textSecondary">
+          {formatDate(createdAt)}
+        </Typography>
+      ) : null}
+    </Stack>
   </Stack>
 );

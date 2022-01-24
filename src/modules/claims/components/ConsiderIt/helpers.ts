@@ -4,16 +4,28 @@
 
 import d3 from "d3";
 
-export function positionAvatars(opinions, width, height) {
-  opinions = opinions.map((opinion) => {
-    const { acceptance } = opinion;
+import { OpinionProps } from "modules/claims/interfaces";
 
-    return {
-      ...opinion,
-      acceptance:
-        acceptance >= 0.5 ? (acceptance - 0.5) * 2 : -(0.5 - acceptance) * 2,
-    };
-  });
+export function normalizeAcceptance(opinions: OpinionProps[]) {
+  return (
+    opinions?.map((opinion) => {
+      const { acceptance } = opinion;
+
+      return {
+        ...opinion,
+        acceptance:
+          acceptance >= 0.5 ? (acceptance - 0.5) * 2 : -(0.5 - acceptance) * 2,
+      };
+    }) || []
+  );
+}
+
+export function positionAvatars(
+  opinions: OpinionProps[],
+  width: number,
+  height: number
+) {
+  opinions = normalizeAcceptance(opinions);
 
   // Check if system energy would be reduced if two nodes' positions would
   // be swapped. We square the difference in order to favor large differences

@@ -26,5 +26,4 @@ export enum UserRole {
 
 export interface GetProfileProps {
   username: string;
-  claimsRelation: UserClaimRelation;
 }

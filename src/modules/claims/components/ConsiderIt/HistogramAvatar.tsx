@@ -1,5 +1,6 @@
 import { FC, useMemo } from "react";
 import { Tooltip, Typography } from "@mui/material";
+import { get } from "lodash-es";
 
 import { Avatar } from "modules/users/components/Avatar";
 import styles from "./HistogramAvatar.module.css";
@@ -19,17 +20,19 @@ export const HistogramAvatar: FC = ({
     }
   }, [acceptance]);
 
+  const user = get(opinion, "user", {});
+
   return (
     <Tooltip
       title={
         <Typography variant="body1">
-          <b>{opinion?.user?.username}</b> {acceptanceText}
+          <b>{user.username}</b> {acceptanceText}
         </Typography>
       }
       placement="right"
     >
       <Avatar
-        src={opinion?.user?.avatar}
+        src={`${user.avatar}?s=${Math.ceil(radius * 2)}`}
         onClick={onClick}
         size={radius * 2}
         className={styles.avatar}

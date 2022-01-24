@@ -13,6 +13,9 @@ import { useRouter } from "next/router";
 import Head from "next/head";
 import { ClaimsService } from "modules/claims/services/claims";
 import { get, map } from "lodash-es";
+import { Container } from "@mui/material";
+import { useSnackbar } from "notistack";
+import { useClaims } from "modules/claims/hooks/useClaims";
 
 const profileTabs: {
   label: string;
@@ -24,29 +27,51 @@ const profileTabs: {
 ];
 
 const Profile: FC<any> = (serverProps) => {
-  const { isFallback } = useRouter();
+  const router = useRouter();
   const { getProfile } = useUsers();
+  const { getUserClaims, getUserContributedClaims, getUserFollowingClaims } =
+    useClaims();
   const [activeTab, setActiveTab] = useState<UserClaimRelation>(
     UserClaimRelation.OWN
   );
   const [loadingClaims, setLoadingClaims] = useState<boolean>(false);
   const [profile, setProfile] = useState<ProfileProps>(serverProps.profile);
   const [claims, setClaims] = useState<ClaimProps[]>(serverProps.userClaims);
+  const { enqueueSnackbar } = useSnackbar();
 
-  const handleTabChange = (ev: SyntheticEvent, tab: UserClaimRelation) => {
+  const handleTabChange = async (
+    ev: SyntheticEvent,
+    tab: UserClaimRelation
+  ) => {
     setActiveTab(tab);
     setLoadingClaims(true);
 
-    getProfile({
-      username: serverProps.username,
-      claimsRelation: tab,
-    })
-      .then((data) => {
-        setClaims(data.userClaims);
-      })
-      .finally(() => {
-        setLoadingClaims(false);
-      });
+    const username = router.query.username as string;
+
+    try {
+      switch (tab) {
+        case UserClaimRelation.OWN:
+          const userClaims = await getUserClaims({ username });
+          setClaims(userClaims);
+          break;
+        case UserClaimRelation.CONTRIBUTED:
+          const userContributedClaims = await getUserContributedClaims({
+            username,
+          });
+          setClaims(userContributedClaims);
+          break;
+        case UserClaimRelation.FOLLOWING:
+          const userFollowingClaims = await getUserFollowingClaims({
+            username,
+          });
+          setClaims(userFollowingClaims);
+          break;
+      }
+    } catch (e: any) {
+      enqueueSnackbar(e?.message || e, { variant: "error" });
+    } finally {
+      setLoadingClaims(false);
+    }
   };
 
   useEffect(() => {
@@ -54,16 +79,16 @@ const Profile: FC<any> = (serverProps) => {
     setClaims(serverProps.userClaims);
   }, [serverProps]);
 
-  if (isFallback) {
+  if (router.isFallback) {
     return (
-      <Box className="container page">
+      <Container className="page">
         <Spinner />
-      </Box>
+      </Container>
     );
   }
 
   return (
-    <Box className="container page">
+    <Container className="page">
       <Head>
         <title>{profile?.username}</title>
         <meta property="og:title" content={profile?.username} />
@@ -136,7 +161,7 @@ const Profile: FC<any> = (serverProps) => {
           </TabContext>
         </Stack>
       </Stack>
-    </Box>
+    </Container>
   );
 };
 
@@ -148,10 +173,7 @@ export async function getStaticProps({ params }) {
   });
 
   return {
-    props: {
-      ...profile,
-      username,
-    },
+    props: profile,
     revalidate: 10,
   };
 }

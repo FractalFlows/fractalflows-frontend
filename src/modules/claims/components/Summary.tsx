@@ -406,7 +406,12 @@ export const ClaimSummary: FC = (props) => {
           <ul className={styles.sources}>
             {map(claim?.sources, ({ id, url }) => (
               <li key={id}>
-                <a href={url} rel="noreferrer" className="styled-link">
+                <a
+                  href={url}
+                  rel="noreferrer"
+                  className="styled-link"
+                  target="_blank"
+                >
                   <Typography variant="body1" sx={{ display: "inline" }}>
                     {url}
                   </Typography>

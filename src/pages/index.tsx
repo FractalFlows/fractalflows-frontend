@@ -11,6 +11,7 @@ import { ClaimsList } from "modules/claims/components/ClaimsList";
 import styles from "modules/home/components/Hero.module.css";
 import { Link } from "common/components/Link";
 import { useClaims } from "modules/claims/hooks/useClaims";
+import { Container } from "@mui/material";
 
 enum HomeTab {
   TRENDING = "TRENDING",
@@ -99,7 +100,7 @@ const Home: NextPage<HomeProps> = (serverProps) => {
 
   return (
     <>
-      <Box className={`container ${styles.hero}`}>
+      <div className={`${styles.hero}`}>
         <Image
           src="/images/hero.png"
           alt="Hero background"
@@ -107,66 +108,74 @@ const Home: NextPage<HomeProps> = (serverProps) => {
           layout="fill"
           objectFit="cover"
           objectPosition="bottom"
+          priority
+          quality={100}
         />
-        <Box sx={{ px: "15px" }} className={styles.hero__content}>
-          <Stack spacing={8} alignItems="center">
-            <Stack spacing={2}>
-              <Typography
-                variant="h2"
-                component="h1"
-                color="primary.contrastText"
-                align="center"
-                fontWeight="700"
-              >
-                Fractal Flows
-              </Typography>
-              <Typography
-                variant="h5"
-                component="h2"
-                color="primary.contrastText"
-                align="center"
-                fontWeight="400"
-              >
-                Submit a scientific claim and start collecting knowledge bits
-                supporting or refuting it
-              </Typography>
-            </Stack>
-
-            <Stack
-              direction={{ xs: "column", sm: "row" }}
-              spacing={{ xs: 2, sm: 2 }}
-            >
-              <Link href="/claim/new">
-                <Button
-                  size="large"
-                  fullWidth
-                  variant="contained"
-                  color="primaryContrast"
+        <Container fixed>
+          <Box sx={{ px: "15px" }} className={styles.hero__content}>
+            <Stack spacing={8} alignItems="center">
+              <Stack spacing={2}>
+                <Typography
+                  variant="h2"
+                  component="h1"
+                  color="primary.contrastText"
+                  align="center"
+                  fontWeight="700"
                 >
-                  Host new claim
-                </Button>
-              </Link>
-              <Button
-                size="large"
-                variant="outlined"
-                color="primaryContrast"
-                startIcon={<i className="fas fa-info"></i>}
+                  Fractal Flows
+                </Typography>
+                <Typography
+                  variant="h5"
+                  component="h2"
+                  color="primary.contrastText"
+                  align="center"
+                  fontWeight="400"
+                >
+                  Submit a scientific claim and start collecting knowledge bits
+                  supporting or refuting it
+                </Typography>
+              </Stack>
+
+              <Stack
+                direction={{ xs: "column", sm: "row" }}
+                spacing={{ xs: 2, sm: 2 }}
               >
-                About
-              </Button>
-              <Button
-                size="large"
-                variant="outlined"
-                color="primaryContrast"
-                startIcon={<i className="fas fa-handshake"></i>}
-              >
-                Code of conduct
-              </Button>
+                <Link href="/claim/new">
+                  <Button
+                    size="large"
+                    fullWidth
+                    variant="contained"
+                    color="primaryContrast"
+                  >
+                    Host new claim
+                  </Button>
+                </Link>
+                <Link href="/about">
+                  <Button
+                    size="large"
+                    variant="outlined"
+                    color="primaryContrast"
+                    startIcon={<i className="fas fa-info"></i>}
+                  >
+                    About
+                  </Button>
+                </Link>
+                <Link href="/code-of-conduct">
+                  <Button
+                    size="large"
+                    variant="outlined"
+                    color="primaryContrast"
+                    startIcon={<i className="fas fa-handshake"></i>}
+                  >
+                    Code of conduct
+                  </Button>
+                </Link>
+              </Stack>
             </Stack>
-          </Stack>
-        </Box>
-      </Box>
-      <Box className="container" sx={{ py: 12 }}>
+          </Box>
+        </Container>
+      </div>
+      <Container sx={{ py: 12 }}>
         <Stack spacing={{ xs: 3, md: 4 }} className="horizontal-tabs">
           <TabContext value={activeTab}>
             <Stack
@@ -204,7 +213,7 @@ const Home: NextPage<HomeProps> = (serverProps) => {
             </TabPanel>
           </TabContext>
         </Stack>
-      </Box>
+      </Container>
     </>
   );
 };
