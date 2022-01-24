@@ -1,6 +1,13 @@
 .slider {
   --fractalflows-considerit-thumb-height: 5px;
   --fractalflows-considerit-franklin-diameter: 50px;
+  margin-bottom: 40px;
+}
+
+@media screen and (min-width: 900px) {
+  .slider {
+    margin-bottom: 100px;
+  }
 }
 
 .slider__thumb {
@@ -8,7 +15,6 @@
   height: var(--fractalflows-considerit-thumb-height);
   width: 100%;
   position: relative;
-  margin-bottom: 100px;
 }
 
 .slider__thumb--moving {
@@ -25,6 +31,7 @@
       var(--fractalflows-considerit-thumb-height) / 2
   );
   margin-left: calc(var(--fractalflows-considerit-franklin-diameter) / -2);
+  touch-action: none;
 }
 
 .slider__franklin {

@@ -36,6 +36,7 @@ a {
 
 a.styled-link {
   color: var(--fractalflows-colors-primary);
+  word-break: break-all;
 }
 
 a.styled-link:hover {
