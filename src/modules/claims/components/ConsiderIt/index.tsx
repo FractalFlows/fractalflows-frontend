@@ -39,7 +39,7 @@ export const ConsiderIt = () => {
           direction={{ xs: "column", md: "row" }}
           spacing={5}
           sx={{
-            width: { xs: "100%", lg: "initial" },
+            width: { xs: "100%", md: "700px", lg: "initial" },
             flexWrap: { xs: "wrap", lg: "initial" },
             justifyContent: { xs: "center", lg: "initial" },
           }}
