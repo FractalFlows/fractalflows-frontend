@@ -31,6 +31,7 @@ import {
   GET_USER_CLAIMS,
   GET_USER_CONTRIBUTED_CLAIMS,
   GET_USER_FOLLOWING_CLAIMS,
+  GET_DISABLED_CLAIMS,
 } from "../queries";
 import type {
   ArgumentProps,
@@ -99,6 +100,21 @@ export const ClaimsService = {
     });
 
     return data.trendingClaims;
+  },
+
+  async getDisabledClaims({
+    limit,
+    offset,
+  }: PaginationProps): Promise<PaginatedClaimsProps> {
+    const { data } = await apolloClient.query({
+      query: GET_DISABLED_CLAIMS,
+      variables: {
+        limit,
+        offset,
+      },
+    });
+
+    return data.disabledClaims;
   },
 
   async searchClaims({

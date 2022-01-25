@@ -101,6 +101,19 @@ export const GET_TRENDING_CLAIMS = gql`
   }
 `;
 
+export const GET_DISABLED_CLAIMS = gql`
+  ${CORE_CLAIM_FIELDS}
+
+  query GetDisabledClaims($offset: Int!, $limit: Int!) {
+    disabledClaims(offset: $offset, limit: $limit) {
+      totalCount
+      data {
+        ...CoreClaimFields
+      }
+    }
+  }
+`;
+
 export const SEARCH_CLAIMS = gql`
   ${CORE_CLAIM_FIELDS}
 

@@ -50,30 +50,18 @@ const Home: NextPage<HomeProps> = (serverProps) => {
 
     const pagination = { limit, offset: 0 };
 
-    if (tab === HomeTab.TRENDING) {
-      try {
-        const trendingClaims = await getTrendingClaims(pagination);
-        setClaims(trendingClaims.data);
-        setTotalCount(trendingClaims.totalCount);
-      } catch (e: any) {
-        enqueueSnackbar(e?.message, {
-          variant: "error",
-        });
-      } finally {
-        setIsLoading(false);
-      }
-    } else {
-      try {
-        const allClaims = await getClaims(pagination);
-        setClaims(allClaims.data);
-        setTotalCount(allClaims.totalCount);
-      } catch (e: any) {
-        enqueueSnackbar(e?.message, {
-          variant: "error",
-        });
-      } finally {
-        setIsLoading(false);
-      }
+    try {
+      const trendingClaims = await (tab === HomeTab.TRENDING
+        ? getTrendingClaims
+        : getClaims)(pagination);
+      setClaims(trendingClaims.data);
+      setTotalCount(trendingClaims.totalCount);
+    } catch (e: any) {
+      enqueueSnackbar(e?.message, {
+        variant: "error",
+      });
+    } finally {
+      setIsLoading(false);
     }
   };
   const handleFetchMore = async () => {

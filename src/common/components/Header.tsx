@@ -23,6 +23,8 @@ import styles from "./Header.module.css";
 import { useApp } from "modules/app/useApp";
 import { useRouter } from "next/router";
 import { Container } from "@mui/material";
+import { UserRole } from "modules/users/interfaces";
+import { get } from "lodash-es";
 
 export const Header = () => {
   const { isChangingRoutes } = useApp();
@@ -87,6 +89,15 @@ export const Header = () => {
       <Link href="/settings/profile">
         <MenuItem onClick={handleMenuClose}>Settings</MenuItem>
       </Link>
+      {get(user, "role") === UserRole.ADMIN ? (
+        <>
+          <Divider sx={{ my: 0.5 }} />
+          <Link href="/claims/disabled">
+            <MenuItem onClick={handleMenuClose}>Disabled claims</MenuItem>
+            <Divider sx={{ my: 0.5 }} />
+          </Link>
+        </>
+      ) : null}
       <MenuItem
         onClick={() => {
           signout();
