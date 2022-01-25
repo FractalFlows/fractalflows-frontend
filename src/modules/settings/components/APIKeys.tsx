@@ -8,6 +8,9 @@ import {
   Button,
   Link as MuiLink,
   Alert,
+  Dialog,
+  DialogTitle,
+  DialogActions,
 } from "@mui/material";
 import {
   ContentCopy as ContentCopyIcon,
@@ -20,11 +23,12 @@ import { useSettings } from "../hooks/useSettings";
 import { TabPanel } from "./TabPanel";
 import { APIKeyProps } from "../interfaces";
 import { isEmpty } from "lodash-es";
+import { Spinner } from "common/components/Spinner";
 
 enum APIKeyState {
   GENERATING,
   SUCCESFULLY_GENERATED,
-  REMOVING,
+  DELETING,
 }
 
 enum CopyAPIKeyTooltipTextState {
@@ -35,23 +39,25 @@ enum CopyAPIKeyTooltipTextState {
 export const APIKeys = () => {
   const [apiKey, setAPIKey] = useState<APIKeyProps>();
   const [apiKeyState, setAPIKeyState] = useState<APIKeyState>();
+  const [isRegenerateDialogOpen, setIsRegenerateDialogOpen] = useState(false);
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [copyAPIKeyTooltipText, setCopyAPIKeyTooltipText] =
     useState<CopyAPIKeyTooltipTextState>(CopyAPIKeyTooltipTextState.COPY);
   const { getAPIKey, createAPIKey, removeAPIKey } = useSettings();
   const { enqueueSnackbar } = useSnackbar();
 
-  const handleCreateAPIKeyClick = async () => {
+  const handleCreate = async () => {
     setAPIKeyState(APIKeyState.GENERATING);
-    enqueueSnackbar(`Generating ${apiKey ? "new" : ""} API Key...`, {
-      variant: "info",
-    });
 
     try {
       const newApiKey = await createAPIKey();
       setAPIKey(newApiKey);
       setAPIKeyState(APIKeyState.SUCCESFULLY_GENERATED);
+      setIsRegenerateDialogOpen(false);
       enqueueSnackbar(
-        `Your ${apiKey ? "new" : ""} API Key has been succesfully generated!`,
+        `Your API Key has been succesfully ${
+          apiKey ? "regenerated" : "generated"
+        }!`,
         {
           variant: "success",
         }
@@ -63,17 +69,15 @@ export const APIKeys = () => {
       });
     }
   };
-
-  const handleRemoveAPIKeyClick = async () => {
-    setAPIKeyState(APIKeyState.REMOVING);
-    enqueueSnackbar("Removing your API Key...", {
-      variant: "info",
-    });
+  const handleRegenerateDialogClose = () => setIsRegenerateDialogOpen(false);
+  const handleDelete = async () => {
+    setAPIKeyState(APIKeyState.DELETING);
 
     try {
       await removeAPIKey();
       setAPIKey(undefined);
-      enqueueSnackbar("Your API Key has been succesfully removed!", {
+      setIsDeleteDialogOpen(false);
+      enqueueSnackbar("Your API Key has been succesfully deleted!", {
         variant: "success",
       });
     } catch (e: any) {
@@ -84,6 +88,7 @@ export const APIKeys = () => {
       setAPIKeyState(undefined);
     }
   };
+  const handleDeleteDialogClose = () => setIsDeleteDialogOpen(false);
 
   const handleCopyAPIKeyClick = (text: string = "") => {
     navigator.clipboard.writeText(text).then(
@@ -209,28 +214,72 @@ export const APIKeys = () => {
         )}
         <Stack direction={{ xs: "column", sm: "row" }} spacing={1}>
           <LoadingButton
-            loading={apiKeyState === APIKeyState.GENERATING}
+            loading={!apiKey && apiKeyState === APIKeyState.GENERATING}
             variant="contained"
             size="large"
-            onClick={handleCreateAPIKeyClick}
+            onClick={() =>
+              apiKey ? setIsRegenerateDialogOpen(true) : handleCreate()
+            }
             sx={{ alignSelf: { xs: "initial", sm: "start" } }}
           >
-            Generate {apiKey ? "new" : ""} API Key
+            {apiKey ? "Regenerate" : "Generate"} API Key
           </LoadingButton>
           {apiKey ? (
-            <LoadingButton
-              loading={apiKeyState === APIKeyState.REMOVING}
+            <Button
               variant="contained"
               color="secondary"
               size="large"
-              onClick={handleRemoveAPIKeyClick}
+              onClick={() => setIsDeleteDialogOpen(true)}
               sx={{ alignSelf: { xs: "initial", sm: "start" } }}
             >
-              Remove API Key
-            </LoadingButton>
+              Delete API Key
+            </Button>
           ) : null}
         </Stack>
       </Stack>
+
+      <Dialog
+        open={isRegenerateDialogOpen}
+        onClose={handleRegenerateDialogClose}
+        fullWidth
+        maxWidth="xs"
+        aria-labelledby="regenerate-api-key-dialog-title"
+      >
+        <DialogTitle id="regenerate-api-key-dialog-title">
+          Regenerate API Key?
+        </DialogTitle>
+        {apiKeyState === APIKeyState.GENERATING ? (
+          <Spinner />
+        ) : (
+          <DialogActions>
+            <Button onClick={handleRegenerateDialogClose}>Cancel</Button>
+            <Button onClick={handleCreate} autoFocus>
+              Regenerate
+            </Button>
+          </DialogActions>
+        )}
+      </Dialog>
+      <Dialog
+        open={isDeleteDialogOpen}
+        onClose={handleDeleteDialogClose}
+        fullWidth
+        maxWidth="xs"
+        aria-labelledby="delete-api-key-dialog-title"
+      >
+        <DialogTitle id="delete-api-key-dialog-title">
+          Delete API Key?
+        </DialogTitle>
+        {apiKeyState === APIKeyState.DELETING ? (
+          <Spinner />
+        ) : (
+          <DialogActions>
+            <Button onClick={handleDeleteDialogClose}>Cancel</Button>
+            <Button onClick={handleDelete} autoFocus>
+              Delete
+            </Button>
+          </DialogActions>
+        )}
+      </Dialog>
     </TabPanel>
   );
 };

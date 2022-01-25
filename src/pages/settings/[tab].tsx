@@ -55,7 +55,10 @@ const Settings = () => {
           className="horizontal-tabs"
         >
           <TabContext value={activeTab}>
-            <Paper variant="outlined" sx={{ alignSelf: "start" }}>
+            <Paper
+              variant="outlined"
+              sx={{ alignSelf: "start", flexShrink: 0 }}
+            >
               <TabList
                 onChange={handleTabChange}
                 orientation={isMobile ? "horizontal" : "vertical"}

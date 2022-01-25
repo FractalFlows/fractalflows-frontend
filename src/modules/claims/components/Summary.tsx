@@ -86,7 +86,7 @@ export const ClaimSummary: FC = (props) => {
       setIsDeleting(false);
     }
   };
-  const handleDisableDialogClose = () => setIsDisableDialogOpen(false);
+  const handleDeleteDialogClose = () => setIsDeleteDialogOpen(false);
   const handleDisable = async () => {
     setIsDisabling(true);
 
@@ -105,7 +105,7 @@ export const ClaimSummary: FC = (props) => {
       setIsDisabling(false);
     }
   };
-  const handleDeleteDialogClose = () => setIsDeleteDialogOpen(false);
+  const handleDisableDialogClose = () => setIsDisableDialogOpen(false);
   const handleInviteFriendsDialogClose = () =>
     setIsInviteFriendsDialogOpen(false);
   const handleFollow = async () => {
@@ -113,7 +113,7 @@ export const ClaimSummary: FC = (props) => {
 
     try {
       await addFollowerToClaim({ id: claim?.id as string });
-      enqueueSnackbar("The notifications have been sucesfully enabled!", {
+      enqueueSnackbar("Notifications have been sucesfully enabled!", {
         variant: "success",
       });
       const updatedClaim = {
@@ -134,7 +134,7 @@ export const ClaimSummary: FC = (props) => {
 
     try {
       await removeFollowerFromClaim({ id: claim?.id as string });
-      enqueueSnackbar("The notifications have been sucesfully disabled!", {
+      enqueueSnackbar("Notifications have been sucesfully disabled!", {
         variant: "success",
       });
       const updatedClaim = {
