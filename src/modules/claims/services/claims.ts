@@ -15,6 +15,7 @@ import {
   ADD_FOLLOWER_TO_CLAIM,
   REMOVE_FOLLOWER_FROM_CLAIM,
   REQUEST_CLAIM_OWNERSHIP,
+  REENABLE_CLAIM,
 } from "../mutations";
 import {
   GET_CLAIM,
@@ -230,6 +231,17 @@ export const ClaimsService = {
     });
 
     return data.disableClaim;
+  },
+
+  async reenableClaim({ id }: { id: string }): Promise<boolean> {
+    const { data } = await apolloClient.mutate({
+      mutation: REENABLE_CLAIM,
+      variables: {
+        id,
+      },
+    });
+
+    return data.reenableClaim;
   },
 
   async addFollowerToClaim({ id }: { id: string }): Promise<boolean> {

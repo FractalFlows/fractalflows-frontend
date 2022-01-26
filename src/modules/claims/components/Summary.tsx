@@ -25,7 +25,6 @@ import {
 } from "@mui/icons-material";
 import { compact, concat, filter, find, get, isEmpty, map } from "lodash-es";
 
-import type { ClaimProps } from "modules/claims/interfaces";
 import type { TagProps } from "modules/tags/interfaces";
 import { AuthorBlock } from "modules/users/components/AuthorBlock";
 import { Link } from "common/components/Link";
@@ -46,7 +45,16 @@ enum ClaimCallbackOperations {
 
 export const ClaimSummary: FC = (props) => {
   const { session, requireSignIn } = useAuth();
-  const { claim, setClaim, requestClaimOwnership } = useClaims();
+  const {
+    claim,
+    setClaim,
+    requestClaimOwnership,
+    reenableClaim,
+    deleteClaim,
+    disableClaim,
+    addFollowerToClaim,
+    removeFollowerFromClaim,
+  } = useClaims();
   const [isInviteFriendsDialogOpen, setIsInviteFriendsDialogOpen] =
     useState(false);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
@@ -59,12 +67,6 @@ export const ClaimSummary: FC = (props) => {
     setIsConnectTwitterAccountDialogOpen,
   ] = useState(false);
   const [isTogglingNotifications, setIsTogglingNotifications] = useState(false);
-  const {
-    deleteClaim,
-    disableClaim,
-    addFollowerToClaim,
-    removeFollowerFromClaim,
-  } = useClaims();
   const router = useRouter();
   const { enqueueSnackbar } = useSnackbar();
 
@@ -134,7 +136,7 @@ export const ClaimSummary: FC = (props) => {
 
     try {
       await removeFollowerFromClaim({ id: claim?.id as string });
-      enqueueSnackbar("Notifications have been sucesfully disabled!", {
+      enqueueSnackbar("The notifications have been sucesfully disabled!", {
         variant: "success",
       });
       const updatedClaim = {

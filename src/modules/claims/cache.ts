@@ -10,6 +10,8 @@ import type {
 
 export const ClaimsCache = {
   claim: makeVar({} as ClaimProps),
+  disabledClaims: makeVar([] as ClaimProps[]),
+  disabledClaimsTotalCount: makeVar(0),
   knowledgeBits: makeVar([] as KnowledgeBitProps[]),
   arguments: makeVar([] as ArgumentProps[]),
   opinions: makeVar([] as OpinionProps[]),

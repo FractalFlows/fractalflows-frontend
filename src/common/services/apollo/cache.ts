@@ -26,6 +26,12 @@ const cacheOptions = {
         claim: {
           read: () => ClaimsCache.claim(),
         },
+        disabledClaims: {
+          read: () => ClaimsCache.disabledClaims(),
+        },
+        disabledClaimsTotalCount: {
+          read: () => ClaimsCache.disabledClaimsTotalCount(),
+        },
         knowledgeBits: {
           read: () => ClaimsCache.knowledgeBits(),
         },

@@ -83,21 +83,28 @@ export const Header = () => {
           {user?.username}
         </span>
       </MenuItem>
+      <Box sx={{ ...renderMenuOnlyOnMobile }}>
+        <Link href="/claim/new">
+          <MenuItem>Host new claim</MenuItem>
+        </Link>
+        {/* <MenuItem>Become a validator</MenuItem> */}
+        <Divider sx={{ my: 0.5 }} />
+      </Box>
+      {get(user, "role") === UserRole.ADMIN
+        ? [
+            <Link href="/claims/disabled" key={1}>
+              <MenuItem onClick={handleMenuClose}>Disabled claims</MenuItem>
+            </Link>,
+            <Divider sx={{ my: 0.5 }} key={2} />,
+          ]
+        : null}
       <Link href={`/user/${user?.username}/claims`}>
         <MenuItem onClick={handleMenuClose}>Profile</MenuItem>
       </Link>
       <Link href="/settings/profile">
         <MenuItem onClick={handleMenuClose}>Settings</MenuItem>
       </Link>
-      {get(user, "role") === UserRole.ADMIN ? (
-        <>
-          <Divider sx={{ my: 0.5 }} />
-          <Link href="/claims/disabled">
-            <MenuItem onClick={handleMenuClose}>Disabled claims</MenuItem>
-            <Divider sx={{ my: 0.5 }} />
-          </Link>
-        </>
-      ) : null}
+
       <MenuItem
         onClick={() => {
           signout();
@@ -106,13 +113,6 @@ export const Header = () => {
       >
         Sign out
       </MenuItem>
-      <Box sx={{ ...renderMenuOnlyOnMobile }}>
-        <Divider sx={{ my: 0.5 }} />
-        <Link href="/claim/new">
-          <MenuItem>Host new claim</MenuItem>
-        </Link>
-        {/* <MenuItem>Become a validator</MenuItem> */}
-      </Box>
     </Menu>
   );
 

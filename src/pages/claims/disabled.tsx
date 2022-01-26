@@ -1,6 +1,6 @@
 import type { NextPage } from "next";
 import { isEmpty } from "lodash-es";
-import { Container, Box, Stack, Typography } from "@mui/material";
+import { Container, Stack, Typography } from "@mui/material";
 
 import { useAuth } from "modules/auth/hooks/useAuth";
 import { AuthWall } from "common/components/AuthWall";
@@ -14,11 +14,14 @@ const limit = 10;
 
 const DisabledClaim: NextPage = () => {
   const { session } = useAuth();
-  const { getDisabledClaims } = useClaims();
-  const [disabledClaims, setDisabledClaims] = useState<ClaimProps[]>([]);
+  const {
+    getDisabledClaims,
+    getMoreDisabledClaims,
+    disabledClaims,
+    disabledClaimsTotalCount: totalCount,
+  } = useClaims();
   const [isLoading, setIsLoading] = useState(true);
   const [isLoadingMore, setIsLoadingMore] = useState(false);
-  const [totalCount, setTotalCount] = useState(0);
   const [offset, setOffset] = useState(0);
   const { enqueueSnackbar } = useSnackbar();
 
@@ -26,9 +29,7 @@ const DisabledClaim: NextPage = () => {
     const pagination = { limit, offset: 0 };
 
     try {
-      const claims = await getDisabledClaims(pagination);
-      setDisabledClaims(claims.data);
-      setTotalCount(claims.totalCount);
+      await getDisabledClaims(pagination);
     } catch (e: any) {
       enqueueSnackbar(e?.message, {
         variant: "error",
@@ -47,12 +48,10 @@ const DisabledClaim: NextPage = () => {
     try {
       const updatedOffset = offset + limit;
       setOffset(offset + limit);
-      const claims = await getDisabledClaims({
+      await getMoreDisabledClaims({
         limit,
         offset: updatedOffset,
       });
-      setDisabledClaims(claims.data);
-      setTotalCount(claims.totalCount);
     } catch (e: any) {
       enqueueSnackbar(e?.message, {
         variant: "error",

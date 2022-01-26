@@ -17,6 +17,7 @@ import { ClaimsCache } from "../cache";
 import { ClaimProps } from "../interfaces";
 import { apolloClient } from "common/services/apollo/client";
 import { AuthCache } from "modules/auth/cache";
+import { get } from "lodash-es";
 
 const searchClaims = async ({
   term,
@@ -31,7 +32,26 @@ const getUserClaims = async ({ username }: { username: string }) => {
 };
 
 const getDisabledClaims = async ({ limit, offset }: PaginationProps) => {
-  return await ClaimsService.getDisabledClaims({ limit, offset });
+  const disabledClaims = await ClaimsService.getDisabledClaims({
+    limit,
+    offset,
+  });
+  ClaimsCache.disabledClaims(disabledClaims.data);
+  ClaimsCache.disabledClaimsTotalCount(disabledClaims.totalCount);
+  return disabledClaims;
+};
+
+const getMoreDisabledClaims = async ({ limit, offset }: PaginationProps) => {
+  const disabledClaims = await ClaimsService.getDisabledClaims({
+    limit,
+    offset,
+  });
+  ClaimsCache.disabledClaims([
+    ...ClaimsCache.disabledClaims(),
+    ...disabledClaims.data,
+  ]);
+  ClaimsCache.disabledClaimsTotalCount(disabledClaims.totalCount);
+  return disabledClaims;
 };
 
 const getUserContributedClaims = async ({ username }: { username: string }) => {
@@ -44,6 +64,19 @@ const getUserFollowingClaims = async ({ username }: { username: string }) => {
 
 const disableClaim = async ({ id }: { id: string }) => {
   return await ClaimsService.disableClaim({ id });
+};
+
+const reenableClaim = async ({ id }: { id: string }) => {
+  const result = await ClaimsService.reenableClaim({ id });
+  ClaimsCache.disabledClaims(
+    ClaimsCache.disabledClaims().filter(
+      (disabledClaim) => disabledClaim.id !== id
+    )
+  );
+  ClaimsCache.disabledClaimsTotalCount(
+    ClaimsCache.disabledClaimsTotalCount() - 1
+  );
+  return result;
 };
 
 const addFollowerToClaim = async ({ id }: { id: string }) => {
@@ -66,25 +99,28 @@ const requestClaimOwnership = async ({ id }: { id: string }) => {
 const setClaim = (claim: ClaimProps) => ClaimsCache.claim(claim);
 
 export const useClaims = () => {
-  const {
-    data: { claim },
-  } = useQuery(
+  const { data } = useQuery(
     gql`
       query Claim {
         claim @client
+        disabledClaims @client
+        disabledClaimsTotalCount @client
       }
     `,
     { client: apolloClient }
   );
 
   return {
-    claim,
+    claim: get(data, "claim"),
+    disabledClaims: get(data, "disabledClaims"),
+    disabledClaimsTotalCount: get(data, "disabledClaimsTotalCount"),
     getClaim,
     setClaim,
     getPartialClaim,
     getClaims,
     getTrendingClaims,
     getDisabledClaims,
+    getMoreDisabledClaims,
     searchClaims,
     getUserClaims,
     getUserContributedClaims,
@@ -93,6 +129,7 @@ export const useClaims = () => {
     updateClaim,
     deleteClaim,
     disableClaim,
+    reenableClaim,
     addFollowerToClaim,
     removeFollowerFromClaim,
     inviteFriends,

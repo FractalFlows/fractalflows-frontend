@@ -109,6 +109,7 @@ export const GET_DISABLED_CLAIMS = gql`
       totalCount
       data {
         ...CoreClaimFields
+        disabled
       }
     }
   }
