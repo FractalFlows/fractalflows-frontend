@@ -392,7 +392,9 @@ export const ClaimSummary: FC = (props) => {
         </Stack>
       </Stack>
       <Divider></Divider>
-      <Typography variant="body1">{claim?.summary}</Typography>
+      <Typography variant="body1" sx={{ whiteSpace: "pre-line" }}>
+        {claim?.summary}
+      </Typography>
       {isEmpty(claim?.tags) ? null : (
         <Stack direction="row" spacing={1}>
           {claim?.tags?.map(({ id, label }: TagProps) => (
