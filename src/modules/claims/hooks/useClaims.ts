@@ -31,6 +31,14 @@ const getUserClaims = async ({ username }: { username: string }) => {
   return await ClaimsService.getUserClaims({ username });
 };
 
+const getClaimsByTag = async ({
+  tag,
+  limit,
+  offset,
+}: { tag: string } & PaginationProps) => {
+  return await ClaimsService.getClaimsByTag({ tag, limit, offset });
+};
+
 const getDisabledClaims = async ({ limit, offset }: PaginationProps) => {
   const disabledClaims = await ClaimsService.getDisabledClaims({
     limit,
@@ -123,6 +131,7 @@ export const useClaims = () => {
     getMoreDisabledClaims,
     searchClaims,
     getUserClaims,
+    getClaimsByTag,
     getUserContributedClaims,
     getUserFollowingClaims,
     createClaim,

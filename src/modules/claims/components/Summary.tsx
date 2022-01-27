@@ -28,7 +28,6 @@ import { compact, concat, filter, find, get, isEmpty, map } from "lodash-es";
 import type { TagProps } from "modules/tags/interfaces";
 import { AuthorBlock } from "modules/users/components/AuthorBlock";
 import { Link } from "common/components/Link";
-import { deleteClaim } from "../hooks/delete";
 import { useClaims } from "../hooks/useClaims";
 import { useSnackbar } from "notistack";
 import { Spinner } from "common/components/Spinner";
@@ -397,8 +396,10 @@ export const ClaimSummary: FC = (props) => {
       </Typography>
       {isEmpty(claim?.tags) ? null : (
         <Stack direction="row" spacing={1}>
-          {claim?.tags?.map(({ id, label }: TagProps) => (
-            <Chip key={id} label={label} />
+          {claim?.tags?.map(({ id, label, slug }: TagProps) => (
+            <Link href={`/tag/${slug}`} key={id}>
+              <Chip label={label} />
+            </Link>
           ))}
         </Stack>
       )}

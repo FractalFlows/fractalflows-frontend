@@ -33,6 +33,7 @@ import {
   GET_USER_CONTRIBUTED_CLAIMS,
   GET_USER_FOLLOWING_CLAIMS,
   GET_DISABLED_CLAIMS,
+  GET_CLAIMS_BY_TAG,
 } from "../queries";
 import type {
   ArgumentProps,
@@ -43,6 +44,7 @@ import type {
   KnowledgeBitVoteTypes,
   OpinionProps,
   PaginatedClaimsProps,
+  TagProps,
 } from "../interfaces";
 import type { PaginationProps } from "modules/interfaces";
 
@@ -148,6 +150,26 @@ export const ClaimsService = {
     });
 
     return data.userClaims;
+  },
+
+  async getClaimsByTag({
+    tag,
+    limit,
+    offset,
+  }: { tag: string } & PaginationProps): Promise<{
+    tag: TagProps;
+    claimsByTag: PaginatedClaimsProps;
+  }> {
+    const { data } = await apolloClient.query({
+      query: GET_CLAIMS_BY_TAG,
+      variables: {
+        tag,
+        limit,
+        offset,
+      },
+    });
+
+    return data;
   },
 
   async getUserContributedClaims({

@@ -5,37 +5,22 @@ import { ClaimsList } from "modules/claims/components/ClaimsList";
 import { useClaims } from "modules/claims/hooks/useClaims";
 import { useEffect, useState } from "react";
 import { useSnackbar } from "notistack";
-import { RequireSignIn } from "common/components/RequireSignIn";
+import { ClaimsService } from "modules/claims/services/claims";
+import { useRouter } from "next/router";
 
 const limit = 10;
 
-const DisabledClaim: NextPage = RequireSignIn(() => {
-  const {
-    getDisabledClaims,
-    getMoreDisabledClaims,
-    disabledClaims,
-    disabledClaimsTotalCount: totalCount,
-  } = useClaims();
-  const [isLoading, setIsLoading] = useState(true);
+const Tag: NextPage = ({ tag, claimsByTag: initialClaimsByTag }) => {
+  const [claimsByTag, setClaimsByTag] = useState(initialClaimsByTag?.data);
+  const [totalCount, setTotalCount] = useState(initialClaimsByTag?.totalCount);
+  const { getClaimsByTag } = useClaims();
   const [isLoadingMore, setIsLoadingMore] = useState(false);
   const [offset, setOffset] = useState(0);
   const { enqueueSnackbar } = useSnackbar();
+  const router = useRouter();
 
-  const handleFetch = async () => {
-    const pagination = { limit, offset: 0 };
-
-    try {
-      await getDisabledClaims(pagination);
-    } catch (e: any) {
-      enqueueSnackbar(e?.message, {
-        variant: "error",
-      });
-    } finally {
-      setIsLoading(false);
-    }
-  };
   const handleFetchMore = async () => {
-    if (totalCount <= offset + limit || isLoadingMore || isLoading) {
+    if (totalCount <= offset + limit || isLoadingMore) {
       return;
     }
 
@@ -44,7 +29,8 @@ const DisabledClaim: NextPage = RequireSignIn(() => {
     try {
       const updatedOffset = offset + limit;
       setOffset(offset + limit);
-      await getMoreDisabledClaims({
+      await getClaimsByTag({
+        tag: router.tag as string,
         limit,
         offset: updatedOffset,
       });
@@ -57,30 +43,47 @@ const DisabledClaim: NextPage = RequireSignIn(() => {
     }
   };
 
-  useEffect(() => {
-    handleFetch();
-  }, []);
-
   return (
     <Container className="page">
       <Stack spacing={5}>
         <Typography variant="h3" component="h1">
-          Disabled claims
+          Tag: &quot;{tag?.label}&quot;
         </Typography>
-        {isLoading ? null : (
-          <Typography variant="body1" alignSelf="flex-end">
-            Showing {disabledClaims.length} of {totalCount}
-          </Typography>
-        )}
+        <Typography variant="body1" alignSelf="flex-end">
+          Showing {claimsByTag?.length} of {totalCount}
+        </Typography>
         <ClaimsList
-          claims={disabledClaims}
-          loading={isLoading}
+          claims={claimsByTag}
           loadingMore={isLoadingMore}
           handleFetchMore={handleFetchMore}
         />
       </Stack>
     </Container>
   );
-});
+};
 
-export default DisabledClaim;
+export async function getStaticProps({ params }) {
+  try {
+    const props = await ClaimsService.getClaimsByTag({
+      tag: params.tag,
+      offset: 0,
+      limit,
+    });
+
+    return {
+      props,
+      revalidate: 10,
+    };
+  } catch (e) {
+    return { notFound: true };
+  }
+}
+
+export async function getStaticPaths() {
+  return {
+    paths: [],
+    fallback: true,
+  };
+}
+
+export default Tag;

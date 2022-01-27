@@ -108,8 +108,10 @@ export const ClaimTile: FC<{ claim: ClaimProps }> = ({ claim }) => {
                 ) : null}
                 {isEmpty(claim?.tags) ? null : (
                   <Stack direction="row" spacing={1}>
-                    {claim?.tags?.map(({ id, label }: TagProps) => (
-                      <Chip key={id} label={label} />
+                    {claim?.tags?.map(({ id, label, slug }: TagProps) => (
+                      <Link href={`/tag/${slug}`} key={id}>
+                        <Chip label={label} />
+                      </Link>
                     ))}
                   </Stack>
                 )}

@@ -139,6 +139,23 @@ export const GET_USER_CLAIMS = gql`
   }
 `;
 
+export const GET_CLAIMS_BY_TAG = gql`
+  ${CORE_CLAIM_FIELDS}
+
+  query GetClaimsByTag($tag: String!, $limit: Int!, $offset: Int!) {
+    tag(slug: $tag) {
+      label
+    }
+
+    claimsByTag(tag: $tag, limit: $limit, offset: $offset) {
+      totalCount
+      data {
+        ...CoreClaimFields
+      }
+    }
+  }
+`;
+
 export const GET_USER_CONTRIBUTED_CLAIMS = gql`
   ${CORE_CLAIM_FIELDS}
 
