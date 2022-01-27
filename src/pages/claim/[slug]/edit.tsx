@@ -5,7 +5,6 @@ import type { NextPage } from "next";
 import { isEmpty } from "lodash-es";
 
 import { useAuth } from "modules/auth/hooks/useAuth";
-import { AuthWall } from "common/components/AuthWall";
 import {
   ClaimUpsertForm,
   ClaimUpsertFormOperation,
@@ -35,8 +34,6 @@ const EditClaim: NextPage = () => {
         );
     }
   }, [slug]);
-
-  if (isEmpty(session)) return <AuthWall />;
 
   return (
     <Container className="page">

@@ -19,6 +19,7 @@ import "common/styles/globals.css";
 import "common/styles/overrides.css";
 import { useRouter } from "next/router";
 import { useApp } from "modules/app/useApp";
+import { SignIn } from "common/components/SignIn";
 
 const clientSideEmotionCache = createEmotionCache();
 
@@ -84,6 +85,7 @@ const MyApp = ({
               <Component {...pageProps} />
             </main>
             <Footer />
+            <SignIn />
           </SnackbarProvider>
         </ThemeProvider>
       </CacheProvider>

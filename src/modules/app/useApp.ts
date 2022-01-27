@@ -7,13 +7,18 @@ const setIsChangingRoutes = (isChangingRoutes: boolean) => {
   AppCache.isChangingRoutes(isChangingRoutes);
 };
 
+const setIsSignInDialogOpen = (isSignInDialogOpen: boolean) => {
+  AppCache.isSignInDialogOpen(isSignInDialogOpen);
+};
+
 export const useApp = () => {
   const {
-    data: { isChangingRoutes },
+    data: { isChangingRoutes, isSignInDialogOpen },
   } = useQuery(
     gql`
       query App {
         isChangingRoutes @client
+        isSignInDialogOpen @client
       }
     `,
     { client: apolloClient }
@@ -22,5 +27,7 @@ export const useApp = () => {
   return {
     isChangingRoutes,
     setIsChangingRoutes,
+    isSignInDialogOpen,
+    setIsSignInDialogOpen,
   };
 };

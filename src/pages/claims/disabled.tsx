@@ -3,7 +3,6 @@ import { isEmpty } from "lodash-es";
 import { Container, Stack, Typography } from "@mui/material";
 
 import { useAuth } from "modules/auth/hooks/useAuth";
-import { AuthWall } from "common/components/AuthWall";
 import { ClaimsList } from "modules/claims/components/ClaimsList";
 import { useClaims } from "modules/claims/hooks/useClaims";
 import { useEffect, useState } from "react";
@@ -66,8 +65,6 @@ const DisabledClaim: NextPage = () => {
       handleFetch();
     }
   }, [session]);
-
-  if (isEmpty(session)) return <AuthWall />;
 
   return (
     <Container className="page">

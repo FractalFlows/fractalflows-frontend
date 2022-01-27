@@ -3,7 +3,6 @@ import { isEmpty } from "lodash-es";
 import { Container, Box } from "@mui/material";
 
 import { useAuth } from "modules/auth/hooks/useAuth";
-import { AuthWall } from "common/components/AuthWall";
 import {
   ClaimUpsertForm,
   ClaimUpsertFormOperation,
@@ -11,8 +10,6 @@ import {
 
 const NewClaim: NextPage = () => {
   const { session } = useAuth();
-
-  if (isEmpty(session)) return <AuthWall />;
 
   return (
     <Container className="page">

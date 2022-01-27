@@ -23,6 +23,9 @@ const cacheOptions = {
         isChangingRoutes: {
           read: () => AppCache.isChangingRoutes(),
         },
+        isSignInDialogOpen: {
+          read: () => AppCache.isSignInDialogOpen(),
+        },
         claim: {
           read: () => ClaimsCache.claim(),
         },

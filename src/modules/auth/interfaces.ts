@@ -7,7 +7,7 @@ export interface Session {
 }
 
 export enum SignInMethod {
-  MAGIC_LINK = "MAGIC_LINK",
+  EMAIL = "EMAIL",
   ETHEREUM = "ETHEREUM",
 }
 

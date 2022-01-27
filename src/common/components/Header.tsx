@@ -21,13 +21,12 @@ import { Link } from "common/components/Link";
 import { Search } from "./Search";
 import styles from "./Header.module.css";
 import { useApp } from "modules/app/useApp";
-import { useRouter } from "next/router";
 import { Container } from "@mui/material";
 import { UserRole } from "modules/users/interfaces";
 import { get } from "lodash-es";
 
 export const Header = () => {
-  const { isChangingRoutes } = useApp();
+  const { isChangingRoutes, setIsSignInDialogOpen } = useApp();
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
   const [mobileMoreAnchorEl, setMobileMoreAnchorEl] =
     React.useState<null | HTMLElement>(null);
@@ -144,6 +143,7 @@ export const Header = () => {
             <Link href="/signin" key={1}>
               <MenuItem
                 onClick={() => {
+                  setIsSignInDialogOpen(true);
                   handleMobileMenuClose();
                 }}
               >
@@ -225,11 +225,13 @@ export const Header = () => {
                     </Button>
                   </>
                 ) : (
-                  <Link href="/signin">
-                    <Button variant="contained" color="primaryContrast">
-                      Sign in
-                    </Button>
-                  </Link>
+                  <Button
+                    variant="contained"
+                    color="primaryContrast"
+                    onClick={() => setIsSignInDialogOpen(true)}
+                  >
+                    Sign in
+                  </Button>
                 )}
               </Stack>
             </Box>

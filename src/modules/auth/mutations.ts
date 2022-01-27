@@ -11,15 +11,15 @@ export const SIGN_IN_WITH_ETHEREUM = gql`
   }
 `;
 
-export const SEND_MAGIC_LINK = gql`
-  mutation SendMagicLink($email: String!) {
-    sendMagicLink(email: $email)
+export const SEND_SIGN_IN_CODE = gql`
+  mutation SendSignInCode($email: String!) {
+    sendSignInCode(email: $email)
   }
 `;
 
-export const VERIFY_MAGIC_LINK = gql`
-  mutation VerifyMagicLink($hash: String!) {
-    verifyMagicLink(hash: $hash) {
+export const VERIFY_SIGN_IN_CODE = gql`
+  mutation VerifySignInCode($signInCode: String!) {
+    verifySignInCode(signInCode: $signInCode) {
       ethAddress
       email
     }

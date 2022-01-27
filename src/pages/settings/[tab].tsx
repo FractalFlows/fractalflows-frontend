@@ -11,7 +11,6 @@ import { Twitter } from "modules/settings/components/Twitter";
 import { APIKeys } from "modules/settings/components/APIKeys";
 import { Profile } from "modules/settings/components/Profile";
 import { useAuth } from "modules/auth/hooks/useAuth";
-import { AuthWall } from "common/components/AuthWall";
 import { useRouter } from "next/router";
 import { Container } from "@mui/material";
 
@@ -40,8 +39,6 @@ const Settings = () => {
       setActiveTab((router.query.tab as string).toLowerCase());
     }
   }, [router.isReady]);
-
-  if (isEmpty(session)) return <AuthWall />;
 
   return (
     <Container className="page">
