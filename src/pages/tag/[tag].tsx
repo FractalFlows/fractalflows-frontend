@@ -1,16 +1,27 @@
+import { useEffect, useState } from "react";
+import { useSnackbar } from "notistack";
 import type { NextPage } from "next";
 import { Container, Stack, Typography } from "@mui/material";
+import { useRouter } from "next/router";
 
 import { ClaimsList } from "modules/claims/components/ClaimsList";
 import { useClaims } from "modules/claims/hooks/useClaims";
-import { useEffect, useState } from "react";
-import { useSnackbar } from "notistack";
 import { ClaimsService } from "modules/claims/services/claims";
-import { useRouter } from "next/router";
+import { Spinner } from "common/components/Spinner";
+import { TagProps } from "modules/tags/interfaces";
+import { PaginatedClaimsProps } from "modules/claims/interfaces";
+
+interface TagComponentProps {
+  tag: TagProps;
+  claimsByTag: PaginatedClaimsProps;
+}
 
 const limit = 10;
 
-const Tag: NextPage = ({ tag, claimsByTag: initialClaimsByTag }) => {
+const Tag: NextPage<TagComponentProps> = ({
+  tag,
+  claimsByTag: initialClaimsByTag,
+}) => {
   const [claimsByTag, setClaimsByTag] = useState(initialClaimsByTag?.data);
   const [totalCount, setTotalCount] = useState(initialClaimsByTag?.totalCount);
   const { getClaimsByTag } = useClaims();
@@ -30,7 +41,7 @@ const Tag: NextPage = ({ tag, claimsByTag: initialClaimsByTag }) => {
       const updatedOffset = offset + limit;
       setOffset(offset + limit);
       await getClaimsByTag({
-        tag: router.tag as string,
+        tag: router.query.tag as string,
         limit,
         offset: updatedOffset,
       });
@@ -43,21 +54,30 @@ const Tag: NextPage = ({ tag, claimsByTag: initialClaimsByTag }) => {
     }
   };
 
+  useEffect(() => {
+    setClaimsByTag(initialClaimsByTag?.data);
+    setTotalCount(initialClaimsByTag?.totalCount);
+  }, [initialClaimsByTag]);
+
   return (
     <Container className="page">
-      <Stack spacing={5}>
-        <Typography variant="h3" component="h1">
-          Tag: &quot;{tag?.label}&quot;
-        </Typography>
-        <Typography variant="body1" alignSelf="flex-end">
-          Showing {claimsByTag?.length} of {totalCount}
-        </Typography>
-        <ClaimsList
-          claims={claimsByTag}
-          loadingMore={isLoadingMore}
-          handleFetchMore={handleFetchMore}
-        />
-      </Stack>
+      {router.isFallback ? (
+        <Spinner />
+      ) : (
+        <Stack spacing={5}>
+          <Typography variant="h3" component="h1">
+            Tag: &quot;{tag?.label}&quot;
+          </Typography>
+          <Typography variant="body1" alignSelf="flex-end">
+            Showing {claimsByTag?.length} of {totalCount}
+          </Typography>
+          <ClaimsList
+            claims={claimsByTag}
+            loadingMore={isLoadingMore}
+            handleFetchMore={handleFetchMore}
+          />
+        </Stack>
+      )}
     </Container>
   );
 };
