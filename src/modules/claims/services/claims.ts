@@ -15,6 +15,7 @@ import {
   ADD_FOLLOWER_TO_CLAIM,
   REMOVE_FOLLOWER_FROM_CLAIM,
   REQUEST_CLAIM_OWNERSHIP,
+  REENABLE_CLAIM,
 } from "../mutations";
 import {
   GET_CLAIM,
@@ -31,6 +32,8 @@ import {
   GET_USER_CLAIMS,
   GET_USER_CONTRIBUTED_CLAIMS,
   GET_USER_FOLLOWING_CLAIMS,
+  GET_DISABLED_CLAIMS,
+  GET_CLAIMS_BY_TAG,
 } from "../queries";
 import type {
   ArgumentProps,
@@ -41,6 +44,7 @@ import type {
   KnowledgeBitVoteTypes,
   OpinionProps,
   PaginatedClaimsProps,
+  TagProps,
 } from "../interfaces";
 import type { PaginationProps } from "modules/interfaces";
 
@@ -101,6 +105,21 @@ export const ClaimsService = {
     return data.trendingClaims;
   },
 
+  async getDisabledClaims({
+    limit,
+    offset,
+  }: PaginationProps): Promise<PaginatedClaimsProps> {
+    const { data } = await apolloClient.query({
+      query: GET_DISABLED_CLAIMS,
+      variables: {
+        limit,
+        offset,
+      },
+    });
+
+    return data.disabledClaims;
+  },
+
   async searchClaims({
     term,
     limit,
@@ -131,6 +150,26 @@ export const ClaimsService = {
     });
 
     return data.userClaims;
+  },
+
+  async getClaimsByTag({
+    tag,
+    limit,
+    offset,
+  }: { tag: string } & PaginationProps): Promise<{
+    tag: TagProps;
+    claimsByTag: PaginatedClaimsProps;
+  }> {
+    const { data } = await apolloClient.query({
+      query: GET_CLAIMS_BY_TAG,
+      variables: {
+        tag,
+        limit,
+        offset,
+      },
+    });
+
+    return data;
   },
 
   async getUserContributedClaims({
@@ -214,6 +253,17 @@ export const ClaimsService = {
     });
 
     return data.disableClaim;
+  },
+
+  async reenableClaim({ id }: { id: string }): Promise<boolean> {
+    const { data } = await apolloClient.mutate({
+      mutation: REENABLE_CLAIM,
+      variables: {
+        id,
+      },
+    });
+
+    return data.reenableClaim;
   },
 
   async addFollowerToClaim({ id }: { id: string }): Promise<boolean> {

@@ -1,28 +1,27 @@
 import { FC } from "react";
 import { useSnackbar } from "notistack";
-import { useCallback, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { LoadingButton } from "@mui/lab";
-import { Button, Stack, TextField, Typography } from "@mui/material";
+import { Button, Stack, TextField } from "@mui/material";
+import { filter } from "lodash-es";
+import { useRouter } from "next/router";
 
 import {
   Autocomplete,
   AutocompleteOptionProps,
 } from "common/components/Autocomplete";
 import { registerMui } from "common/utils/registerMui";
-import { useClaims } from "modules/claims/hooks/useClaims";
 import {
   ArgumentProps,
   ArgumentSides,
   KnowledgeBitProps,
   KnowledgeBitSides,
 } from "modules/claims/interfaces";
-import { useRouter } from "next/router";
 import { UpsertFormOperation } from "common/interfaces";
 import { mapArray } from "common/utils/mapArray";
 import { useArguments } from "modules/claims/hooks/useArguments";
 import { useKnowledgeBits } from "modules/claims/hooks/useKnowledgeBits";
-import { filter } from "lodash-es";
 import { useOpinions } from "modules/claims/hooks/useOpinions";
 
 const ArgumentUpsertFormOperationTexts = {
@@ -57,7 +56,8 @@ export const ArgumentUpsertForm: FC<ArgumentUpsertFormProps> = ({
   operation,
   handleClose,
 }) => {
-  const { createArgument, updateArgument } = useArguments();
+  const { createArgument, updateArgument, setArguments, argumentsList } =
+    useArguments();
   const { addArgumentToOpinion } = useOpinions();
   const { enqueueSnackbar } = useSnackbar();
   const { knowledgeBits } = useKnowledgeBits();
@@ -91,6 +91,7 @@ export const ArgumentUpsertForm: FC<ArgumentUpsertFormProps> = ({
           argument: mapArgument(),
         });
         addArgumentToOpinion(addedArgument);
+        setArguments([...argumentsList, addedArgument]);
       } else {
         await updateArgument({
           id: argument?.id as string,

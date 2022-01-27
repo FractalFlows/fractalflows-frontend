@@ -1,20 +1,69 @@
 import { gql, useQuery } from "@apollo/client";
-import { useRouter } from "next/router";
 
 import { apolloClient } from "common/services/apollo/client";
 import { signInWithEthereum } from "./siwe";
-import { sendMagicLink, verifyMagicLink } from "./magic-link";
 import { signout } from "./signout";
-import { getSession } from "./session";
+import { AppCache } from "modules/app/cache";
+import { AuthCache } from "../cache";
+import { AuthService } from "../services/auth";
+import type { Session } from "../interfaces";
+
+const getSession = async () => {
+  AuthCache.isLoadingSession(true);
+
+  try {
+    const session = await AuthService.getSession();
+
+    AuthCache.session(session);
+    AuthCache.isSignedIn(true);
+  } catch (e: any) {
+    AuthCache.session({} as Session);
+    AuthCache.isSignedIn(false);
+  } finally {
+    AuthCache.isLoadingSession(false);
+  }
+};
+
+export const reloadSession = async () => {
+  try {
+    const session = await AuthService.getSession();
+    AuthCache.session(session);
+    AuthCache.isSignedIn(true);
+  } catch (e: any) {
+    AuthCache.session({} as Session);
+    AuthCache.isSignedIn(false);
+  }
+};
+
+const sendSignInCode = async ({ email }: { email: string }) =>
+  await AuthService.sendSignInCode({ email });
+
+const verifySignInCode = async ({ signInCode }: { signInCode: string }) => {
+  await AuthService.verifySignInCode({ signInCode });
+  await reloadSession();
+};
+
+const requireSignIn =
+  (handler: any, executeAnywaysHandler?: any) =>
+  (...props: any) => {
+    executeAnywaysHandler && executeAnywaysHandler(...props);
+
+    if (AuthCache.isSignedIn()) {
+      handler(...props);
+    } else {
+      AppCache.isSignInDialogOpen(true);
+      AppCache.signInCallback = () => handler(...props);
+    }
+  };
 
 export const useAuth = () => {
-  const router = useRouter();
   const {
-    data: { session, isSignedIn },
+    data: { session, isLoadingSession, isSignedIn },
   } = useQuery(
     gql`
       query Session {
         session @client
+        isLoadingSession @client
         isSignedIn @client
       }
     `,
@@ -23,26 +72,15 @@ export const useAuth = () => {
     }
   );
 
-  const requireSignIn =
-    (handler: any, executeAnywaysHandler?: any) =>
-    (...props: any) => {
-      executeAnywaysHandler && executeAnywaysHandler(...props);
-
-      if (isSignedIn) {
-        handler(...props);
-      } else {
-        router.push("/signin");
-      }
-    };
-
   return {
     signInWithEthereum,
-    sendMagicLink,
-    verifyMagicLink,
+    sendSignInCode,
+    verifySignInCode,
     signout,
     requireSignIn,
     getSession,
     session,
+    isLoadingSession,
     isSignedIn,
   };
 };

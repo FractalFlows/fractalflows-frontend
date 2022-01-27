@@ -22,7 +22,7 @@ import { ArgumentCommentUpsertForm } from "./ArgumentCommentUpsertForm";
 import { UpsertFormOperation } from "common/interfaces";
 import { ArgumentCommentProps } from "modules/argument-comments/interfaces";
 import { ArgumentComment } from "./ArgumentComment";
-import { Link } from "common/components/Link";
+import { useApp } from "modules/app/useApp";
 
 interface ArgumentDetailsProps {
   argumentId: string;
@@ -30,6 +30,7 @@ interface ArgumentDetailsProps {
 
 export const ArgumentDetails: FC<ArgumentDetailsProps> = ({ argumentId }) => {
   const { session, isSignedIn } = useAuth();
+  const { setIsSignInDialogOpen } = useApp();
   const [argument, setArgument] = useState({} as ArgumentProps);
   const [isLoadingArgument, setIsLoadingArgument] = useState(true);
   const { getArgument } = useArguments();
@@ -118,9 +119,14 @@ export const ArgumentDetails: FC<ArgumentDetailsProps> = ({ argumentId }) => {
               />
             </Stack>
           ) : (
-            <Link href="/signin">
-              <Button variant="contained">Sign in to participate</Button>
-            </Link>
+            <Button
+              variant="contained"
+              color="secondary"
+              onClick={() => setIsSignInDialogOpen(true)}
+              sx={{ alignSelf: "flex-start" }}
+            >
+              Sign in to participate
+            </Button>
           )}
         </Stack>
       </Stack>

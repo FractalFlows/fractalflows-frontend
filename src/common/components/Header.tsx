@@ -21,11 +21,12 @@ import { Link } from "common/components/Link";
 import { Search } from "./Search";
 import styles from "./Header.module.css";
 import { useApp } from "modules/app/useApp";
-import { useRouter } from "next/router";
 import { Container } from "@mui/material";
+import { UserRole } from "modules/users/interfaces";
+import { get } from "lodash-es";
 
 export const Header = () => {
-  const { isChangingRoutes } = useApp();
+  const { isChangingRoutes, setIsSignInDialogOpen } = useApp();
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
   const [mobileMoreAnchorEl, setMobileMoreAnchorEl] =
     React.useState<null | HTMLElement>(null);
@@ -81,12 +82,28 @@ export const Header = () => {
           {user?.username}
         </span>
       </MenuItem>
+      <Box sx={{ ...renderMenuOnlyOnMobile }}>
+        <Link href="/claim/new">
+          <MenuItem>Host new claim</MenuItem>
+        </Link>
+        {/* <MenuItem>Become a validator</MenuItem> */}
+        <Divider sx={{ my: 0.5 }} />
+      </Box>
+      {get(user, "role") === UserRole.ADMIN
+        ? [
+            <Link href="/claims/disabled" key={1}>
+              <MenuItem onClick={handleMenuClose}>Disabled claims</MenuItem>
+            </Link>,
+            <Divider sx={{ my: 0.5 }} key={2} />,
+          ]
+        : null}
       <Link href={`/user/${user?.username}/claims`}>
         <MenuItem onClick={handleMenuClose}>Profile</MenuItem>
       </Link>
       <Link href="/settings/profile">
         <MenuItem onClick={handleMenuClose}>Settings</MenuItem>
       </Link>
+
       <MenuItem
         onClick={() => {
           signout();
@@ -95,13 +112,6 @@ export const Header = () => {
       >
         Sign out
       </MenuItem>
-      <Box sx={{ ...renderMenuOnlyOnMobile }}>
-        <Divider sx={{ my: 0.5 }} />
-        <Link href="/claim/new">
-          <MenuItem>Host new claim</MenuItem>
-        </Link>
-        {/* <MenuItem>Become a validator</MenuItem> */}
-      </Box>
     </Menu>
   );
 
@@ -130,17 +140,17 @@ export const Header = () => {
         ? null
         : [
             <Divider key={0} sx={{ my: 0.5 }} />,
-            <Link href="/signin" key={1}>
-              <MenuItem
-                onClick={() => {
-                  handleMobileMenuClose();
-                }}
-              >
-                <Button variant="contained" color="primary" fullWidth>
-                  Sign in
-                </Button>
-              </MenuItem>
-            </Link>,
+            <MenuItem
+              onClick={() => {
+                setIsSignInDialogOpen(true);
+                handleMobileMenuClose();
+              }}
+              key={1}
+            >
+              <Button variant="contained" color="primary" fullWidth>
+                Sign in
+              </Button>
+            </MenuItem>,
           ]}
     </Menu>
   );
@@ -214,11 +224,13 @@ export const Header = () => {
                     </Button>
                   </>
                 ) : (
-                  <Link href="/signin">
-                    <Button variant="contained" color="primaryContrast">
-                      Sign in
-                    </Button>
-                  </Link>
+                  <Button
+                    variant="contained"
+                    color="primaryContrast"
+                    onClick={() => setIsSignInDialogOpen(true)}
+                  >
+                    Sign in
+                  </Button>
                 )}
               </Stack>
             </Box>

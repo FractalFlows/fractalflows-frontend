@@ -101,6 +101,20 @@ export const GET_TRENDING_CLAIMS = gql`
   }
 `;
 
+export const GET_DISABLED_CLAIMS = gql`
+  ${CORE_CLAIM_FIELDS}
+
+  query GetDisabledClaims($offset: Int!, $limit: Int!) {
+    disabledClaims(offset: $offset, limit: $limit) {
+      totalCount
+      data {
+        ...CoreClaimFields
+        disabled
+      }
+    }
+  }
+`;
+
 export const SEARCH_CLAIMS = gql`
   ${CORE_CLAIM_FIELDS}
 
@@ -121,6 +135,23 @@ export const GET_USER_CLAIMS = gql`
   query GetUserClaims($username: String!) {
     userClaims(username: $username) {
       ...CoreClaimFields
+    }
+  }
+`;
+
+export const GET_CLAIMS_BY_TAG = gql`
+  ${CORE_CLAIM_FIELDS}
+
+  query GetClaimsByTag($tag: String!, $limit: Int!, $offset: Int!) {
+    tag(slug: $tag) {
+      label
+    }
+
+    claimsByTag(tag: $tag, limit: $limit, offset: $offset) {
+      totalCount
+      data {
+        ...CoreClaimFields
+      }
     }
   }
 `;

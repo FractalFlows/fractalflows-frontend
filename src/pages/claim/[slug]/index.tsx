@@ -1,5 +1,5 @@
 import { useEffect } from "react";
-import { Box, Stack } from "@mui/material";
+import { Stack } from "@mui/material";
 import type { NextPage } from "next";
 import Head from "next/head";
 import { map, get } from "lodash-es";
@@ -95,15 +95,20 @@ const Claim: NextPage<ClaimPageProps> = (serverProps) => {
 };
 
 export async function getStaticProps({ params }: { params: ClaimParamsProps }) {
-  const { slug } = params;
-  const data = await ClaimsService.getClaim({
-    slug,
-  });
+  try {
+    const { slug } = params;
 
-  return {
-    props: data,
-    revalidate: 10,
-  };
+    const data = await ClaimsService.getClaim({
+      slug,
+    });
+
+    return {
+      props: data,
+      revalidate: 5,
+    };
+  } catch (e) {
+    return { notFound: true };
+  }
 }
 
 export async function getStaticPaths() {

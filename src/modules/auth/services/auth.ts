@@ -4,9 +4,9 @@ import { apolloClient } from "common/services/apollo/client";
 import { GET_NONCE, GET_SESSION } from "../queries";
 import {
   SIGN_IN_WITH_ETHEREUM,
-  SEND_MAGIC_LINK,
-  VERIFY_MAGIC_LINK,
   SIGN_OUT,
+  SEND_SIGN_IN_CODE,
+  VERIFY_SIGN_IN_CODE,
 } from "../mutations";
 import type { Session } from "../interfaces";
 import type { UserProps } from "../../users/interfaces";
@@ -53,26 +53,30 @@ export const AuthService = {
     return data.signInWithEthereum;
   },
 
-  async sendMagicLink({ email }: { email: string }): Promise<Boolean> {
+  async sendSignInCode({ email }: { email: string }): Promise<Boolean> {
     const { data } = await apolloClient.mutate({
-      mutation: SEND_MAGIC_LINK,
+      mutation: SEND_SIGN_IN_CODE,
       variables: {
         email,
       },
     });
 
-    return data.sendMagicLink;
+    return data.sendSignInCode;
   },
 
-  async verifyMagicLink({ hash }: { hash: string }): Promise<UserProps> {
+  async verifySignInCode({
+    signInCode,
+  }: {
+    signInCode: string;
+  }): Promise<UserProps> {
     const { data } = await apolloClient.mutate({
-      mutation: VERIFY_MAGIC_LINK,
+      mutation: VERIFY_SIGN_IN_CODE,
       variables: {
-        hash,
+        signInCode,
       },
     });
 
-    return data.verifyMagicLink;
+    return data.verifySignInCode;
   },
 
   async signout(): Promise<Boolean> {

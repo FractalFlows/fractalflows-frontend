@@ -1,9 +1,8 @@
 import { SignatureType, SiweMessage } from "siwe";
 
 import { AuthService } from "../services/auth";
-import { AuthCache } from "../cache";
 import { connectEthereumWallet } from "common/utils/connectEthereumWallet";
-import { reloadSession } from "./session";
+import { reloadSession } from "./useAuth";
 
 export const signInWithEthereum = async (callback: () => any) => {
   const { address, ens, avatar, ethersProvider } =

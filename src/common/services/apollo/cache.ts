@@ -11,6 +11,9 @@ const cacheOptions = {
         session: {
           read: () => AuthCache.session(),
         },
+        isLoadingSession: {
+          read: () => AuthCache.isLoadingSession(),
+        },
         isSignedIn: {
           read: () => AuthCache.isSignedIn(),
         },
@@ -23,8 +26,17 @@ const cacheOptions = {
         isChangingRoutes: {
           read: () => AppCache.isChangingRoutes(),
         },
+        isSignInDialogOpen: {
+          read: () => AppCache.isSignInDialogOpen(),
+        },
         claim: {
           read: () => ClaimsCache.claim(),
+        },
+        disabledClaims: {
+          read: () => ClaimsCache.disabledClaims(),
+        },
+        disabledClaimsTotalCount: {
+          read: () => ClaimsCache.disabledClaimsTotalCount(),
         },
         knowledgeBits: {
           read: () => ClaimsCache.knowledgeBits(),

@@ -86,13 +86,8 @@ export const ClaimUpsertForm: FC<ClaimUpsertFormProps> = ({
       title: get(claim, "title", ""),
       summary: get(claim, "summary", ""),
       tags: mapArray(claim?.tags, ["id", "label"]) as TagProps[],
-      sources: mapArray(claim?.sources, [
-        "id",
-        "origin",
-        "url",
-      ]) as SourceProps[],
+      sources: mapArray(claim?.sources, ["origin", "url"]) as SourceProps[],
       attributions: mapArray(claim?.attributions, [
-        "id",
         "origin",
         "identifier",
       ]) as AttributionProps[],
@@ -135,13 +130,20 @@ export const ClaimUpsertForm: FC<ClaimUpsertFormProps> = ({
 
   const handleSubmit = async (data: ClaimProps) => {
     try {
-      const { slug } = await (operation === ClaimUpsertFormOperation.CREATE
-        ? createClaim({ claim: data })
-        : updateClaim({ id: claim?.id as string, claim: data }));
+      if (operation === ClaimUpsertFormOperation.CREATE) {
+        const { slug } = await createClaim({ claim: data });
+        router.push(`/claim/${slug}`);
+      } else {
+        const { slug } = await updateClaim({
+          id: claim?.id as string,
+          claim: data,
+        });
+        await fetch(`${window.location.origin}/api/claim/preview`);
+        router.push(`/claim/${slug}`);
+      }
       enqueueSnackbar(ClaimUpsertFormOperationText[operation].successFeedback, {
         variant: "success",
       });
-      router.push(`/claim/${slug}`);
     } catch (e: any) {
       enqueueSnackbar(e?.message, {
         variant: "error",

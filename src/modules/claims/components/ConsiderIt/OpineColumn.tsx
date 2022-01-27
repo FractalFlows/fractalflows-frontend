@@ -1,14 +1,14 @@
+import type { FC } from "react";
 import { Button, Stack, Typography } from "@mui/material";
-import { useSnackbar } from "notistack";
 
 import { ArgumentSides } from "modules/claims/interfaces";
 import { Argument, ArgumentPlacements } from "./Argument";
 import { ArgumentUpsertForm } from "./ArgumentUpsertForm";
 import { useState } from "react";
 import { UpsertFormOperation } from "common/interfaces";
-import { useArguments } from "modules/claims/hooks/useArguments";
-import { isEmpty } from "lodash-es";
+import { find, isEmpty } from "lodash-es";
 import { useOpinions } from "modules/claims/hooks/useOpinions";
+import { useArguments } from "modules/claims/hooks/useArguments";
 
 const OpineColumnTexts = {
   [ArgumentSides.CON]: {
@@ -25,12 +25,19 @@ const OpineColumnTexts = {
   },
 };
 
-export const OpineColumn = ({ side }) => {
+interface OpineColumnProps {
+  side: ArgumentSides;
+}
+
+export const OpineColumn: FC<OpineColumnProps> = ({ side }) => {
   const { userOpinion } = useOpinions();
   const [isAddingArgument, setIsAddingArgument] = useState(false);
+  const { argumentsList } = useArguments();
 
-  const filteredArguments = userOpinion?.arguments?.filter(
-    (argument) => argument.side === side
+  const filteredArguments = argumentsList.filter(
+    (argument) =>
+      argument.side === side &&
+      find(userOpinion?.arguments, { id: argument.id }) !== undefined
   );
 
   return (

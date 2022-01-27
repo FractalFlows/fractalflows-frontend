@@ -16,6 +16,7 @@ export const CORE_CLAIM_FIELDS = gql`
     tags {
       id
       label
+      slug
     }
     knowledgeBits {
       id

@@ -25,11 +25,9 @@ import {
 } from "@mui/icons-material";
 import { compact, concat, filter, find, get, isEmpty, map } from "lodash-es";
 
-import type { ClaimProps } from "modules/claims/interfaces";
 import type { TagProps } from "modules/tags/interfaces";
 import { AuthorBlock } from "modules/users/components/AuthorBlock";
 import { Link } from "common/components/Link";
-import { deleteClaim } from "../hooks/delete";
 import { useClaims } from "../hooks/useClaims";
 import { useSnackbar } from "notistack";
 import { Spinner } from "common/components/Spinner";
@@ -46,7 +44,16 @@ enum ClaimCallbackOperations {
 
 export const ClaimSummary: FC = (props) => {
   const { session, requireSignIn } = useAuth();
-  const { claim, setClaim, requestClaimOwnership } = useClaims();
+  const {
+    claim,
+    setClaim,
+    requestClaimOwnership,
+    reenableClaim,
+    deleteClaim,
+    disableClaim,
+    addFollowerToClaim,
+    removeFollowerFromClaim,
+  } = useClaims();
   const [isInviteFriendsDialogOpen, setIsInviteFriendsDialogOpen] =
     useState(false);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
@@ -59,12 +66,6 @@ export const ClaimSummary: FC = (props) => {
     setIsConnectTwitterAccountDialogOpen,
   ] = useState(false);
   const [isTogglingNotifications, setIsTogglingNotifications] = useState(false);
-  const {
-    deleteClaim,
-    disableClaim,
-    addFollowerToClaim,
-    removeFollowerFromClaim,
-  } = useClaims();
   const router = useRouter();
   const { enqueueSnackbar } = useSnackbar();
 
@@ -86,7 +87,7 @@ export const ClaimSummary: FC = (props) => {
       setIsDeleting(false);
     }
   };
-  const handleDisableDialogClose = () => setIsDisableDialogOpen(false);
+  const handleDeleteDialogClose = () => setIsDeleteDialogOpen(false);
   const handleDisable = async () => {
     setIsDisabling(true);
 
@@ -105,7 +106,7 @@ export const ClaimSummary: FC = (props) => {
       setIsDisabling(false);
     }
   };
-  const handleDeleteDialogClose = () => setIsDeleteDialogOpen(false);
+  const handleDisableDialogClose = () => setIsDisableDialogOpen(false);
   const handleInviteFriendsDialogClose = () =>
     setIsInviteFriendsDialogOpen(false);
   const handleFollow = async () => {
@@ -113,7 +114,7 @@ export const ClaimSummary: FC = (props) => {
 
     try {
       await addFollowerToClaim({ id: claim?.id as string });
-      enqueueSnackbar("The notifications have been sucesfully enabled!", {
+      enqueueSnackbar("Notifications have been sucesfully enabled!", {
         variant: "success",
       });
       const updatedClaim = {
@@ -390,11 +391,15 @@ export const ClaimSummary: FC = (props) => {
         </Stack>
       </Stack>
       <Divider></Divider>
-      <Typography variant="body1">{claim?.summary}</Typography>
+      <Typography variant="body1" sx={{ whiteSpace: "pre-line" }}>
+        {claim?.summary}
+      </Typography>
       {isEmpty(claim?.tags) ? null : (
         <Stack direction="row" spacing={1}>
-          {claim?.tags?.map(({ id, label }: TagProps) => (
-            <Chip key={id} label={label} />
+          {claim?.tags?.map(({ id, label, slug }: TagProps) => (
+            <Link href={`/tag/${slug}`} key={id}>
+              <Chip label={label} />
+            </Link>
           ))}
         </Stack>
       )}

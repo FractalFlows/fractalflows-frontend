@@ -2,22 +2,18 @@ import { useEffect, useState } from "react";
 import { useSnackbar } from "notistack";
 import { useRouter } from "next/router";
 import type { NextPage } from "next";
-import { isEmpty } from "lodash-es";
 
-import { useAuth } from "modules/auth/hooks/useAuth";
-import { AuthWall } from "common/components/AuthWall";
 import {
   ClaimUpsertForm,
   ClaimUpsertFormOperation,
 } from "modules/claims/components/ClaimUpsertForm";
 import { ClaimProps } from "modules/claims/interfaces";
 import { useClaims } from "modules/claims/hooks/useClaims";
-import { Spinner } from "common/components/Spinner";
-import { Box } from "@mui/material";
+import { RequireSignIn } from "common/components/RequireSignIn";
 import { Container } from "@mui/material";
+import { Spinner } from "common/components/Spinner";
 
-const EditClaim: NextPage = () => {
-  const { session } = useAuth();
+const EditClaim: NextPage = RequireSignIn(() => {
   const { getPartialClaim } = useClaims();
   const [claim, setClaim] = useState<ClaimProps>();
   const router = useRouter();
@@ -36,8 +32,6 @@ const EditClaim: NextPage = () => {
     }
   }, [slug]);
 
-  if (isEmpty(session)) return <AuthWall />;
-
   return (
     <Container className="page">
       {claim ? (
@@ -50,6 +44,6 @@ const EditClaim: NextPage = () => {
       )}
     </Container>
   );
-};
+});
 
 export default EditClaim;

@@ -7,6 +7,7 @@ import {
   CONNECT_ETHEREUM_WALLET,
   CREATE_API_KEY,
   REMOVE_API_KEY,
+  SEND_UPDATE_EMAIL_VERIFICATION_CODE,
 } from "../mutations";
 import type { APIKeyProps, UpdateProfileProps } from "../interfaces";
 import type { UserProps } from "modules/users/interfaces";
@@ -23,15 +24,34 @@ export const SettingsService = {
     return data.updateProfile;
   },
 
-  async updateEmail({ email }: { email: string }): Promise<any> {
+  async updateEmail({
+    verificationCode,
+  }: {
+    verificationCode: string;
+  }): Promise<any> {
     const { data } = await apolloClient.mutate({
       mutation: UPDATE_EMAIL,
+      variables: {
+        verificationCode,
+      },
+    });
+
+    return data.updateEmail;
+  },
+
+  async sendUpdateEmailVerificationCode({
+    email,
+  }: {
+    email: string;
+  }): Promise<any> {
+    const { data } = await apolloClient.mutate({
+      mutation: SEND_UPDATE_EMAIL_VERIFICATION_CODE,
       variables: {
         email,
       },
     });
 
-    return data.saveEmail;
+    return data.sendUpdateEmailVerificationCode;
   },
 
   async connectEthereumWallet({ address }: any): Promise<Boolean> {

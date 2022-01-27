@@ -31,6 +31,12 @@ export const DISABLE_CLAIM = gql`
   }
 `;
 
+export const REENABLE_CLAIM = gql`
+  mutation ReenableClaim($id: String!) {
+    reenableClaim(id: $id)
+  }
+`;
+
 export const ADD_FOLLOWER_TO_CLAIM = gql`
   mutation AddFollowerToClaim($id: String!) {
     addFollowerToClaim(id: $id)

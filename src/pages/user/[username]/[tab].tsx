@@ -134,34 +134,38 @@ const Profile: FC<ProfileComponentProps> = ({ profile, userClaims }) => {
 };
 
 export async function getStaticProps({ params }) {
-  const { username, tab } = params;
+  try {
+    const { username, tab } = params;
 
-  const getUserClaims = async () => {
-    switch (tab.toLowerCase()) {
-      case ProfileTab.CLAIMS:
-        return await ClaimsService.getUserClaims({ username });
-      case ProfileTab.CONTRIBUTED:
-        return await ClaimsService.getUserContributedClaims({
-          username,
-        });
-      case ProfileTab.FOLLOWING:
-        return await ClaimsService.getUserFollowingClaims({
-          username,
-        });
-    }
-  };
+    const getUserClaims = async () => {
+      switch (tab.toLowerCase()) {
+        case ProfileTab.CLAIMS:
+          return await ClaimsService.getUserClaims({ username });
+        case ProfileTab.CONTRIBUTED:
+          return await ClaimsService.getUserContributedClaims({
+            username,
+          });
+        case ProfileTab.FOLLOWING:
+          return await ClaimsService.getUserFollowingClaims({
+            username,
+          });
+      }
+    };
 
-  const profile = await UsersService.getProfile({
-    username,
-  });
+    const profile = await UsersService.getProfile({
+      username,
+    });
 
-  return {
-    props: {
-      profile,
-      userClaims: await getUserClaims(),
-    },
-    revalidate: 10,
-  };
+    return {
+      props: {
+        profile,
+        userClaims: await getUserClaims(),
+      },
+      revalidate: Number(process.env.ISR_REVALIDATE_PERIOD),
+    };
+  } catch (e) {
+    return { notFound: true };
+  }
 }
 
 export async function getStaticPaths() {
