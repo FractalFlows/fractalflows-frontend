@@ -63,10 +63,6 @@ const Claim: NextPage<ClaimPageProps> = (serverProps) => {
   }, [serverProps]);
 
   useEffect(() => {
-    fetch(`${window.location.origin}/api/claim/preview/clear`);
-  }, []);
-
-  useEffect(() => {
     if (isSignedIn && slug) {
       getUserOpinion({ claimSlug: slug }).catch((e: any) =>
         enqueueSnackbar(e?.message, { variant: "error" })
