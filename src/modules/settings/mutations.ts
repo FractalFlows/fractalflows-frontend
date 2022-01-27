@@ -9,10 +9,14 @@ export const UPDATE_PROFILE = gql`
 `;
 
 export const UPDATE_EMAIL = gql`
-  mutation UpdateEmail($email: String!) {
-    updateEmail(email: $email) {
-      email
-    }
+  mutation UpdateEmail($verificationCode: String!) {
+    updateEmail(verificationCode: $verificationCode)
+  }
+`;
+
+export const SEND_UPDATE_EMAIL_VERIFICATION_CODE = gql`
+  mutation SendUpdateEmailVerificationCode($email: String!) {
+    sendUpdateEmailVerificationCode(email: $email)
   }
 `;
 

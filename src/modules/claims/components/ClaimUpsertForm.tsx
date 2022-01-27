@@ -86,13 +86,8 @@ export const ClaimUpsertForm: FC<ClaimUpsertFormProps> = ({
       title: get(claim, "title", ""),
       summary: get(claim, "summary", ""),
       tags: mapArray(claim?.tags, ["id", "label"]) as TagProps[],
-      sources: mapArray(claim?.sources, [
-        "id",
-        "origin",
-        "url",
-      ]) as SourceProps[],
+      sources: mapArray(claim?.sources, ["origin", "url"]) as SourceProps[],
       attributions: mapArray(claim?.attributions, [
-        "id",
         "origin",
         "identifier",
       ]) as AttributionProps[],
