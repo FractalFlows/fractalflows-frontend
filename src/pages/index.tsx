@@ -207,17 +207,21 @@ const Home: NextPage<HomeProps> = (serverProps) => {
 };
 
 export async function getStaticProps() {
-  const trendingClaims = await ClaimsService.getTrendingClaims({
-    offset: 0,
-    limit,
-  });
+  try {
+    const trendingClaims = await ClaimsService.getTrendingClaims({
+      offset: 0,
+      limit,
+    });
 
-  return {
-    props: {
-      trendingClaims,
-    },
-    revalidate: 10,
-  };
+    return {
+      props: {
+        trendingClaims,
+      },
+      revalidate: Number(process.env.ISR_REVALIDATE_PERIOD),
+    };
+  } catch (e) {
+    return { notFound: true };
+  }
 }
 
 export default Home;

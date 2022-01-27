@@ -63,6 +63,10 @@ const Claim: NextPage<ClaimPageProps> = (serverProps) => {
   }, [serverProps]);
 
   useEffect(() => {
+    fetch(`${window.location.origin}/api/claim/preview/clear`);
+  }, []);
+
+  useEffect(() => {
     if (isSignedIn && slug) {
       getUserOpinion({ claimSlug: slug }).catch((e: any) =>
         enqueueSnackbar(e?.message, { variant: "error" })
@@ -95,16 +99,16 @@ const Claim: NextPage<ClaimPageProps> = (serverProps) => {
 };
 
 export async function getStaticProps({ params }: { params: ClaimParamsProps }) {
-  const { slug } = params;
-
   try {
+    const { slug } = params;
+
     const data = await ClaimsService.getClaim({
       slug,
     });
 
     return {
       props: data,
-      revalidate: 10,
+      revalidate: 5,
     };
   } catch (e) {
     return { notFound: true };

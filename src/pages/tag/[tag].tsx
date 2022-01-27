@@ -92,7 +92,7 @@ export async function getStaticProps({ params }) {
 
     return {
       props,
-      revalidate: 10,
+      revalidate: Number(process.env.ISR_REVALIDATE_PERIOD),
     };
   } catch (e) {
     return { notFound: true };
