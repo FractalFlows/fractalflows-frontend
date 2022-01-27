@@ -13,6 +13,7 @@ import { Profile } from "modules/settings/components/Profile";
 import { useAuth } from "modules/auth/hooks/useAuth";
 import { useRouter } from "next/router";
 import { Container } from "@mui/material";
+import { RequireSignIn } from "common/components/RequireSignIn";
 
 const settingsTabs = [
   { label: "Profile", value: "profile" },
@@ -22,10 +23,9 @@ const settingsTabs = [
   { label: "API Keys", value: "apiKeys" },
 ];
 
-const Settings = () => {
+const Settings = RequireSignIn(() => {
   const router = useRouter();
   const [activeTab, setActiveTab] = useState("profile");
-  const { session } = useAuth();
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("md"));
 
@@ -88,6 +88,6 @@ const Settings = () => {
       </Stack>
     </Container>
   );
-};
+});
 
 export default Settings;

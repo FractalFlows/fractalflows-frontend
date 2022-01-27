@@ -17,6 +17,11 @@ form {
   min-width: unset;
 }
 
+#WEB3_CONNECT_MODAL_ID {
+  z-index: 14000;
+  position: fixed;
+}
+
 @media screen and (min-width: 900px) {
   /* .MuiToolbar-gutters, */
   .container {

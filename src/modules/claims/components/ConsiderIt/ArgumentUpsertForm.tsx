@@ -20,7 +20,7 @@ import {
 import { useRouter } from "next/router";
 import { UpsertFormOperation } from "common/interfaces";
 import { mapArray } from "common/utils/mapArray";
-import { useArguments } from "modules/claims/hooks/useArguments";
+import { setArguments, useArguments } from "modules/claims/hooks/useArguments";
 import { useKnowledgeBits } from "modules/claims/hooks/useKnowledgeBits";
 import { filter } from "lodash-es";
 import { useOpinions } from "modules/claims/hooks/useOpinions";
@@ -57,7 +57,8 @@ export const ArgumentUpsertForm: FC<ArgumentUpsertFormProps> = ({
   operation,
   handleClose,
 }) => {
-  const { createArgument, updateArgument } = useArguments();
+  const { createArgument, updateArgument, setArguments, argumentsList } =
+    useArguments();
   const { addArgumentToOpinion } = useOpinions();
   const { enqueueSnackbar } = useSnackbar();
   const { knowledgeBits } = useKnowledgeBits();
@@ -91,6 +92,7 @@ export const ArgumentUpsertForm: FC<ArgumentUpsertFormProps> = ({
           argument: mapArgument(),
         });
         addArgumentToOpinion(addedArgument);
+        setArguments([...argumentsList, addedArgument]);
       } else {
         await updateArgument({
           id: argument?.id as string,

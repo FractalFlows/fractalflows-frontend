@@ -1,21 +1,18 @@
 import type { NextPage } from "next";
-import { isEmpty } from "lodash-es";
-import { Container, Box } from "@mui/material";
+import { Container } from "@mui/material";
 
-import { useAuth } from "modules/auth/hooks/useAuth";
 import {
   ClaimUpsertForm,
   ClaimUpsertFormOperation,
 } from "modules/claims/components/ClaimUpsertForm";
+import { RequireSignIn } from "common/components/RequireSignIn";
 
-const NewClaim: NextPage = () => {
-  const { session } = useAuth();
-
+const NewClaim: NextPage = RequireSignIn(() => {
   return (
     <Container className="page">
       <ClaimUpsertForm operation={ClaimUpsertFormOperation.CREATE} />
     </Container>
   );
-};
+});
 
 export default NewClaim;

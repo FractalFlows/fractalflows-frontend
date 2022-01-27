@@ -140,18 +140,17 @@ export const Header = () => {
         ? null
         : [
             <Divider key={0} sx={{ my: 0.5 }} />,
-            <Link href="/signin" key={1}>
-              <MenuItem
-                onClick={() => {
-                  setIsSignInDialogOpen(true);
-                  handleMobileMenuClose();
-                }}
-              >
-                <Button variant="contained" color="primary" fullWidth>
-                  Sign in
-                </Button>
-              </MenuItem>
-            </Link>,
+            <MenuItem
+              onClick={() => {
+                setIsSignInDialogOpen(true);
+                handleMobileMenuClose();
+              }}
+              key={1}
+            >
+              <Button variant="contained" color="primary" fullWidth>
+                Sign in
+              </Button>
+            </MenuItem>,
           ]}
     </Menu>
   );

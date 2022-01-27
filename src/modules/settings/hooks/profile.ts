@@ -1,4 +1,4 @@
-import { reloadSession } from "modules/auth/hooks/session";
+import { reloadSession } from "modules/auth/hooks/useAuth";
 import { UpdateProfileProps } from "../interfaces";
 import { SettingsService } from "../services/settings";
 

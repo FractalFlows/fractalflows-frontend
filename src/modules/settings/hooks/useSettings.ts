@@ -2,7 +2,7 @@ import { getAPIKey, createAPIKey, removeAPIKey } from "./apiKeys";
 import { connectEthereumWallet } from "./web3connection";
 import { updateProfile } from "./profile";
 import { SettingsService } from "../services/settings";
-import { reloadSession } from "modules/auth/hooks/session";
+import { reloadSession } from "modules/auth/hooks/useAuth";
 
 const updateEmail = async ({
   verificationCode,

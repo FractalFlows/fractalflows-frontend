@@ -1,9 +1,6 @@
-import { merge } from "lodash-es";
-
-import { AuthCache } from "../../auth/cache";
 import { connectEthereumWallet as connectEthereumWalletHelper } from "common/utils/connectEthereumWallet";
 import { SettingsService } from "../services/settings";
-import { reloadSession } from "modules/auth/hooks/session";
+import { reloadSession } from "modules/auth/hooks/useAuth";
 
 export const connectEthereumWallet = async () => {
   const { address, ens, avatar } = await connectEthereumWalletHelper();

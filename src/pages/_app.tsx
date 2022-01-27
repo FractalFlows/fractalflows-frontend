@@ -8,6 +8,7 @@ import { EmotionCache } from "@emotion/cache";
 import { ApolloProvider } from "@apollo/client";
 import { SnackbarProvider } from "notistack";
 import type { AppProps } from "next/app";
+import { useRouter } from "next/router";
 
 import { muiTheme } from "common/config/muiTheme";
 import { apolloClient } from "common/services/apollo/client";
@@ -17,7 +18,6 @@ import { Header } from "common/components/Header";
 import { Footer } from "common/components/Footer";
 import "common/styles/globals.css";
 import "common/styles/overrides.css";
-import { useRouter } from "next/router";
 import { useApp } from "modules/app/useApp";
 import { SignIn } from "common/components/SignIn";
 

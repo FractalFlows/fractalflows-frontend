@@ -11,6 +11,9 @@ const cacheOptions = {
         session: {
           read: () => AuthCache.session(),
         },
+        isLoadingSession: {
+          read: () => AuthCache.isLoadingSession(),
+        },
         isSignedIn: {
           read: () => AuthCache.isSignedIn(),
         },

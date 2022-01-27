@@ -47,18 +47,20 @@ export const SignIn = () => {
 
   const signInCallback = () => {
     AppCache.signInCallback && AppCache.signInCallback();
-    AppCache.signInCallback = undefined;
+    AppCache.signInCallback = () => {};
   };
   const handleReset = () => {
+    resetEmailForm();
     setChosenSignInMethod(undefined);
     setHasSignInCodeBeenSent(false);
   };
   const handleSignInDialogClose = () => {
     setIsSignInDialogOpen(false);
-    handleReset();
+    setTimeout(() => {
+      handleReset();
+    }, 0);
   };
   const handleGoBack = () => {
-    resetEmailForm();
     handleReset();
   };
   const handleEmailFormSubmit = async ({
