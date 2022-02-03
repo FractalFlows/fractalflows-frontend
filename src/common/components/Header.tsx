@@ -172,6 +172,22 @@ export const Header = () => {
     <div className={styles.header}>
       <AppBar position="sticky">
         <Container fixed>
+          <Box sx={{ display: { xs: "block", sm: "none" } }}>
+            <Link href="/">
+              <Typography
+                variant="h6"
+                noWrap
+                component="div"
+                sx={{
+                  fontWeight: 700,
+                  textAlign: "center",
+                  paddingTop: "8px",
+                }}
+              >
+                Fractal Flows
+              </Typography>
+            </Link>
+          </Box>
           <Toolbar disableGutters>
             <Link href="/">
               <Typography
@@ -184,11 +200,14 @@ export const Header = () => {
               </Typography>
             </Link>
             <Search />
-            <Box sx={{ flexGrow: 1 }} />
             <Box sx={{ display: { xs: "none", md: "flex" } }}>
               <Stack direction="row" alignItems="center" spacing={2}>
                 <Link href="/claim/new">
-                  <Button variant="text" color="primaryContrast">
+                  <Button
+                    variant="text"
+                    color="primaryContrast"
+                    sx={{ flexShrink: 0, whiteSpace: "nowrap" }}
+                  >
                     Host new claim
                   </Button>
                 </Link>
@@ -228,6 +247,7 @@ export const Header = () => {
                     variant="contained"
                     color="primaryContrast"
                     onClick={() => setIsSignInDialogOpen(true)}
+                    sx={{ flexShrink: 0 }}
                   >
                     Sign in
                   </Button>

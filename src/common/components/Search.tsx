@@ -22,6 +22,7 @@ import { Container } from "@mui/material";
 
 const SearchInput = styled("div")(({ theme }) => ({
   position: "relative",
+  width: "100%",
   borderRadius: theme.shape.borderRadius,
   backgroundColor: alpha(theme.palette.common.white, 0.15),
   "&:hover": {
@@ -29,11 +30,10 @@ const SearchInput = styled("div")(({ theme }) => ({
   },
   marginRight: theme.spacing(2),
   marginLeft: 0,
-  width: "100%",
   [theme.breakpoints.up("sm")]: {
     marginLeft: theme.spacing(3),
-    width: "auto",
   },
+  flexGrow: 1,
 }));
 
 const SearchIconWrapper = styled("div")(({ theme }) => ({
@@ -48,14 +48,12 @@ const SearchIconWrapper = styled("div")(({ theme }) => ({
 
 const StyledInputBase = styled(InputBase)(({ theme }) => ({
   color: "inherit",
+  width: "100%",
   "& .MuiInputBase-input": {
     padding: theme.spacing(1, 1, 1, 0),
     paddingLeft: `calc(1em + ${theme.spacing(4)})`,
     transition: theme.transitions.create("width"),
     width: "100%",
-    [theme.breakpoints.up("md")]: {
-      width: "20ch",
-    },
   },
   "& .MuiInputBase-input::placeholder": {
     opacity: 0.9,
@@ -75,7 +73,6 @@ export const Search = () => {
   const [searchResults, setSearchResults] = useState([] as ClaimProps[]);
   const { enqueueSnackbar } = useSnackbar();
   const searchInputEl = useRef();
-  const resultsEndEl = useRef();
 
   const sortResults = (results: ClaimProps[]) =>
     sortBy(results, ["relevance"]).reverse();
