@@ -206,7 +206,7 @@ export const Header = () => {
                   <Button
                     variant="text"
                     color="primaryContrast"
-                    sx={{ minWidth: "150px" }}
+                    sx={{ flexShrink: 0, whiteSpace: "nowrap" }}
                   >
                     Host new claim
                   </Button>
@@ -247,7 +247,7 @@ export const Header = () => {
                     variant="contained"
                     color="primaryContrast"
                     onClick={() => setIsSignInDialogOpen(true)}
-                    sx={{ minWidth: "100px" }}
+                    sx={{ flexShrink: 0 }}
                   >
                     Sign in
                   </Button>
