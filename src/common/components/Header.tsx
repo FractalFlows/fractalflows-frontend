@@ -1,79 +1,80 @@
-import * as React from 'react'
-import { alpha } from '@mui/material/styles'
-import AppBar from '@mui/material/AppBar'
-import Box from '@mui/material/Box'
-import Avatar from '@mui/material/Avatar'
-import Divider from '@mui/material/Divider'
-import Toolbar from '@mui/material/Toolbar'
-import IconButton from '@mui/material/IconButton'
-import Button from '@mui/material/Button'
-import Stack from '@mui/material/Stack'
-import Typography from '@mui/material/Typography'
-import MenuItem from '@mui/material/MenuItem'
-import Menu from '@mui/material/Menu'
-import AccountCircle from '@mui/icons-material/AccountCircle'
-import MoreIcon from '@mui/icons-material/MoreVert'
-import { LinearProgress } from '@mui/material'
+import * as React from "react";
+import { alpha } from "@mui/material/styles";
+import AppBar from "@mui/material/AppBar";
+import Box from "@mui/material/Box";
+import Avatar from "@mui/material/Avatar";
+import Divider from "@mui/material/Divider";
+import Toolbar from "@mui/material/Toolbar";
+import IconButton from "@mui/material/IconButton";
+import Button from "@mui/material/Button";
+import Stack from "@mui/material/Stack";
+import Typography from "@mui/material/Typography";
+import MenuItem from "@mui/material/MenuItem";
+import Menu from "@mui/material/Menu";
+import AccountCircle from "@mui/icons-material/AccountCircle";
+import MoreIcon from "@mui/icons-material/MoreVert";
+import { LinearProgress } from "@mui/material";
 
-import { useAuth } from 'modules/auth/hooks/useAuth'
-import { muiTheme } from 'common/config/muiTheme'
-import { Link } from 'common/components/Link'
-import { Search } from './Search'
-import styles from './Header.module.css'
-import { useApp } from 'modules/app/useApp'
-import { Container } from '@mui/material'
-import { UserRole } from 'modules/users/interfaces'
-import { get } from 'lodash-es'
+import { useAuth } from "modules/auth/hooks/useAuth";
+import { muiTheme } from "common/config/muiTheme";
+import { Link } from "common/components/Link";
+import { Search } from "./Search";
+import styles from "./Header.module.css";
+import { useApp } from "modules/app/useApp";
+import { Container } from "@mui/material";
+import { UserRole } from "modules/users/interfaces";
+import { get } from "lodash-es";
 
 export const Header = () => {
-  const { isChangingRoutes, setIsSignInDialogOpen } = useApp()
-  const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null)
-  const [mobileMoreAnchorEl, setMobileMoreAnchorEl] = React.useState<null | HTMLElement>(null)
-  const isMenuOpen = Boolean(anchorEl)
-  const isMobileMenuOpen = Boolean(mobileMoreAnchorEl)
+  const { isChangingRoutes, setIsSignInDialogOpen } = useApp();
+  const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
+  const [mobileMoreAnchorEl, setMobileMoreAnchorEl] =
+    React.useState<null | HTMLElement>(null);
+  const isMenuOpen = Boolean(anchorEl);
+  const isMobileMenuOpen = Boolean(mobileMoreAnchorEl);
 
   const {
     signout,
     session: { user },
     isSignedIn,
-  } = useAuth()
+  } = useAuth();
 
   const handleProfileMenuOpen = (event: React.MouseEvent<HTMLElement>) => {
-    setAnchorEl(event.currentTarget)
-  }
+    setAnchorEl(event.currentTarget);
+  };
 
   const handleMobileMenuClose = () => {
-    setMobileMoreAnchorEl(null)
-  }
+    setMobileMoreAnchorEl(null);
+  };
 
   const handleMenuClose = () => {
-    setAnchorEl(null)
-    handleMobileMenuClose()
-  }
+    setAnchorEl(null);
+    handleMobileMenuClose();
+  };
 
   const handleMobileMenuOpen = (event: React.MouseEvent<HTMLElement>) => {
-    setMobileMoreAnchorEl(event.currentTarget)
-  }
+    setMobileMoreAnchorEl(event.currentTarget);
+  };
 
-  const menuId = 'primary-search-account-menu'
-  const renderMenuOnlyOnMobile = { display: { xs: 'block', sm: 'none' } }
+  const menuId = "primary-search-account-menu";
+  const renderMenuOnlyOnMobile = { display: { xs: "block", sm: "none" } };
   const renderMenu = (
     <Menu
       anchorEl={anchorEl}
       anchorOrigin={{
-        vertical: 'top',
-        horizontal: 'right',
+        vertical: "top",
+        horizontal: "right",
       }}
       id={menuId}
       keepMounted
       transformOrigin={{
-        vertical: 'top',
-        horizontal: 'right',
+        vertical: "top",
+        horizontal: "right",
       }}
       open={isMenuOpen}
       onClose={handleMenuClose}
       sx={{
-        maxWidth: '250px',
+        maxWidth: "250px",
       }}
     >
       <MenuItem disabled sx={{ ...renderMenuOnlyOnMobile, fontWeight: 700 }}>
@@ -88,7 +89,7 @@ export const Header = () => {
         {/* <MenuItem>Become a validator</MenuItem> */}
         <Divider sx={{ my: 0.5 }} />
       </Box>
-      {get(user, 'role') === UserRole.ADMIN
+      {get(user, "role") === UserRole.ADMIN
         ? [
             <Link href="/claims/disabled" key={1}>
               <MenuItem onClick={handleMenuClose}>Disabled claims</MenuItem>
@@ -105,28 +106,28 @@ export const Header = () => {
 
       <MenuItem
         onClick={() => {
-          signout()
-          handleMenuClose()
+          signout();
+          handleMenuClose();
         }}
       >
         Sign out
       </MenuItem>
     </Menu>
-  )
+  );
 
-  const mobileMenuId = 'primary-search-account-menu-mobile'
+  const mobileMenuId = "primary-search-account-menu-mobile";
   const renderMobileMenu = (
     <Menu
       anchorEl={mobileMoreAnchorEl}
       anchorOrigin={{
-        vertical: 'top',
-        horizontal: 'right',
+        vertical: "top",
+        horizontal: "right",
       }}
       id={mobileMenuId}
       keepMounted
       transformOrigin={{
-        vertical: 'top',
-        horizontal: 'right',
+        vertical: "top",
+        horizontal: "right",
       }}
       open={isMobileMenuOpen}
       onClose={handleMobileMenuClose}
@@ -141,8 +142,8 @@ export const Header = () => {
             <Divider key={0} sx={{ my: 0.5 }} />,
             <MenuItem
               onClick={() => {
-                setIsSignInDialogOpen(true)
-                handleMobileMenuClose()
+                setIsSignInDialogOpen(true);
+                handleMobileMenuClose();
               }}
               key={1}
             >
@@ -152,7 +153,7 @@ export const Header = () => {
             </MenuItem>,
           ]}
     </Menu>
-  )
+  );
 
   const userAvatar = (
     <Avatar
@@ -165,38 +166,48 @@ export const Header = () => {
     >
       <AccountCircle sx={{ fontSize: 35 }} />
     </Avatar>
-  )
+  );
 
   return (
     <div className={styles.header}>
       <AppBar position="sticky">
         <Container fixed>
-          <Link href="/">
-            <Typography
-              variant="h6"
-              noWrap
-              component="div"
-              sx={{ display: { xs: 'block', sm: 'none' }, fontWeight: 700, textAlign: 'center', paddingTop: '8px' }}
-            >
-              Fractal Flows
-            </Typography>
-          </Link>
+          <Box sx={{ display: { xs: "block", sm: "none" } }}>
+            <Link href="/">
+              <Typography
+                variant="h6"
+                noWrap
+                component="div"
+                sx={{
+                  fontWeight: 700,
+                  textAlign: "center",
+                  paddingTop: "8px",
+                }}
+              >
+                Fractal Flows
+              </Typography>
+            </Link>
+          </Box>
           <Toolbar disableGutters>
             <Link href="/">
               <Typography
                 variant="h6"
                 noWrap
                 component="div"
-                sx={{ display: { xs: 'none', sm: 'block' }, fontWeight: 700 }}
+                sx={{ display: { xs: "none", sm: "block" }, fontWeight: 700 }}
               >
                 Fractal Flows
               </Typography>
             </Link>
             <Search />
-            <Box sx={{ display: { xs: 'none', md: 'flex' } }}>
+            <Box sx={{ display: { xs: "none", md: "flex" } }}>
               <Stack direction="row" alignItems="center" spacing={2}>
                 <Link href="/claim/new">
-                  <Button variant="text" color="primaryContrast" sx={{ minWidth: '150px' }}>
+                  <Button
+                    variant="text"
+                    color="primaryContrast"
+                    sx={{ minWidth: "150px" }}
+                  >
                     Host new claim
                   </Button>
                 </Link>
@@ -221,7 +232,7 @@ export const Header = () => {
                           noWrap
                           sx={{
                             fontWeight: 600,
-                            textTransform: 'initial',
+                            textTransform: "initial",
                             maxWidth: 150,
                           }}
                           title={user?.username}
@@ -236,14 +247,14 @@ export const Header = () => {
                     variant="contained"
                     color="primaryContrast"
                     onClick={() => setIsSignInDialogOpen(true)}
-                    sx={{ minWidth: '100px' }}
+                    sx={{ minWidth: "100px" }}
                   >
                     Sign in
                   </Button>
                 )}
               </Stack>
             </Box>
-            <Box sx={{ display: { xs: 'flex', md: 'none' } }}>
+            <Box sx={{ display: { xs: "flex", md: "none" } }}>
               {isSignedIn ? (
                 <>
                   <IconButton
@@ -271,9 +282,12 @@ export const Header = () => {
         </Container>
       </AppBar>
 
-      <LinearProgress className={styles.header__spinner} sx={isChangingRoutes ? {} : { display: 'none' }} />
+      <LinearProgress
+        className={styles.header__spinner}
+        sx={isChangingRoutes ? {} : { display: "none" }}
+      />
       {renderMobileMenu}
       {renderMenu}
     </div>
-  )
-}
+  );
+};
