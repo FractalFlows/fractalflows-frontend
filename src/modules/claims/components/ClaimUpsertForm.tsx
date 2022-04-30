@@ -132,6 +132,10 @@ export const ClaimUpsertForm: FC<ClaimUpsertFormProps> = ({
   ];
 
   const handleSubmit = async (data: ClaimProps) => {
+    enqueueSnackbar("Saving metadata on IPFS...", {
+      variant: "info",
+    });
+
     try {
       if (operation === ClaimUpsertFormOperation.CREATE) {
         const metadataURI = await saveClaim({ claim: data });
@@ -142,6 +146,11 @@ export const ClaimUpsertForm: FC<ClaimUpsertFormProps> = ({
         const ClaimContract = new ethers.Contract(process.env.NEXT_PUBLIC_CLAIM_CONTRACT_ID as string, ClaimContractABI.abi, signer);
 
         const claimTxn = await ClaimContract.mintToken(tokenURI);
+
+        enqueueSnackbar("Minting claim NFT...", {
+          variant: "info",
+        });
+
         const claimTxnResult = await claimTxn.wait();
         
         const tokenId = claimTxnResult.events[0].args.tokenId.toString()

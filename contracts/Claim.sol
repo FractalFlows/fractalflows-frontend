@@ -4,8 +4,9 @@ pragma solidity ^0.8.9;
 
 import "@openzeppelin/contracts/token/ERC721/extensions/ERC721URIStorage.sol";
 import "@openzeppelin/contracts/utils/Counters.sol";
-
 import "hardhat/console.sol";
+
+import "./ClaimFractionalizer.sol";
 
 contract Claim is ERC721URIStorage {
   using Counters for Counters.Counter;
@@ -18,13 +19,19 @@ contract Claim is ERC721URIStorage {
   }
 
   function mintToken (string memory metadataURI) public returns (uint256) {
-    uint256 newItemId = _tokenIds.current();
-    _safeMint(msg.sender, newItemId);
-    _setTokenURI(newItemId, metadataURI);
+    uint256 newTokenId = _tokenIds.current();
+
+    ClaimFractionalizer claimFractionalizer = new ClaimFractionalizer(
+      "Fractal Flows Claim Fractionalizer",
+      string(abi.encodePacked("FFC-", Strings.toString(newTokenId)))
+    );
+
+    _safeMint(address(claimFractionalizer), newTokenId);
+    _setTokenURI(newTokenId, metadataURI);
 
     _tokenIds.increment();
 
-    return newItemId;
+    return newTokenId;
   }
 
   function setTokenURI(uint tokenId, string memory metadataURI) public {

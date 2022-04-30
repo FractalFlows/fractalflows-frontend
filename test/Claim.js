@@ -3,7 +3,7 @@ const { expect } = require('chai')
 describe('Claim', function () {
   it('should return correct name', async function () {
     const ClaimContractFactory = await hre.ethers.getContractFactory("Claim")
-    const ClaimContract = await ClaimContractFactory.deploy("Fractal Flows Claims", "FFC")
+    const ClaimContract = await ClaimContractFactory.deploy()
 
     await ClaimContract.deployed();
 
