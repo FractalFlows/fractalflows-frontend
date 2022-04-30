@@ -19,6 +19,9 @@ import { apolloClient } from "common/services/apollo/client";
 import { AuthCache } from "modules/auth/cache";
 import { get } from "lodash-es";
 
+const saveClaim = async ({ claim }: { claim: ClaimProps }) =>
+  await ClaimsService.saveClaim({ claim });
+
 const searchClaims = async ({
   term,
   limit,
@@ -135,6 +138,7 @@ export const useClaims = () => {
     getUserContributedClaims,
     getUserFollowingClaims,
     createClaim,
+    saveClaim,
     updateClaim,
     deleteClaim,
     disableClaim,

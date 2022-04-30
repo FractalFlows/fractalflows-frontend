@@ -14,6 +14,7 @@ import { useForm, useFieldArray, NestedValue } from "react-hook-form";
 import { useSnackbar } from "notistack";
 import { useRouter } from "next/router";
 import { get } from "lodash-es";
+import { ethers } from "ethers";
 
 import {
   Autocomplete,
@@ -37,6 +38,8 @@ import {
 } from "common/utils/validate";
 import { registerMui } from "common/utils/registerMui";
 import { mapArray } from "common/utils/mapArray";
+import { connectEthereumWallet } from "common/utils/connectEthereumWallet";
+import ClaimContractABI from "../../../../artifacts/contracts/Claim.sol/Claim.json";
 
 export enum ClaimUpsertFormOperation {
   CREATE,
@@ -65,7 +68,7 @@ export const ClaimUpsertForm: FC<ClaimUpsertFormProps> = ({
   claim,
   operation = ClaimUpsertFormOperation.UPDATE,
 }) => {
-  const { createClaim, updateClaim } = useClaims();
+  const { saveClaim, updateClaim } = useClaims();
   const { searchTags } = useTags();
   const { enqueueSnackbar } = useSnackbar();
   const router = useRouter();
@@ -131,8 +134,19 @@ export const ClaimUpsertForm: FC<ClaimUpsertFormProps> = ({
   const handleSubmit = async (data: ClaimProps) => {
     try {
       if (operation === ClaimUpsertFormOperation.CREATE) {
-        const { slug } = await createClaim({ claim: data });
-        router.push(`/claim/${slug}`);
+        const metadataURI = await saveClaim({ claim: data });
+        const tokenURI = metadataURI.replace(/^ipfs:\/\//, "");
+
+        const { ethersProvider } = await connectEthereumWallet();
+        const signer = ethersProvider.getSigner();
+        const ClaimContract = new ethers.Contract(process.env.NEXT_PUBLIC_CLAIM_CONTRACT_ID as string, ClaimContractABI.abi, signer);
+
+        const claimTxn = await ClaimContract.mintToken(tokenURI);
+        const claimTxnResult = await claimTxn.wait();
+        
+        const tokenId = claimTxnResult.events[0].args.tokenId.toString()
+
+        router.push(`/claim/${tokenId}`);
       } else {
         const { slug } = await updateClaim({
           id: claim?.id as string,
