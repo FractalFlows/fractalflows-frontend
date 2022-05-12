@@ -2,6 +2,8 @@
 
 artifacts
 cache
+graph
+.env
 
 # dependencies
 /node_modules

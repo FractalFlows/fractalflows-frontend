@@ -141,8 +141,12 @@ export const ClaimUpsertForm: FC<ClaimUpsertFormProps> = ({
         const metadataURI = await saveClaim({ claim: data });
         const tokenURI = metadataURI.replace(/^ipfs:\/\//, "");
 
-        const { ethersProvider } = await connectEthereumWallet();
-        const signer = ethersProvider.getSigner();
+        // const { ethersProvider } = await connectEthereumWallet();
+        const provider = ethers.getDefaultProvider(process.env.NEXT_PUBLIC_NETWORK, {
+            alchemy: process.env.NEXT_PUBLIC_ALCHEMY_API_KEY,
+        });
+        const x = new ethers.providers.Web3Provider(provider)
+        const signer = x.getSigner();
         const ClaimContract = new ethers.Contract(process.env.NEXT_PUBLIC_CLAIM_CONTRACT_ID as string, ClaimContractABI.abi, signer);
 
         const claimTxn = await ClaimContract.mintToken(tokenURI);
