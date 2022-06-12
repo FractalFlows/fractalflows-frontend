@@ -37,6 +37,7 @@ import { UserRole } from "modules/auth/interfaces";
 import { ConnectTwitter } from "common/components/ConnectTwitter";
 import styles from "./Summary.module.css";
 import { LoadingButton } from "@mui/lab";
+import { ClaimNFTStatusBar } from "./ClaimNFTStatusBar";
 
 enum ClaimCallbackOperations {
   REQUEST_OWNERSHIP = "REQUEST_OWNERSHIP",
@@ -390,7 +391,9 @@ export const ClaimSummary: FC = (props) => {
           </Dialog>
         </Stack>
       </Stack>
-      <Divider></Divider>
+      <Divider />
+      <ClaimNFTStatusBar />
+      <Divider />
       <Typography variant="body1" sx={{ whiteSpace: "pre-line" }}>
         {claim?.summary}
       </Typography>

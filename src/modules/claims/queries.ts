@@ -44,6 +44,7 @@ export const GET_CLAIM = gql`
       followers {
         id
       }
+      nftStatus
     }
     relatedClaims(slug: $slug) {
       ...CoreClaimFields

@@ -6,7 +6,12 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "prepare": "husky install"
+    "prepare": "husky install",
+    "node:start": "export $(cat .env) && hardhat node",
+    "contracts:compile": "hardhat compile",
+    "contracts:deploy": "export $(cat .env) && hardhat run scripts/deploy.js",
+    "contracts:deploy:localhost": "npm run deploy-contracts -- --network localhost",
+    "contracts:deploy:rinkeby": "npm run deploy-contracts -- --network rinkeby"
   },
   "dependencies": {
     "@apollo/client": "^3.5.6",
@@ -21,7 +26,7 @@
     "d3": "3.5.16",
     "ethers": "^5.6.4",
     "graphql": "^16.2.0",
-    "hardhat": "^2.9.3",
+    "hardhat": "^2.9.4",
     "lodash-es": "^4.17.21",
     "next": "^12.0.7",
     "notistack": "^2.0.3",

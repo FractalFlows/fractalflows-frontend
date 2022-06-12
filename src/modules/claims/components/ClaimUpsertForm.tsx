@@ -14,7 +14,6 @@ import { useForm, useFieldArray, NestedValue } from "react-hook-form";
 import { useSnackbar } from "notistack";
 import { useRouter } from "next/router";
 import { get } from "lodash-es";
-import { ethers } from "ethers";
 
 import {
   Autocomplete,
@@ -38,8 +37,6 @@ import {
 } from "common/utils/validate";
 import { registerMui } from "common/utils/registerMui";
 import { mapArray } from "common/utils/mapArray";
-import { connectEthereumWallet } from "common/utils/connectEthereumWallet";
-import ClaimContractABI from "../../../../artifacts/contracts/Claim.sol/Claim.json";
 
 export enum ClaimUpsertFormOperation {
   CREATE,
@@ -68,7 +65,7 @@ export const ClaimUpsertForm: FC<ClaimUpsertFormProps> = ({
   claim,
   operation = ClaimUpsertFormOperation.UPDATE,
 }) => {
-  const { saveClaim, updateClaim } = useClaims();
+  const { createClaim, updateClaim } = useClaims();
   const { searchTags } = useTags();
   const { enqueueSnackbar } = useSnackbar();
   const router = useRouter();
@@ -132,34 +129,10 @@ export const ClaimUpsertForm: FC<ClaimUpsertFormProps> = ({
   ];
 
   const handleSubmit = async (data: ClaimProps) => {
-    enqueueSnackbar("Saving metadata on IPFS...", {
-      variant: "info",
-    });
-
     try {
       if (operation === ClaimUpsertFormOperation.CREATE) {
-        const metadataURI = await saveClaim({ claim: data });
-        const tokenURI = metadataURI.replace(/^ipfs:\/\//, "");
-
-        // const { ethersProvider } = await connectEthereumWallet();
-        const provider = ethers.getDefaultProvider(process.env.NEXT_PUBLIC_NETWORK, {
-            alchemy: process.env.NEXT_PUBLIC_ALCHEMY_API_KEY,
-        });
-        const x = new ethers.providers.Web3Provider(provider)
-        const signer = x.getSigner();
-        const ClaimContract = new ethers.Contract(process.env.NEXT_PUBLIC_CLAIM_CONTRACT_ID as string, ClaimContractABI.abi, signer);
-
-        const claimTxn = await ClaimContract.mintToken(tokenURI);
-
-        enqueueSnackbar("Minting claim NFT...", {
-          variant: "info",
-        });
-
-        const claimTxnResult = await claimTxn.wait();
-        
-        const tokenId = claimTxnResult.events[0].args.tokenId.toString()
-
-        router.push(`/claim/${tokenId}`);
+        const { slug } = await createClaim({ claim: data });
+        router.push(`/claim/${slug}`);
       } else {
         const { slug } = await updateClaim({
           id: claim?.id as string,

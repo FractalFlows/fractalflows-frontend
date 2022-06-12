@@ -234,19 +234,19 @@ export const ClaimsService = {
     return data.updateClaim;
   },
 
-  async saveClaim({ claim }: { claim: ClaimProps }): Promise<string> {
+  async saveClaimMetadataOnIPFS({ id }: { id: string }): Promise<string> {
     const { data } = await apolloClient.mutate({
       mutation: gql`
-        mutation UpdateClaim($saveClaimInput: CreateClaimInput!) {
-          saveClaim(saveClaimInput: $saveClaimInput)
+        mutation SaveClaimMetadataOnIPFS($id: String!) {
+          saveClaimMetadataOnIPFS(id: $id)
         }
       `,
       variables: {
-        saveClaimInput: claim,
+        id,
       },
     });
 
-    return data.saveClaim;
+    return data.saveClaimMetadataOnIPFS;
   },
 
   async deleteClaim({ id }: { id: string }): Promise<Boolean> {
