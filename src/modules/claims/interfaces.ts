@@ -129,6 +129,10 @@ export interface ClaimProps {
   tweetId?: string;
   tweetOwner?: string;
   origin?: ClaimOrigins;
+  nftStatus?: ClaimNFTStatuses;
+  nftTxId?: string;
+  nftTokenId?: string;
+  nftFractionalizationContractAddress?: string;
 }
 
 export interface PaginatedClaimsProps {

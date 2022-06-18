@@ -249,6 +249,22 @@ export const ClaimsService = {
     return data.saveClaimMetadataOnIPFS;
   },
 
+  async saveClaimTxId({ id, txId }: { id: string, txId: string }): Promise<void> {
+    const { data } = await apolloClient.mutate({
+      mutation: gql`
+        mutation SaveClaimTxId($id: String!, $txId: String!) {
+          saveClaimTxId(id: $id, txId: $txId)
+        }
+      `,
+      variables: {
+        id,
+        txId
+      },
+    });
+
+    return data.saveClaimTxId;
+  },
+
   async deleteClaim({ id }: { id: string }): Promise<Boolean> {
     const { data } = await apolloClient.mutate({
       mutation: DELETE_CLAIM,

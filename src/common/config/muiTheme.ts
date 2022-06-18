@@ -1,5 +1,5 @@
 import { createTheme } from "@mui/material/styles";
-import { amber, red, yellow } from "@mui/material/colors";
+import { amber, green, lime, red, yellow } from "@mui/material/colors";
 
 const fontWeightBold = {
   fontWeight: 400,
@@ -30,7 +30,10 @@ export const muiTheme = createTheme({
       main: "#757575",
     },
     warning: {
-      main: amber[800],
+      main: amber[400],
+    },
+    success: {
+      main: green[500],
       contrastText: "#fff",
     },
     error: {

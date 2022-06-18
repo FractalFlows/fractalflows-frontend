@@ -28,8 +28,10 @@ import { get } from "lodash-es";
 export const Header = () => {
   const { isChangingRoutes, setIsSignInDialogOpen } = useApp();
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
-  const [mobileMoreAnchorEl, setMobileMoreAnchorEl] =
-    React.useState<null | HTMLElement>(null);
+  const [
+    mobileMoreAnchorEl,
+    setMobileMoreAnchorEl,
+  ] = React.useState<null | HTMLElement>(null);
   const isMenuOpen = Boolean(anchorEl);
   const isMobileMenuOpen = Boolean(mobileMoreAnchorEl);
 
@@ -200,7 +202,12 @@ export const Header = () => {
               </Typography>
             </Link>
             <Search />
-            <Box sx={{ display: { xs: "none", md: "flex" } }}>
+            <Box
+              sx={{
+                display: { xs: "none", md: "flex" },
+                marginLeft: { md: "5rem" },
+              }}
+            >
               <Stack direction="row" alignItems="center" spacing={2}>
                 <Link href="/claim/new">
                   <Button

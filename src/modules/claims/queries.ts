@@ -45,6 +45,7 @@ export const GET_CLAIM = gql`
         id
       }
       nftStatus
+      nftTxId
     }
     relatedClaims(slug: $slug) {
       ...CoreClaimFields

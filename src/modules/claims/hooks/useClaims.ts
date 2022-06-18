@@ -14,13 +14,23 @@ import {
 import { ClaimsService } from "../services/claims";
 import { PaginationProps } from "modules/interfaces";
 import { ClaimsCache } from "../cache";
-import { ClaimProps } from "../interfaces";
+import { ClaimNFTStatuses, ClaimProps } from "../interfaces";
 import { apolloClient } from "common/services/apollo/client";
 import { AuthCache } from "modules/auth/cache";
 import { get } from "lodash-es";
 
-const saveClaimMetadataOnIPFS = async ({ id }: { id: string }) =>
-  await ClaimsService.saveClaimMetadataOnIPFS({ id });
+const saveClaimMetadataOnIPFS = async ({ id }: { id: string }) => {
+  return await ClaimsService.saveClaimMetadataOnIPFS({ id });
+};
+
+const saveClaimTxId = async ({ id, txId }: { id: string; txId: string }) => {
+  await ClaimsService.saveClaimTxId({ id, txId });
+  ClaimsCache.claim({
+    ...ClaimsCache.claim(),
+    nftStatus: ClaimNFTStatuses.MINTING,
+    nftTxId: txId,
+  });
+};
 
 const searchClaims = async ({
   term,
@@ -28,6 +38,21 @@ const searchClaims = async ({
   offset,
 }: { term: string } & PaginationProps) => {
   return await ClaimsService.searchClaims({ term, limit, offset });
+};
+
+const setClaimNFTAsMinted = ({
+  tokenId,
+  fractionalizationContractAddress,
+}: {
+  tokenId: string;
+  fractionalizationContractAddress: string;
+}) => {
+  ClaimsCache.claim({
+    ...ClaimsCache.claim(),
+    nftStatus: ClaimNFTStatuses.MINTED,
+    nftFractionalizationContractAddress: fractionalizationContractAddress,
+    nftTokenId: tokenId,
+  });
 };
 
 const getUserClaims = async ({ username }: { username: string }) => {
@@ -139,6 +164,8 @@ export const useClaims = () => {
     getUserFollowingClaims,
     createClaim,
     saveClaimMetadataOnIPFS,
+    saveClaimTxId,
+    setClaimNFTAsMinted,
     updateClaim,
     deleteClaim,
     disableClaim,
