@@ -30,7 +30,7 @@ export const muiTheme = createTheme({
       main: "#757575",
     },
     warning: {
-      main: amber[400],
+      main: yellow[500],
     },
     success: {
       main: green[500],

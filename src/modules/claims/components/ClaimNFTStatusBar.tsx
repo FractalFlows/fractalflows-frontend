@@ -22,10 +22,6 @@ export const ClaimNFTStatusBar = () => {
   const { session, requireSignIn } = useAuth();
   const [isMintingNFT, setIsMintingNFT] = useState(false);
   const { enqueueSnackbar } = useSnackbar();
-  const canMintNFT =
-    isEmpty(get(session, "user")) ||
-    (isEmpty(get(session, "user.ethAddress")) === false &&
-      get(claim, "user.id") === get(session, "user.id"));
 
   const handleMintNFT = async () => {
     setIsMintingNFT(true);
@@ -94,58 +90,64 @@ export const ClaimNFTStatusBar = () => {
 
       {claim?.nftStatus === ClaimNFTStatuses.MINTING ||
       claim?.nftStatus === ClaimNFTStatuses.MINTED ? (
-        <Typography variant="body1" sx={{ display: "flex" }}>
-          TxId:&nbsp;
-          <Typography noWrap sx={{ maxWidth: 150, display: "inline-block" }}>
+        <Stack direction="row">
+          <Typography variant="body1">TxId:</Typography>
+          &nbsp;
+          <Typography variant="body1" noWrap sx={{ maxWidth: 120 }}>
             <Link
               href={`${process.env.NEXT_PUBLIC_ETH_EXPLORER_URL}/tx/${claim?.nftTxId}`}
               text
+              blank
             >
               {claim?.nftTxId}
             </Link>
           </Typography>
-        </Typography>
+        </Stack>
       ) : null}
 
       {claim?.nftStatus === ClaimNFTStatuses.MINTED ? (
-        <Typography variant="body1" sx={{ display: "flex" }}>
-          Token ID:&nbsp;
-          <Typography sx={{ display: "inline-block" }}>
+        <Stack direction="row">
+          <Typography variant="body1" sx={{ display: "flex" }}>
+            Token ID:
+          </Typography>
+          &nbsp;
+          <Typography variant="body1" noWrap sx={{ maxWidth: 120 }}>
             <Link
               href={`${process.env.NEXT_PUBLIC_ETH_EXPLORER_URL}/token/${process.env.NEXT_PUBLIC_CLAIM_CONTRACT_ID}?a=${claim?.nftTokenId}`}
               text
+              blank
             >
               {claim?.nftTokenId}
             </Link>
           </Typography>
-        </Typography>
+        </Stack>
       ) : null}
 
       {claim?.nftStatus === ClaimNFTStatuses.MINTED ? (
-        <Typography variant="body1" sx={{ display: "flex" }}>
-          Fractionalization Contract:&nbsp;
-          <Typography noWrap sx={{ maxWidth: 150, display: "inline-block" }}>
+        <Stack direction="row">
+          <Typography variant="body1" sx={{ display: "flex" }}>
+            Fractionalization Contract:
+          </Typography>
+          &nbsp;
+          <Typography variant="body1" noWrap sx={{ maxWidth: 120 }}>
             <Link
               href={`${process.env.NEXT_PUBLIC_ETH_EXPLORER_URL}/address/${claim?.nftFractionalizationContractAddress}`}
               text
+              blank
             >
               {claim?.nftFractionalizationContractAddress}
             </Link>
           </Typography>
-        </Typography>
+        </Stack>
       ) : null}
       {claim?.nftStatus === ClaimNFTStatuses.NOTMINTED ? (
-        <>
-          <LoadingButton
-            variant="contained"
-            // sx={{ marginLeft: 2 }}
-            loading={isMintingNFT}
-            onClick={requireSignIn(handleMintNFT)}
-            disabled={canMintNFT === false}
-          >
-            Mint NFT
-          </LoadingButton>
-        </>
+        <LoadingButton
+          variant="contained"
+          loading={isMintingNFT}
+          onClick={requireSignIn(handleMintNFT)}
+        >
+          Mint NFT
+        </LoadingButton>
       ) : null}
     </Stack>
   );
