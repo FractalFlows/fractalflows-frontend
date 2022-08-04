@@ -106,6 +106,12 @@ export enum ClaimOrigins {
   TWITTER = "Twitter",
 }
 
+export enum ClaimNFTStatuses {
+  NOTMINTED = "NOTMINTED",
+  MINTING = "MINTING",
+  MINTED = "MINTED",
+}
+
 export interface ClaimProps {
   id?: string;
   title: string;
@@ -123,6 +129,10 @@ export interface ClaimProps {
   tweetId?: string;
   tweetOwner?: string;
   origin?: ClaimOrigins;
+  nftStatus?: ClaimNFTStatuses;
+  nftTxId?: string;
+  nftTokenId?: string;
+  nftFractionalizationContractAddress?: string;
 }
 
 export interface PaginatedClaimsProps {

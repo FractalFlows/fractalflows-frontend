@@ -44,6 +44,10 @@ export const GET_CLAIM = gql`
       followers {
         id
       }
+      nftStatus
+      nftTxId
+      nftTokenId
+      nftFractionalizationContractAddress
     }
     relatedClaims(slug: $slug) {
       ...CoreClaimFields

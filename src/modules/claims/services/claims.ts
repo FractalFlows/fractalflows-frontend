@@ -47,6 +47,7 @@ import type {
   TagProps,
 } from "../interfaces";
 import type { PaginationProps } from "modules/interfaces";
+import { gql } from "@apollo/client";
 
 export const ClaimsService = {
   async getClaim({
@@ -231,6 +232,37 @@ export const ClaimsService = {
     });
 
     return data.updateClaim;
+  },
+
+  async saveClaimMetadataOnIPFS({ id }: { id: string }): Promise<string> {
+    const { data } = await apolloClient.mutate({
+      mutation: gql`
+        mutation SaveClaimMetadataOnIPFS($id: String!) {
+          saveClaimMetadataOnIPFS(id: $id)
+        }
+      `,
+      variables: {
+        id,
+      },
+    });
+
+    return data.saveClaimMetadataOnIPFS;
+  },
+
+  async saveClaimTxId({ id, txId }: { id: string, txId: string }): Promise<void> {
+    const { data } = await apolloClient.mutate({
+      mutation: gql`
+        mutation SaveClaimTxId($id: String!, $txId: String!) {
+          saveClaimTxId(id: $id, txId: $txId)
+        }
+      `,
+      variables: {
+        id,
+        txId
+      },
+    });
+
+    return data.saveClaimTxId;
   },
 
   async deleteClaim({ id }: { id: string }): Promise<Boolean> {
