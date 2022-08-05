@@ -32,26 +32,26 @@ export const connectEthereumWallet = async (): Promise<ConnectEthereumWalletResu
     .then(({ chainId }) => chainId);
 
   // if (process.env.NODE_ENV === "production") {
-  //   if (
-  //     ethersProvider.connection.url === "metamask" &&
-  //     ethersProvider.provider.request
-  //   ) {
-  //     await ethersProvider.provider.request({
-  //       method: "wallet_switchEthereumChain",
-  //       params: [
-  //         {
-  //           chainId: "0x1",
-  //         },
-  //       ],
-  //     });
-  //   } else if (chainId !== 1) {
-  //     const closeWallet = (ethersProvider.provider as any).close();
-  //     if (closeWallet) await closeWallet();
+  if (
+    ethersProvider.connection.url === "metamask" &&
+    ethersProvider.provider.request
+  ) {
+    await ethersProvider.provider.request({
+      method: "wallet_switchEthereumChain",
+      params: [
+        {
+          chainId: "0x4",
+        },
+      ],
+    });
+  } else if (chainId !== 4) {
+    const closeWallet = (ethersProvider.provider as any).close();
+    if (closeWallet) await closeWallet();
 
-  //     throw new Error(
-  //       "Unsupported network. Please, switch to Ethereum mainnet and try again."
-  //     );
-  //   }
+    throw new Error(
+      "Unsupported network. Please, switch to Rinkeby testnet and try again."
+    );
+  }
   // }
 
   const [address] = await ethersProvider.listAccounts();
