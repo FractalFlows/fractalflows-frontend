@@ -10,8 +10,9 @@
     "node:start": "export $(cat .env) && hardhat node",
     "contracts:compile": "hardhat compile",
     "contracts:deploy": "export $(cat .env) && hardhat run scripts/deploy.js",
-    "contracts:deploy:localhost": "npm run deploy-contracts -- --network localhost",
-    "contracts:deploy:rinkeby": "npm run deploy-contracts -- --network rinkeby"
+    "contracts:deploy:localhost": "npm run contracts:deploy -- --network localhost",
+    "contracts:deploy:goerli": "npm run contracts:deploy -- --network goerli",
+    "contracts:verify:goerli": "export $(cat .env) && hardhat verify --network goerli"
   },
   "dependencies": {
     "@apollo/client": "^3.5.6",
@@ -41,6 +42,7 @@
   },
   "devDependencies": {
     "@nomiclabs/hardhat-ethers": "^2.0.5",
+    "@nomiclabs/hardhat-etherscan": "^3.1.2",
     "@nomiclabs/hardhat-waffle": "^2.0.3",
     "@types/lodash-es": "^4.17.5",
     "@types/node": "17.0.1",

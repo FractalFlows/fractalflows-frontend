@@ -4,6 +4,8 @@ artifacts
 cache
 graph
 .env
+.env.development
+.env.production
 
 # dependencies
 /node_modules

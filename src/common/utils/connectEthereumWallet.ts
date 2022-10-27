@@ -40,7 +40,7 @@ export const connectEthereumWallet = async (): Promise<ConnectEthereumWalletResu
       method: "wallet_switchEthereumChain",
       params: [
         {
-          chainId: "0x4",
+          chainId: process.env.NEXT_PUBLIC_NETWORK_ID,
         },
       ],
     });
