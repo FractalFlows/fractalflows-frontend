@@ -4,6 +4,8 @@ artifacts
 cache
 graph
 .env
+.env.development
+.env.production
 
 # dependencies
 /node_modules
@@ -40,3 +42,9 @@ yarn-error.log*
 
 # typescript
 *.tsbuildinfo
+
+# Sentry
+.sentryclirc
+
+# Sentry
+.sentryclirc

@@ -4,6 +4,7 @@ import type { NextPage } from "next";
 import { Box, Button, Paper, Stack, Tab, Typography } from "@mui/material";
 import { TabContext, TabList, TabPanel } from "@mui/lab";
 import { useSnackbar } from "notistack";
+import * as Sentry from "@sentry/nextjs";
 
 import { ClaimsService } from "modules/claims/services/claims";
 import type { ClaimProps } from "modules/claims/interfaces";
@@ -220,6 +221,7 @@ export async function getStaticProps() {
       revalidate: Number(process.env.ISR_REVALIDATE_PERIOD),
     };
   } catch (e) {
+    Sentry.captureException(e);
     return { notFound: true };
   }
 }

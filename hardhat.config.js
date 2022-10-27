@@ -3,6 +3,7 @@
  */
 
 require("@nomiclabs/hardhat-ethers");
+require("@nomiclabs/hardhat-etherscan");
 require("hardhat-gas-reporter");
 
 module.exports = {
@@ -17,10 +18,10 @@ module.exports = {
     },
   },
   networks: {
-    //rinkeby: {
-    //url: process.env.STAGING_ALCHEMY_KEY,
-    //accounts: [process.env.PRIVATE_KEY],
-    //},
+    goerli: {
+      url: process.env.STAGING_ALCHEMY_KEY,
+      accounts: [process.env.PRIVATE_KEY],
+    },
     // mainnet: {
     //   chainId: 1,
     //   url: process.env.PROD_ALCHEMY_KEY,
@@ -32,5 +33,8 @@ module.exports = {
     token: "MATIC",
     gasPrice: 100,
     coinmarketcap: process.env.CMC_API_KEY,
+  },
+  etherscan: {
+    apiKey: process.env.ETHERSCAN_API_KEY,
   },
 };
