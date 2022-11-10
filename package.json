@@ -25,8 +25,10 @@
     "@openzeppelin/contracts": "^4.6.0",
     "@sentry/nextjs": "^7.16.0",
     "@walletconnect/web3-provider": "^1.7.0",
+    "@web3modal/ethereum": "^2.0.0-beta.3",
+    "@web3modal/react": "^2.0.0-beta.3",
     "d3": "3.5.16",
-    "ethers": "^5.6.4",
+    "ethers": "^5.7.2",
     "graphql": "^16.2.0",
     "lodash-es": "^4.17.21",
     "next": "12.2.1",
@@ -37,7 +39,6 @@
     "sharp": "^0.29.3",
     "siwe": "^0.1.2",
     "styled-components": "^5.3.3",
-    "web3modal": "^1.9.4",
     "yup": "^0.32.11"
   },
   "devDependencies": {

@@ -1,15 +1,7 @@
 import { useState } from "react";
 import { LoadingButton } from "@mui/lab";
 import { useSnackbar } from "notistack";
-import {
-  Box,
-  Button,
-  Dialog,
-  DialogContent,
-  Stack,
-  TextField,
-  Typography,
-} from "@mui/material";
+import { Box, Dialog, DialogContent, Stack, Typography } from "@mui/material";
 import { useRouter } from "next/router";
 import { useForm } from "react-hook-form";
 
@@ -19,28 +11,24 @@ import { useAuth } from "modules/auth/hooks/useAuth";
 import { SignInMethod } from "modules/auth/interfaces";
 import { useApp } from "modules/app/useApp";
 import { AppCache } from "modules/app/cache";
+import { Link } from "./Link";
 
-interface EmailFormProps {
-  email: string;
-  signInCode: string;
+interface WalletNoticeFormProps {
+  dontShowNoticeAgain: boolean;
 }
 
 export const SignIn = () => {
   const { isSignInDialogOpen, setIsSignInDialogOpen } = useApp();
-  const { signInWithEthereum, sendSignInCode, verifySignInCode } = useAuth();
-  const [chosenSignInMethod, setChosenSignInMethod] = useState<SignInMethod>();
-  const [hasSignInCodeBeenSent, setHasSignInCodeBeenSent] =
-    useState<Boolean>(false);
+  const { signInWithEthereum } = useAuth();
   const {
+    control,
     register,
-    getValues,
-    reset: resetEmailForm,
+    watch,
     formState: { errors, isSubmitting },
     handleSubmit: handleSubmitHook,
-  } = useForm<EmailFormProps>({
+  } = useForm<WalletNoticeFormProps>({
     defaultValues: {
-      email: "",
-      signInCode: "",
+      dontShowNoticeAgain: true,
     },
   });
   const { enqueueSnackbar } = useSnackbar();
@@ -49,68 +37,21 @@ export const SignIn = () => {
     AppCache.signInCallback && AppCache.signInCallback();
     AppCache.signInCallback = () => {};
   };
-  const handleReset = () => {
-    resetEmailForm();
-    setChosenSignInMethod(undefined);
-    setHasSignInCodeBeenSent(false);
-  };
   const handleSignInDialogClose = () => {
     setIsSignInDialogOpen(false);
-    setTimeout(() => {
-      handleReset();
-    }, 0);
-  };
-  const handleGoBack = () => {
-    handleReset();
-  };
-  const handleEmailFormSubmit = async ({
-    email,
-    signInCode,
-  }: EmailFormProps) => {
-    try {
-      if (hasSignInCodeBeenSent) {
-        await verifySignInCode({ signInCode });
-        handleSignInDialogClose();
-        signInCallback();
-      } else {
-        await sendSignInCode({ email });
-        setHasSignInCodeBeenSent(true);
-      }
-    } catch (e: any) {
-      enqueueSnackbar(e?.message, {
-        variant: "error",
-      });
-    }
   };
 
   const handleEthereumSignIn = async () => {
     handleSignInDialogClose();
-    setChosenSignInMethod(SignInMethod.ETHEREUM);
 
     try {
       await signInWithEthereum(signInCallback);
       handleSignInDialogClose();
-    } catch (e: any) {
+    } catch (e) {
       enqueueSnackbar(e?.message || e, {
         variant: "error",
       });
-    } finally {
-      setChosenSignInMethod(undefined);
     }
-  };
-
-  const getSubtitle = () => {
-    if (chosenSignInMethod === SignInMethod.EMAIL) {
-      return hasSignInCodeBeenSent ? (
-        <>
-          A 6-digit sign in code has been sent to you at{" "}
-          <b>{getValues("email")}</b>
-        </>
-      ) : (
-        "Fill in your email address to continue."
-      );
-    } else
-      return "In order to continue, please choose one of the following options:";
   };
 
   return (
@@ -125,10 +66,30 @@ export const SignIn = () => {
         <Stack spacing={5}>
           <Stack spacing={2}>
             <Typography variant="h3" component="h1" align="center">
-              Sign in
+              Notice
             </Typography>
             <Typography variant="body1" align="center">
-              {getSubtitle()}
+              If you still don't have a wallet, you can create one with{" "}
+              <Link href="https://metamask.io/" blank text>
+                Metamask
+              </Link>
+              .
+            </Typography>
+            <Typography variant="body1" align="center">
+              If don't feel ready to manage private keys by yourself, we
+              recommend using{" "}
+              <Link href="https://www.ambire.com/" blank text>
+                Ambire
+              </Link>{" "}
+              and backing up keys on{" "}
+              <Link
+                href="https://help.ambire.com/hc/en-us/articles/4410892186002-What-is-Ambire-Cloud-"
+                blank
+                text
+              >
+                Ambire Cloud
+              </Link>
+              .
             </Typography>
           </Stack>
           <Box
@@ -137,86 +98,20 @@ export const SignIn = () => {
               width: { xs: "initial", sm: "350px" },
             }}
           >
-            {chosenSignInMethod === SignInMethod.EMAIL ? (
-              <form onSubmit={handleSubmitHook(handleEmailFormSubmit)}>
-                <Stack spacing={3}>
-                  {hasSignInCodeBeenSent ? (
-                    <TextField
-                      label="Sign in code"
-                      fullWidth
-                      {...registerMui({
-                        register,
-                        name: "signInCode",
-                        props: {
-                          validate: {
-                            required: () => hasSignInCodeBeenSent,
-                          },
-                        },
-                        errors,
-                      })}
-                    />
-                  ) : (
-                    <TextField
-                      label="Email"
-                      fullWidth
-                      {...registerMui({
-                        register,
-                        name: "email",
-                        props: {
-                          required: true,
-                          validate: {
-                            email: (email: string) => validateEmail(email),
-                          },
-                        },
-                        errors,
-                      })}
-                    />
-                  )}
-                  <Stack spacing={2}>
-                    <LoadingButton
-                      type="submit"
-                      size="large"
-                      loading={isSubmitting}
-                      variant="contained"
-                    >
-                      {hasSignInCodeBeenSent
-                        ? "Verify code"
-                        : "Sign in with email"}
-                    </LoadingButton>
-                    <Button
-                      variant="contained"
-                      color="secondary"
-                      size="large"
-                      onClick={handleGoBack}
-                    >
-                      Go back
-                    </Button>
-                  </Stack>
-                </Stack>
-              </form>
-            ) : (
+            <form onSubmit={handleSubmitHook(handleEthereumSignIn)}>
               <Stack spacing={2}>
                 <LoadingButton
                   variant="contained"
                   color="primary"
-                  loading={chosenSignInMethod === SignInMethod.ETHEREUM}
+                  type="submit"
+                  // loading={chosenSignInMethod === SignInMethod.ETHEREUM}
                   size="large"
-                  startIcon={<i className="fab fa-ethereum"></i>}
-                  onClick={handleEthereumSignIn}
+                  // onClick={handleEthereumSignIn}
                 >
-                  Sign in with Ethereum
+                  Continue
                 </LoadingButton>
-
-                <Button
-                  variant="contained"
-                  color="secondary"
-                  size="large"
-                  onClick={() => setChosenSignInMethod(SignInMethod.EMAIL)}
-                >
-                  Continue with email
-                </Button>
               </Stack>
-            )}
+            </form>
           </Box>
         </Stack>
       </DialogContent>

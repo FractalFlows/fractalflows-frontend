@@ -255,8 +255,9 @@ export const Header = () => {
                     color="primaryContrast"
                     onClick={() => setIsSignInDialogOpen(true)}
                     sx={{ flexShrink: 0 }}
+                    startIcon={<i className="fab fa-ethereum"></i>}
                   >
-                    Sign in
+                    Sign In With Ethereum
                   </Button>
                 )}
               </Stack>
