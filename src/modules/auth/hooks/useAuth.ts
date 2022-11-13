@@ -1,8 +1,8 @@
 import { gql, useQuery } from "@apollo/client";
+import { SignatureType, SiweMessage } from "siwe";
+import { AccountCtrl, EnsCtrl, ModalCtrl, NetworkCtrl, SignerCtrl } from '@web3modal/core'
 
 import { apolloClient } from "common/services/apollo/client";
-import { signInWithEthereum } from "./siwe";
-import { signout } from "./signout";
 import { AppCache } from "modules/app/cache";
 import { AuthCache } from "../cache";
 import { AuthService } from "../services/auth";
@@ -41,6 +41,58 @@ const sendSignInCode = async ({ email }: { email: string }) =>
 const verifySignInCode = async ({ signInCode }: { signInCode: string }) => {
   await AuthService.verifySignInCode({ signInCode });
   await reloadSession();
+};
+
+const signInWithEthereum = async (callback: () => any) => {
+  const handleSIWE = async (address: string) => {
+    const nonce = await AuthService.getNonce();
+    const network = NetworkCtrl.get()
+
+    const siweMessage = new SiweMessage({
+      domain: document.location.host,
+      address,
+      chainId: String(network?.chain?.id),
+      uri: document.location.origin,
+      version: "1",
+      statement: "Fractal Flows sign in",
+      type: SignatureType.PERSONAL_SIGNATURE,
+      nonce,
+    });
+
+    const signature = await SignerCtrl.signMessage({ message: siweMessage.signMessage() })
+
+    siweMessage.signature = signature;
+
+    const ens = await EnsCtrl.fetchEnsName({ address })
+    const avatar = await EnsCtrl.fetchEnsAvatar({ addressOrName: address })
+
+    await AuthService.signInWithEthereum({
+      siweMessage,
+      ens,
+      avatar,
+    });
+    await reloadSession();
+
+    callback(); 
+  }
+
+  AccountCtrl.disconnect()
+  ModalCtrl.open()
+
+  AccountCtrl.watch(async account => {
+    if (account.isConnected) {
+      handleSIWE(account.address)
+    } 
+  })
+}
+
+const signout = async () => {
+  await AuthService.signout();
+
+  AccountCtrl.disconnect();
+
+  AuthCache.session({} as Session);
+  AuthCache.isSignedIn(false);
 };
 
 const requireSignIn =

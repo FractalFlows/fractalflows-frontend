@@ -9,6 +9,9 @@ import { ApolloProvider } from "@apollo/client";
 import { SnackbarProvider } from "notistack";
 import type { AppProps } from "next/app";
 import { useRouter } from "next/router";
+import { ClientCtrl, ConfigCtrl } from '@web3modal/core'
+import { chains, providers } from '@web3modal/ethereum'
+import '@web3modal/ui'
 
 import { muiTheme } from "common/config/muiTheme";
 import { apolloClient } from "common/services/apollo/client";
@@ -20,6 +23,21 @@ import "common/styles/globals.css";
 import "common/styles/overrides.css";
 import { useApp } from "modules/app/useApp";
 import { SignIn } from "common/components/SignIn";
+
+// Configure web3modal
+ConfigCtrl.setConfig({
+  projectId: process.env.NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID,
+  accentColor: 'default'
+})
+
+// Configure ethereum client
+ClientCtrl.setEthereumClient({
+  appName: 'Fractal Flows',
+  autoConnect: true,
+  // chains: [process.env.NEXT_PUBLIC_NETWORK_ID === "5" ? chains.goerli : chains.mainnet],
+  chains: [chains.goerli, chains.mainnet],
+  providers: [providers.walletConnectProvider({ projectId: process.env.NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID })]
+})
 
 const clientSideEmotionCache = createEmotionCache();
 
@@ -86,6 +104,7 @@ const MyApp = ({
             </main>
             <Footer />
             <SignIn />
+            <w3m-modal></w3m-modal>
           </SnackbarProvider>
         </ThemeProvider>
       </CacheProvider>

@@ -7,7 +7,6 @@ interface ConnectEthereumWalletResultProps {
 
 export const connectEthereumWallet = async (): Promise<ConnectEthereumWalletResultProps> => {
   const { ethers } = await import("ethers");
-  const { Web3Modal } = await import("@web3modal/react");
   const WalletConnect = (await import("@walletconnect/web3-provider")).default;
 
   const providerOptions = {
