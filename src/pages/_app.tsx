@@ -34,8 +34,8 @@ ConfigCtrl.setConfig({
 ClientCtrl.setEthereumClient({
   appName: 'Fractal Flows',
   autoConnect: true,
-  // chains: [process.env.NEXT_PUBLIC_NETWORK_ID === "5" ? chains.goerli : chains.mainnet],
-  chains: [chains.goerli, chains.mainnet],
+  chains: [process.env.NEXT_PUBLIC_NETWORK_ID === "5" ? chains.goerli : chains.mainnet],
+  // chains: [chains.goerli, chains.mainnet],
   providers: [providers.walletConnectProvider({ projectId: process.env.NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID })]
 })
 

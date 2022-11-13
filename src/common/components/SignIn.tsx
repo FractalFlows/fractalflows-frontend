@@ -1,3 +1,4 @@
+import { useEffect, useState } from "react";
 import { LoadingButton } from "@mui/lab";
 import { useSnackbar } from "notistack";
 import { Box, Dialog, DialogContent, Stack, Typography } from "@mui/material";
@@ -8,7 +9,6 @@ import { useApp } from "modules/app/useApp";
 import { AppCache } from "modules/app/cache";
 import { Link } from "./Link";
 import { Checkbox } from "./Checkbox";
-import { useEffect } from "react";
 
 interface WalletNoticeFormProps {
   dontShowNoticeAgain: boolean;
@@ -16,6 +16,9 @@ interface WalletNoticeFormProps {
 
 export const SignIn = () => {
   const { isSignInDialogOpen, setIsSignInDialogOpen } = useApp();
+  const [_isSignInDialogOpen, _setIsSignInDialogOpen] = useState(
+    isSignInDialogOpen
+  );
   const { signInWithEthereum } = useAuth();
   const { control, handleSubmit: handleSubmitHook } = useForm<
     WalletNoticeFormProps
@@ -34,8 +37,12 @@ export const SignIn = () => {
     setIsSignInDialogOpen(false);
   };
 
-  const handleEthereumSignIn = async () => {
+  const handleEthereumSignIn = async (values?: WalletNoticeFormProps) => {
     handleSignInDialogClose();
+
+    if (values?.dontShowNoticeAgain) {
+      localStorage.setItem("dontShowNewToWalletNoticeAgain", "true");
+    }
 
     try {
       await signInWithEthereum(signInCallback);
@@ -47,15 +54,20 @@ export const SignIn = () => {
   };
 
   useEffect(() => {
-    if (isSignInDialogOpen && false) {
+    if (
+      isSignInDialogOpen &&
+      localStorage.getItem("dontShowNewToWalletNoticeAgain") === "true"
+    ) {
       handleEthereumSignIn();
+    } else {
+      _setIsSignInDialogOpen(isSignInDialogOpen);
     }
   }, [isSignInDialogOpen]);
 
   return (
     <>
       <Dialog
-        open={isSignInDialogOpen}
+        open={_isSignInDialogOpen}
         onClose={handleSignInDialogClose}
         fullWidth
         maxWidth="sm"
@@ -105,7 +117,7 @@ export const SignIn = () => {
                     }}
                   >
                     <Checkbox
-                      label="Don't show this notice again"
+                      label="Don't show me this notice again"
                       name="dontShowNoticeAgain"
                       control={control}
                     />
