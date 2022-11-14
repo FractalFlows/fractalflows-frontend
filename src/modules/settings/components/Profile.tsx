@@ -72,7 +72,7 @@ export const Profile = () => {
       enqueueSnackbar("Your profile has been succesfully updated!", {
         variant: "success",
       });
-    } catch (e: any) {
+    } catch (e) {
       enqueueSnackbar(e?.message, {
         variant: "error",
       });
@@ -82,7 +82,7 @@ export const Profile = () => {
   const usernameSource = watch("usernameSource");
 
   return (
-    <TabPanel title="Profile" description="Lorem ipsum dolor sit amet">
+    <TabPanel title="Profile" description="Customize your profile">
       <form onSubmit={handleSubmitHook(handleSubmit)}>
         <Stack spacing={3}>
           <Stack spacing={1}>

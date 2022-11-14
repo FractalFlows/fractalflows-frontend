@@ -126,9 +126,7 @@ export const SignIn = () => {
                     variant="contained"
                     color="primary"
                     type="submit"
-                    // loading={chosenSignInMethod === SignInMethod.ETHEREUM}
                     size="large"
-                    // onClick={handleEthereumSignIn}
                   >
                     Continue
                   </LoadingButton>

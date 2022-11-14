@@ -6,7 +6,6 @@ import { ethers } from "ethers";
 import { useSnackbar } from "notistack";
 
 import { useAuth } from "modules/auth/hooks/useAuth";
-import { connectEthereumWallet } from "common/utils/connectEthereumWallet";
 import ClaimContractABI from "../../../../artifacts/contracts/Claim.sol/Claim.json";
 import { useClaims } from "../hooks/useClaims";
 import { ClaimNFTStatuses } from "../interfaces";
@@ -24,48 +23,39 @@ export const ClaimNFTStatusBar = () => {
   const { enqueueSnackbar } = useSnackbar();
 
   const handleMintNFT = async () => {
-    setIsMintingNFT(true);
-    enqueueSnackbar("Saving metadata on IPFS...", {
-      variant: "info",
-    });
-
-    try {
-      const metadataURI = await saveClaimMetadataOnIPFS({ id: claim?.id });
-      const tokenURI = metadataURI.replace(/^ipfs:\/\//, "");
-
-      const { ethersProvider } = await connectEthereumWallet();
-      const signer = ethersProvider.getSigner();
-      const ClaimContract = new ethers.Contract(
-        process.env.NEXT_PUBLIC_CLAIM_CONTRACT_ID as string,
-        ClaimContractABI.abi,
-        signer
-      );
-
-      const claimTxn = await ClaimContract.mintToken(tokenURI);
-
-      enqueueSnackbar("Minting claim NFT...", {
-        variant: "info",
-      });
-
-      saveClaimTxId({ id: claim?.id, txId: claimTxn.hash });
-
-      const claimTxnResult = await claimTxn.wait();
-
-      const transferEvent = claimTxnResult.events.find(
-        ({ event }: any) => event === "Transfer"
-      );
-
-      const tokenId = transferEvent.args[2].toString();
-      const fractionalizationContractAddress = transferEvent.args[1];
-
-      setClaimNFTAsMinted({ tokenId, fractionalizationContractAddress });
-    } catch (e) {
-      enqueueSnackbar(e?.message, {
-        variant: "error",
-      });
-    } finally {
-      setIsMintingNFT(false);
-    }
+    // setIsMintingNFT(true);
+    // enqueueSnackbar("Saving metadata on IPFS...", {
+    //   variant: "info",
+    // });
+    // try {
+    //   const metadataURI = await saveClaimMetadataOnIPFS({ id: claim?.id });
+    //   const tokenURI = metadataURI.replace(/^ipfs:\/\//, "");
+    //   const { ethersProvider } = await connectEthereumWallet();
+    //   const signer = ethersProvider.getSigner();
+    //   const ClaimContract = new ethers.Contract(
+    //     process.env.NEXT_PUBLIC_CLAIM_CONTRACT_ID as string,
+    //     ClaimContractABI.abi,
+    //     signer
+    //   );
+    //   const claimTxn = await ClaimContract.mintToken(tokenURI);
+    //   enqueueSnackbar("Minting claim NFT...", {
+    //     variant: "info",
+    //   });
+    //   saveClaimTxId({ id: claim?.id, txId: claimTxn.hash });
+    //   const claimTxnResult = await claimTxn.wait();
+    //   const transferEvent = claimTxnResult.events.find(
+    //     ({ event }: any) => event === "Transfer"
+    //   );
+    //   const tokenId = transferEvent.args[2].toString();
+    //   const fractionalizationContractAddress = transferEvent.args[1];
+    //   setClaimNFTAsMinted({ tokenId, fractionalizationContractAddress });
+    // } catch (e) {
+    //   enqueueSnackbar(e?.message, {
+    //     variant: "error",
+    //   });
+    // } finally {
+    //   setIsMintingNFT(false);
+    // }
   };
 
   const NFTStatusChip = useCallback(() => {

@@ -19,10 +19,13 @@ export const Email = () => {
   const { session } = useAuth();
   const { updateEmail, sendUpdateEmailVerificationCode } = useSettings();
   const { enqueueSnackbar } = useSnackbar();
-  const [isSendingVerificationCode, setIsSendingVerificationCode] =
-    useState(false);
-  const [verificationCodeHasBeenSent, setVerificationCodeHasBeenSent] =
-    useState(false);
+  const [isSendingVerificationCode, setIsSendingVerificationCode] = useState(
+    false
+  );
+  const [
+    verificationCodeHasBeenSent,
+    setVerificationCodeHasBeenSent,
+  ] = useState(false);
   const [resendCountdown, setResendCountdown] = useState(0);
   const currentEmail = session.user?.email;
 
@@ -67,7 +70,7 @@ export const Email = () => {
         }
       );
       setResendCountdown(30);
-    } catch (e: any) {
+    } catch (e) {
       enqueueSnackbar(e?.message, {
         variant: "error",
       });
@@ -88,7 +91,7 @@ export const Email = () => {
       } else {
         await handleSendVerificationCode();
       }
-    } catch (e: any) {
+    } catch (e) {
       enqueueSnackbar(e?.message, {
         variant: "error",
       });
@@ -98,7 +101,7 @@ export const Email = () => {
   return (
     <TabPanel
       title="Email"
-      description="Use your email address to sign in and receive app notifications"
+      description="Use your email address to receive app notifications"
     >
       <form onSubmit={handleSubmitHook(handleSubmit)}>
         <Stack spacing={3}>
