@@ -205,7 +205,7 @@ export const Header = () => {
             <Box
               sx={{
                 display: { xs: "none", md: "flex" },
-                marginLeft: { md: "5rem" },
+                marginLeft: { md: "2rem" },
               }}
             >
               <Stack direction="row" alignItems="center" spacing={2}>
@@ -255,8 +255,9 @@ export const Header = () => {
                     color="primaryContrast"
                     onClick={() => setIsSignInDialogOpen(true)}
                     sx={{ flexShrink: 0 }}
+                    startIcon={<i className="fab fa-ethereum"></i>}
                   >
-                    Sign in
+                    Sign In With Ethereum
                   </Button>
                 )}
               </Stack>

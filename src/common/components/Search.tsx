@@ -22,7 +22,6 @@ import { Container } from "@mui/material";
 
 const SearchInput = styled("div")(({ theme }) => ({
   position: "relative",
-  width: "100%",
   borderRadius: theme.shape.borderRadius,
   backgroundColor: alpha(theme.palette.common.white, 0.15),
   "&:hover": {
@@ -111,7 +110,7 @@ export const Search = () => {
       const searchedClaims = await searchClaims({ term, limit, offset: 0 });
       setTotalCount(searchedClaims.totalCount);
       setSearchResults(sortResults(searchedClaims.data));
-    } catch (e: any) {
+    } catch (e) {
       enqueueSnackbar(e?.message, { variant: "error" });
     } finally {
       setIsLoading(false);
@@ -137,7 +136,7 @@ export const Search = () => {
         ...sortResults(moreSearchedClaims.data),
       ]);
       setTotalCount(moreSearchedClaims.totalCount);
-    } catch (e: any) {
+    } catch (e) {
       enqueueSnackbar(e?.message, { variant: "error" });
     } finally {
       setIsLoadingMore(false);

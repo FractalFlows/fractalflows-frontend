@@ -1,5 +1,4 @@
 import { getAPIKey, createAPIKey, removeAPIKey } from "./apiKeys";
-import { connectEthereumWallet } from "./web3connection";
 import { updateProfile } from "./profile";
 import { SettingsService } from "../services/settings";
 import { reloadSession } from "modules/auth/hooks/useAuth";
@@ -18,10 +17,11 @@ const sendUpdateEmailVerificationCode = async ({
 }: {
   email: string;
 }) => {
-  const verificationCode =
-    await SettingsService.sendUpdateEmailVerificationCode({
+  const verificationCode = await SettingsService.sendUpdateEmailVerificationCode(
+    {
       email,
-    });
+    }
+  );
   return verificationCode;
 };
 
@@ -30,7 +30,6 @@ export const useSettings = () => {
     updateProfile,
     updateEmail,
     sendUpdateEmailVerificationCode,
-    connectEthereumWallet,
     getAPIKey,
     createAPIKey,
     removeAPIKey,
