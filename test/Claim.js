@@ -1,7 +1,7 @@
 const { expect } = require("chai");
 
-describe("Claim", function() {
-  it("should return correct name", async function() {
+describe("Claim", function () {
+  it("should return correct name", async function () {
     const ClaimContractFactory = await hre.ethers.getContractFactory("Claim");
     const ClaimContract = await ClaimContractFactory.deploy();
 
@@ -11,7 +11,7 @@ describe("Claim", function() {
     expect(await ClaimContract.symbol()).to.equal("FFC");
   });
 
-  it("should mint NFT", async function() {
+  it("should mint NFT", async function () {
     const ClaimContractFactory = await hre.ethers.getContractFactory("Claim");
     const ClaimContract = await ClaimContractFactory.deploy();
 
@@ -23,7 +23,7 @@ describe("Claim", function() {
     expect(true).to.equal(true);
   });
 
-  it("should mint NFT 2", async function() {
+  it("should mint NFT 2", async function () {
     const ClaimContractFactory = await hre.ethers.getContractFactory("Claim");
     const ClaimContract = await ClaimContractFactory.deploy();
 

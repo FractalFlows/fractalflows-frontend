@@ -19,13 +19,10 @@ export const Email = () => {
   const { session } = useAuth();
   const { updateEmail, sendUpdateEmailVerificationCode } = useSettings();
   const { enqueueSnackbar } = useSnackbar();
-  const [isSendingVerificationCode, setIsSendingVerificationCode] = useState(
-    false
-  );
-  const [
-    verificationCodeHasBeenSent,
-    setVerificationCodeHasBeenSent,
-  ] = useState(false);
+  const [isSendingVerificationCode, setIsSendingVerificationCode] =
+    useState(false);
+  const [verificationCodeHasBeenSent, setVerificationCodeHasBeenSent] =
+    useState(false);
   const [resendCountdown, setResendCountdown] = useState(0);
   const currentEmail = session.user?.email;
 

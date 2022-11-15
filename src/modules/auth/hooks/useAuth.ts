@@ -1,6 +1,12 @@
 import { gql, useQuery } from "@apollo/client";
 import { SignatureType, SiweMessage } from "siwe";
-import { AccountCtrl, EnsCtrl, ModalCtrl, NetworkCtrl, SignerCtrl } from '@web3modal/core'
+import {
+  AccountCtrl,
+  EnsCtrl,
+  ModalCtrl,
+  NetworkCtrl,
+  SignerCtrl,
+} from "@web3modal/core";
 
 import { apolloClient } from "common/services/apollo/client";
 import { AppCache } from "modules/app/cache";
@@ -16,7 +22,7 @@ const getSession = async () => {
 
     AuthCache.session(session);
     AuthCache.isSignedIn(true);
-  } catch (e: any) {
+  } catch (e) {
     AuthCache.session({} as Session);
     AuthCache.isSignedIn(false);
   } finally {
@@ -29,24 +35,16 @@ export const reloadSession = async () => {
     const session = await AuthService.getSession();
     AuthCache.session(session);
     AuthCache.isSignedIn(true);
-  } catch (e: any) {
+  } catch (e) {
     AuthCache.session({} as Session);
     AuthCache.isSignedIn(false);
   }
 };
 
-const sendSignInCode = async ({ email }: { email: string }) =>
-  await AuthService.sendSignInCode({ email });
-
-const verifySignInCode = async ({ signInCode }: { signInCode: string }) => {
-  await AuthService.verifySignInCode({ signInCode });
-  await reloadSession();
-};
-
 const signInWithEthereum = async (callback: () => any) => {
   const handleSIWE = async (address: string) => {
     const nonce = await AuthService.getNonce();
-    const network = NetworkCtrl.get()
+    const network = NetworkCtrl.get();
 
     const siweMessage = new SiweMessage({
       domain: document.location.host,
@@ -59,12 +57,14 @@ const signInWithEthereum = async (callback: () => any) => {
       nonce,
     });
 
-    const signature = await SignerCtrl.signMessage({ message: siweMessage.signMessage() })
+    const signature = await SignerCtrl.signMessage({
+      message: siweMessage.signMessage(),
+    });
 
     siweMessage.signature = signature;
 
-    const ens = await EnsCtrl.fetchEnsName({ address })
-    const avatar = await EnsCtrl.fetchEnsAvatar({ addressOrName: address })
+    const ens = await EnsCtrl.fetchEnsName({ address });
+    const avatar = await EnsCtrl.fetchEnsAvatar({ addressOrName: address });
 
     await AuthService.signInWithEthereum({
       siweMessage,
@@ -73,18 +73,18 @@ const signInWithEthereum = async (callback: () => any) => {
     });
     await reloadSession();
 
-    callback(); 
-  }
+    callback();
+  };
 
-  AccountCtrl.disconnect()
-  ModalCtrl.open()
+  AccountCtrl.disconnect();
+  ModalCtrl.open();
 
-  AccountCtrl.watch(async account => {
+  AccountCtrl.watch(async (account) => {
     if (account.isConnected) {
-      handleSIWE(account.address)
-    } 
-  })
-}
+      handleSIWE(account.address);
+    }
+  });
+};
 
 const signout = async () => {
   await AuthService.signout();
@@ -126,8 +126,6 @@ export const useAuth = () => {
 
   return {
     signInWithEthereum,
-    sendSignInCode,
-    verifySignInCode,
     signout,
     requireSignIn,
     getSession,

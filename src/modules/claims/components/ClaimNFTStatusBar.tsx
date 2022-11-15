@@ -12,12 +12,8 @@ import { ClaimNFTStatuses } from "../interfaces";
 import { Link } from "common/components/Link";
 
 export const ClaimNFTStatusBar = () => {
-  const {
-    claim,
-    saveClaimMetadataOnIPFS,
-    saveClaimTxId,
-    setClaimNFTAsMinted,
-  } = useClaims();
+  const { claim, saveClaimMetadataOnIPFS, saveClaimTxId, setClaimNFTAsMinted } =
+    useClaims();
   const { session, requireSignIn } = useAuth();
   const [isMintingNFT, setIsMintingNFT] = useState(false);
   const { enqueueSnackbar } = useSnackbar();

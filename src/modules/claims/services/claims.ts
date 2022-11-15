@@ -249,7 +249,13 @@ export const ClaimsService = {
     return data.saveClaimMetadataOnIPFS;
   },
 
-  async saveClaimTxId({ id, txId }: { id: string, txId: string }): Promise<void> {
+  async saveClaimTxId({
+    id,
+    txId,
+  }: {
+    id: string;
+    txId: string;
+  }): Promise<void> {
     const { data } = await apolloClient.mutate({
       mutation: gql`
         mutation SaveClaimTxId($id: String!, $txId: String!) {
@@ -258,7 +264,7 @@ export const ClaimsService = {
       `,
       variables: {
         id,
-        txId
+        txId,
       },
     });
 

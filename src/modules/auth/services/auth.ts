@@ -2,10 +2,7 @@ import type { SiweMessage } from "siwe";
 
 import { apolloClient } from "common/services/apollo/client";
 import { GET_NONCE, GET_SESSION } from "../queries";
-import {
-  SIGN_IN_WITH_ETHEREUM,
-  SIGN_OUT,
-} from "../mutations";
+import { SIGN_IN_WITH_ETHEREUM, SIGN_OUT } from "../mutations";
 import type { Session } from "../interfaces";
 import type { UserProps } from "../../users/interfaces";
 

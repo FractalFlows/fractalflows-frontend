@@ -16,17 +16,15 @@ interface WalletNoticeFormProps {
 
 export const SignIn = () => {
   const { isSignInDialogOpen, setIsSignInDialogOpen } = useApp();
-  const [_isSignInDialogOpen, _setIsSignInDialogOpen] = useState(
-    isSignInDialogOpen
-  );
+  const [_isSignInDialogOpen, _setIsSignInDialogOpen] =
+    useState(isSignInDialogOpen);
   const { signInWithEthereum } = useAuth();
-  const { control, handleSubmit: handleSubmitHook } = useForm<
-    WalletNoticeFormProps
-  >({
-    defaultValues: {
-      dontShowNoticeAgain: false,
-    },
-  });
+  const { control, handleSubmit: handleSubmitHook } =
+    useForm<WalletNoticeFormProps>({
+      defaultValues: {
+        dontShowNoticeAgain: false,
+      },
+    });
   const { enqueueSnackbar } = useSnackbar();
 
   const signInCallback = () => {
@@ -80,14 +78,14 @@ export const SignIn = () => {
                 Notice
               </Typography>
               <Typography variant="body1" align="center">
-                If you still don't have a wallet, you can create one with{" "}
+                If you still don&apos;t have a wallet, you can create one with{" "}
                 <Link href="https://metamask.io/" blank text>
                   Metamask
                 </Link>
                 .
               </Typography>
               <Typography variant="body1" align="center">
-                If don't feel ready to manage private keys by yourself and
+                If don&apos;t feel ready to manage private keys by yourself and
                 prefer to sign in with email & password, we recommend using{" "}
                 <Link href="https://www.ambire.com/" blank text>
                   Ambire
