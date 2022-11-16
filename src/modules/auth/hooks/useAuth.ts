@@ -49,25 +49,23 @@ const signInWithEthereum = async (callback: () => any) => {
     const siweMessage = new SiweMessage({
       domain: document.location.host,
       address,
-      chainId: String(network?.chain?.id),
+      chainId: Number(network?.chain?.id),
       uri: document.location.origin,
       version: "1",
       statement: "Fractal Flows sign in",
-      type: SignatureType.PERSONAL_SIGNATURE,
       nonce,
     });
 
     const signature = await SignerCtrl.signMessage({
-      message: siweMessage.signMessage(),
+      message: siweMessage.prepareMessage(),
     });
-
-    siweMessage.signature = signature;
 
     const ens = await EnsCtrl.fetchEnsName({ address });
     const avatar = await EnsCtrl.fetchEnsAvatar({ addressOrName: address });
 
     await AuthService.signInWithEthereum({
       siweMessage,
+      signature,
       ens,
       avatar,
     });
@@ -76,14 +74,20 @@ const signInWithEthereum = async (callback: () => any) => {
     callback();
   };
 
-  AccountCtrl.disconnect();
-  ModalCtrl.open();
+  // AccountCtrl.disconnect();
+  const account = AccountCtrl.get();
 
-  AccountCtrl.watch(async (account) => {
-    if (account.isConnected) {
-      handleSIWE(account.address);
-    }
-  });
+  if (account.isConnected) {
+    handleSIWE(account.address);
+  } else {
+    ModalCtrl.open();
+
+    AccountCtrl.watch(async (account) => {
+      if (account.isConnected) {
+        handleSIWE(account.address);
+      }
+    });
+  }
 };
 
 const signout = async () => {

@@ -48,6 +48,7 @@ import type {
 } from "../interfaces";
 import type { PaginationProps } from "modules/interfaces";
 import { gql } from "@apollo/client";
+import { KNOWLEDGE_BIT_FIELDS } from "../fragments";
 
 export const ClaimsService = {
   async getClaim({
@@ -390,7 +391,21 @@ export const ClaimsService = {
     knowledgeBit: KnowledgeBitProps;
   }): Promise<KnowledgeBitProps> {
     const { data } = await apolloClient.mutate({
-      mutation: CREATE_KNOWLEDGE_BIT,
+      mutation: gql`
+        ${KNOWLEDGE_BIT_FIELDS}
+
+        mutation CreateClaim(
+          $claimSlug: String!
+          $createKnowledgeBitInput: CreateKnowledgeBitInput!
+        ) {
+          createKnowledgeBit(
+            claimSlug: $claimSlug
+            createKnowledgeBitInput: $createKnowledgeBitInput
+          ) {
+            ...KnowledgeBitFields
+          }
+        }
+      `,
       variables: {
         claimSlug,
         createKnowledgeBitInput: knowledgeBit,

@@ -17,7 +17,6 @@ import { get, isEmpty } from "lodash-es";
 import { Select } from "common/components/Select";
 import {
   AttributionProps,
-  KnowledgeBitLocations,
   KnowledgeBitProps,
   KnowledgeBitSides,
   KnowledgeBitTypes,
@@ -30,6 +29,7 @@ import {
 import { registerMui } from "common/utils/registerMui";
 import { mapArray } from "common/utils/mapArray";
 import { useKnowledgeBits } from "../hooks/useKnowledgeBits";
+import { FileInput } from "common/components/FileInput";
 
 const knowledgeBitTypesOptions = [
   {
@@ -69,44 +69,6 @@ const knowledgeBitTypesOptions = [
   { value: KnowledgeBitTypes.OTHER, label: "Other (please specify)" },
 ];
 
-const knowledgeBitLocationsOptions = [
-  { value: KnowledgeBitLocations.EMAIL, label: "Email" },
-  { value: KnowledgeBitLocations.WEBSITE, label: "Website" },
-  { value: KnowledgeBitLocations.PDF, label: "PDF file" },
-  { value: KnowledgeBitLocations.DATABASE, label: "Database" },
-  { value: KnowledgeBitLocations.GIT, label: "Git/GitHub/BitBucket" },
-  { value: KnowledgeBitLocations.DROPBOX, label: "Dropbox" },
-  { value: KnowledgeBitLocations.BOX, label: "Box" },
-  { value: KnowledgeBitLocations.GOOGLE_DRIVE, label: "Google Drive" },
-  { value: KnowledgeBitLocations.ONEDRIVE, label: "OneDrive" },
-  { value: KnowledgeBitLocations.STACK_OVERFLOW, label: "Stack Overflow" },
-  { value: KnowledgeBitLocations.FIGSHARE, label: "Figshare" },
-  { value: KnowledgeBitLocations.SLIDESHARE, label: "SlideShare" },
-  { value: KnowledgeBitLocations.KAGGLE, label: "Kaggle" },
-  { value: KnowledgeBitLocations.IPFS, label: "IPFS" },
-  { value: KnowledgeBitLocations.DAT, label: "Dat" },
-  { value: KnowledgeBitLocations.JUPYTER, label: "Jupyter" },
-  { value: KnowledgeBitLocations.BLOG, label: "Blog" },
-  { value: KnowledgeBitLocations.YOUTUBE, label: "YouTube" },
-  {
-    value: KnowledgeBitLocations.SCIENTIFIC_PUBLISHER,
-    label: "Scientific Publisher",
-  },
-  { value: KnowledgeBitLocations.PUBPEER, label: "PubPeer" },
-  { value: KnowledgeBitLocations.ZENODO, label: "Zenodo" },
-  { value: KnowledgeBitLocations.OPENAIRE, label: "OpenAire" },
-  { value: KnowledgeBitLocations.RE3DATA, label: "re3Data" },
-  { value: KnowledgeBitLocations.ETHEREUM_SWARM, label: "Ethereum Swarm" },
-  { value: KnowledgeBitLocations.BIT_TORRENT, label: "BitTorrent" },
-  { value: KnowledgeBitLocations.RESEARCH_GATE, label: "ResearchGate" },
-  { value: KnowledgeBitLocations.ACADEMIA_EDU, label: "Academia.edu" },
-  { value: KnowledgeBitLocations.RESEARCH_ID, label: "ResearchID" },
-  { value: KnowledgeBitLocations.HAL_ARCHIVES, label: "HAL-Archives" },
-  { value: KnowledgeBitLocations.ARXIV, label: "arXiv" },
-  { value: KnowledgeBitLocations.WIKIPEDIA, label: "Wikipedia" },
-  { value: KnowledgeBitLocations.OTHER, label: "Other (please specify)" },
-];
-
 const KnowledgeBitLocationsAttributionOrigins = [
   { value: "twitter", label: "Twitter" },
   { value: "email", label: "Email" },
@@ -142,9 +104,7 @@ interface KnowledgeBitUpsertFormProps {
   side: KnowledgeBitSides;
   type: string;
   customType?: string;
-  location: string;
-  customLocation?: string;
-  url: string;
+  file: File;
   attributions: NestedValue<AttributionProps[]>;
 }
 
@@ -169,9 +129,7 @@ export const KnowledgeBitUpsert: FC<KnowledgeBitUpsertProps> = ({
       side: get(knowledgeBit, "side"),
       type: get(knowledgeBit, "type", ""),
       customType: get(knowledgeBit, "customType", ""),
-      location: get(knowledgeBit, "location", ""),
-      customLocation: get(knowledgeBit, "customLocation", ""),
-      url: get(knowledgeBit, "url", ""),
+      file: undefined,
       attributions: mapArray(knowledgeBit?.attributions, [
         "id",
         "origin",
@@ -190,6 +148,8 @@ export const KnowledgeBitUpsert: FC<KnowledgeBitUpsertProps> = ({
 
   const handleSubmit = async (data: KnowledgeBitProps) => {
     const { slug } = router.query;
+    console.log(data);
+    data.file = data.file[0];
 
     try {
       await (operation === KnowledgeBitUpsertFormOperation.CREATE
@@ -213,7 +173,6 @@ export const KnowledgeBitUpsert: FC<KnowledgeBitUpsertProps> = ({
   };
 
   const knowledgeBitType = watch("type");
-  const knowledgeBitLocation = watch("location");
 
   return (
     <Stack alignItems="center" spacing={3}>
@@ -276,51 +235,19 @@ export const KnowledgeBitUpsert: FC<KnowledgeBitUpsertProps> = ({
               })}
             ></TextField>
           ) : null}
-          <Select
-            label="Location"
-            name="location"
+
+          <FileInput
+            // label="File"
+            name="file"
             fullWidth
-            options={knowledgeBitLocationsOptions}
+            register={register}
             control={control}
             errors={errors}
             rules={{
               required: true,
-              deps: ["customLocation"],
             }}
           />
-          {knowledgeBitLocation === KnowledgeBitLocations.OTHER ? (
-            <TextField
-              label="Other location"
-              fullWidth
-              {...registerMui({
-                register,
-                name: "customLocation",
-                props: {
-                  validate: {
-                    required: (customLocation) =>
-                      knowledgeBitLocation === KnowledgeBitLocations.OTHER &&
-                      isEmpty(customLocation) === false,
-                  },
-                },
-                errors,
-              })}
-            ></TextField>
-          ) : null}
-          <TextField
-            label="URL"
-            fullWidth
-            {...registerMui({
-              register,
-              name: "url",
-              props: {
-                required: true,
-                validate: {
-                  url: (url) => validateURL(url),
-                },
-              },
-              errors,
-            })}
-          ></TextField>
+
           <Stack spacing={3}>
             <Box>
               <Typography variant="body1" sx={{ fontWeight: 700 }}>

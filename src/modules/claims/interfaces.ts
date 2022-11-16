@@ -35,41 +35,6 @@ export enum KnowledgeBitTypes {
   OTHER = "OTHER",
 }
 
-export enum KnowledgeBitLocations {
-  EMAIL = "EMAIL",
-  WEBSITE = "WEBSITE",
-  PDF = "PDF",
-  DATABASE = "DATABASE",
-  GIT = "GIT",
-  DROPBOX = "DROPBOX",
-  BOX = "BOX",
-  GOOGLE_DRIVE = "GOOGLE_DRIVE",
-  ONEDRIVE = "ONEDRIVE",
-  STACK_OVERFLOW = "STACK_OVERFLOW",
-  FIGSHARE = "FIGSHARE",
-  SLIDESHARE = "SLIDESHARE",
-  KAGGLE = "KAGGLE",
-  IPFS = "IPFS",
-  DAT = "DAT",
-  JUPYTER = "JUPYTER",
-  BLOG = "BLOG",
-  YOUTUBE = "YOUTUBE",
-  SCIENTIFIC_PUBLISHER = "SCIENTIFIC_PUBLISHER",
-  PUBPEER = "PUBPEER",
-  ZENODO = "ZENODO",
-  OPENAIRE = "OPENAIRE",
-  RE3DATA = "RE3DATA",
-  ETHEREUM_SWARM = "ETHEREUM_SWARM",
-  BIT_TORRENT = "BIT_TORRENT",
-  RESEARCH_GATE = "RESEARCH_GATE",
-  ACADEMIA_EDU = "ACADEMIA_EDU",
-  RESEARCH_ID = "RESEARCH_ID",
-  HAL_ARCHIVES = "HAL_ARCHIVES",
-  ARXIV = "ARXIV",
-  WIKIPEDIA = "WIKIPEDIA",
-  OTHER = "OTHER",
-}
-
 export enum KnowledgeBitSides {
   REFUTING = "REFUTING",
   SUPPORTING = "SUPPORTING",
@@ -87,9 +52,7 @@ export interface KnowledgeBitProps {
   summary?: string;
   type: KnowledgeBitTypes;
   customType?: string;
-  location: KnowledgeBitLocations;
-  customLocation?: string;
-  url: string;
+  file: File | string;
   attributions?: AttributionProps[];
   user: UserProps;
   upvotesCount: number;

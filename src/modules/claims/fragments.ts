@@ -41,8 +41,6 @@ export const KNOWLEDGE_BIT_FIELDS = gql`
     side
     type
     customType
-    location
-    customLocation
     url
     attributions {
       origin

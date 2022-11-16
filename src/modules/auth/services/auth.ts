@@ -1,8 +1,8 @@
 import type { SiweMessage } from "siwe";
+import { gql } from "@apollo/client";
 
 import { apolloClient } from "common/services/apollo/client";
 import { GET_NONCE, GET_SESSION } from "../queries";
-import { SIGN_IN_WITH_ETHEREUM, SIGN_OUT } from "../mutations";
 import type { Session } from "../interfaces";
 import type { UserProps } from "../../users/interfaces";
 
@@ -27,18 +27,32 @@ export const AuthService = {
 
   async signInWithEthereum({
     siweMessage,
+    signature,
     ens,
     avatar,
   }: {
     siweMessage: SiweMessage;
+    signature: string;
     ens?: string;
     avatar?: string;
   }): Promise<UserProps> {
     const { data } = await apolloClient.mutate({
-      mutation: SIGN_IN_WITH_ETHEREUM,
+      mutation: gql`
+        mutation SignInWithEthereum(
+          $signInWithEthereumInput: SignInWithEthereumInput!
+        ) {
+          signInWithEthereum(
+            signInWithEthereumInput: $signInWithEthereumInput
+          ) {
+            ethAddress
+            email
+          }
+        }
+      `,
       variables: {
         signInWithEthereumInput: {
           siweMessage,
+          signature,
           ens,
           avatar,
         },
@@ -50,7 +64,11 @@ export const AuthService = {
 
   async signout(): Promise<Boolean> {
     const { data } = await apolloClient.mutate({
-      mutation: SIGN_OUT,
+      mutation: gql`
+        mutation SignOut {
+          signOut
+        }
+      `,
     });
 
     return data.signOut;
