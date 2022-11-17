@@ -139,7 +139,11 @@ export const KnowledgeBit: FC<KnowledgeBitComponentProps> = ({
 
   return (
     <Box>
-      <a href={knowledgeBit.url} target="_blank" rel="noreferrer">
+      <a
+        href={`https://${knowledgeBit.fileCID}.ipfs.w3s.link/${knowledgeBit.filename}`}
+        target="_blank"
+        rel="noreferrer"
+      >
         <Paper variant="outlined" sx={{ p: { xs: 1, sm: 2 } }}>
           <Stack direction="row">
             <Stack spacing={1} alignItems="flex-start" flexGrow={1}>
