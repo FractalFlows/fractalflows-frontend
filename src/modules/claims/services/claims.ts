@@ -423,7 +423,19 @@ export const ClaimsService = {
     knowledgeBit: KnowledgeBitProps;
   }): Promise<KnowledgeBitProps> {
     const { data } = await apolloClient.mutate({
-      mutation: UPDATE_KNOWLEDGE_BIT,
+      mutation: gql`
+        ${KNOWLEDGE_BIT_FIELDS}
+
+        mutation UpdateKnowledgeBit(
+          $updateKnowledgeBitInput: UpdateKnowledgeBitInput!
+        ) {
+          updateKnowledgeBit(
+            updateKnowledgeBitInput: $updateKnowledgeBitInput
+          ) {
+            ...KnowledgeBitFields
+          }
+        }
+      `,
       variables: {
         updateKnowledgeBitInput: {
           ...knowledgeBit,

@@ -30,6 +30,8 @@ import { registerMui } from "common/utils/registerMui";
 import { mapArray } from "common/utils/mapArray";
 import { useKnowledgeBits } from "../hooks/useKnowledgeBits";
 import { FileInput } from "common/components/FileInput";
+import { Link } from "common/components/Link";
+import { getIPFSURL } from "common/utils/getIPFSURL";
 
 const knowledgeBitTypesOptions = [
   {
@@ -148,7 +150,7 @@ export const KnowledgeBitUpsert: FC<KnowledgeBitUpsertProps> = ({
 
   const handleSubmit = async (data: KnowledgeBitProps) => {
     const { slug } = router.query;
-    console.log(data);
+
     data.file = data.file[0];
 
     try {
@@ -236,17 +238,39 @@ export const KnowledgeBitUpsert: FC<KnowledgeBitUpsertProps> = ({
             ></TextField>
           ) : null}
 
-          <FileInput
-            // label="File"
-            name="file"
-            fullWidth
-            register={register}
-            control={control}
-            errors={errors}
-            rules={{
-              required: true,
-            }}
-          />
+          {operation === KnowledgeBitUpsertFormOperation.UPDATE ? (
+            <div>
+              <Typography variant="body1">
+                Current file:{" "}
+                <Link
+                  href={getIPFSURL(
+                    get(knowledgeBit, "fileCID", ""),
+                    get(knowledgeBit, "filename", "")
+                  )}
+                  text
+                  blank
+                >
+                  {get(knowledgeBit, "filename", "")}
+                </Link>
+              </Typography>
+            </div>
+          ) : null}
+
+          <Stack direction="row" alignItems="center">
+            {operation === KnowledgeBitUpsertFormOperation.UPDATE ? (
+              <Typography variant="body1">New file:&nbsp;</Typography>
+            ) : null}
+            <FileInput
+              name="file"
+              fullWidth
+              register={register}
+              control={control}
+              errors={errors}
+              rules={{
+                required: operation === KnowledgeBitUpsertFormOperation.CREATE,
+              }}
+            />
+          </Stack>
 
           <Stack spacing={3}>
             <Box>

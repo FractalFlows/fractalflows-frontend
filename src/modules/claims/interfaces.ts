@@ -52,7 +52,9 @@ export interface KnowledgeBitProps {
   summary?: string;
   type: KnowledgeBitTypes;
   customType?: string;
-  file: File | string;
+  file: File;
+  filename?: string;
+  fileCID?: string;
   attributions?: AttributionProps[];
   user: UserProps;
   upvotesCount: number;

@@ -61,18 +61,6 @@ export const INVITE_FRIENDS = gql`
   }
 `;
 
-export const UPDATE_KNOWLEDGE_BIT = gql`
-  ${KNOWLEDGE_BIT_FIELDS}
-
-  mutation UpdateKnowledgeBit(
-    $updateKnowledgeBitInput: UpdateKnowledgeBitInput!
-  ) {
-    updateKnowledgeBit(updateKnowledgeBitInput: $updateKnowledgeBitInput) {
-      ...KnowledgeBitFields
-    }
-  }
-`;
-
 export const DELETE_KNOWLEDGE_BIT = gql`
   mutation DeleteKnowledgeBit($id: String!) {
     deleteKnowledgeBit(id: $id)
