@@ -153,6 +153,10 @@ export const KnowledgeBitUpsert: FC<KnowledgeBitUpsertProps> = ({
 
     data.file = data.file[0];
 
+    enqueueSnackbar("Saving knowledge bit on IPFS...", {
+      variant: "info",
+    });
+
     try {
       await (operation === KnowledgeBitUpsertFormOperation.CREATE
         ? createKnowledgeBit({ claimSlug: slug as string, knowledgeBit: data })
@@ -160,13 +164,14 @@ export const KnowledgeBitUpsert: FC<KnowledgeBitUpsertProps> = ({
             id: knowledgeBit?.id as string,
             knowledgeBit: data,
           }));
-      enqueueSnackbar(
-        KnowledgeBitUpsertFormOperationText[operation].successFeedback,
-        {
-          variant: "success",
-        }
-      );
-      handleClose();
+
+      // enqueueSnackbar(
+      //   KnowledgeBitUpsertFormOperationText[operation].successFeedback,
+      //   {
+      //     variant: "success",
+      //   }
+      // );
+      // handleClose();
     } catch (e: any) {
       enqueueSnackbar(e?.message, {
         variant: "error",

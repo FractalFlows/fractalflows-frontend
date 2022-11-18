@@ -15,20 +15,16 @@ describe("Claim", function () {
     const ClaimContractFactory = await hre.ethers.getContractFactory("Claim");
     const ClaimContract = await ClaimContractFactory.deploy();
 
-    await ClaimContract.deployed();
-    await ClaimContract.mintToken(
-      "bafyreih36wt6w6bpfuvdabj572gjbqxbd4gb3xihc5tq7rdz6wrcmhtsgi/metadata.json"
-    );
-
-    expect(true).to.equal(true);
-  });
-
-  it("should mint NFT 2", async function () {
-    const ClaimContractFactory = await hre.ethers.getContractFactory("Claim");
-    const ClaimContract = await ClaimContractFactory.deploy();
+    const claimMetadataCID =
+      "bafyreih36wt6w6bpfuvdabj572gjbqxbd4gb3xihc5tq7rdz6wrcmhtsgi/metadata.json";
 
     await ClaimContract.deployed();
+    const mintClaimTx = await ClaimContract.mintToken(claimMetadataCID);
+    const mintClaimTxReceipt = await mintClaimTx.wait();
+    const tokenId = parseInt(mintClaimTxReceipt.events[1].topics[3]);
+    const tokenURI = await ClaimContract.tokenURI(tokenId);
 
-    expect(true).to.equal(true);
+    expect(tokenId).to.equal(0);
+    expect(tokenURI).to.equal(`ipfs://${claimMetadataCID}`);
   });
 });

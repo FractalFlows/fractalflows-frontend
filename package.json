@@ -9,6 +9,7 @@
     "prepare": "husky install",
     "node:start": "export $(cat .env) && hardhat node",
     "contracts:compile": "export $(cat .env) && hardhat compile",
+    "contracts:test": "export $(cat .env) && hardhat test",
     "contracts:deploy": "export $(cat .env) && hardhat run scripts/deploy.js",
     "contracts:deploy:localhost": "npm run contracts:deploy -- --network localhost",
     "contracts:deploy:goerli": "npm run contracts:deploy -- --network goerli",
