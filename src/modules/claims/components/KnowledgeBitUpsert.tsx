@@ -21,11 +21,7 @@ import {
   KnowledgeBitSides,
   KnowledgeBitTypes,
 } from "modules/claims/interfaces";
-import {
-  validateEmail,
-  validateTwitterHandle,
-  validateURL,
-} from "common/utils/validate";
+import { validateEmail, validateTwitterHandle } from "common/utils/validate";
 import { registerMui } from "common/utils/registerMui";
 import { mapArray } from "common/utils/mapArray";
 import { useKnowledgeBits } from "../hooks/useKnowledgeBits";
