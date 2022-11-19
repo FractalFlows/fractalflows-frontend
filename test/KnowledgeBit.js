@@ -9,11 +9,10 @@ const deployKnowledgeBitContract = async () => {
   await ClaimContract.deployed();
 
   const KnowledgeBitContractFactory = await hre.ethers.getContractFactory(
-    "KnowledgeBit"
+    "contracts/KnowledgeBit.sol:KnowledgeBit"
   );
   const KnowledgeBitContract = await KnowledgeBitContractFactory.deploy(
-    ClaimContract.address,
-    {}
+    ClaimContract.address
   );
 
   await KnowledgeBitContract.deployed();
@@ -40,7 +39,12 @@ const deployKnowledgeBitContractAndMintNFT = async (
     mintKnowledgeBitTokenTxReceipt.events[0].topics[3]
   );
 
-  return { KnowledgeBitContract, tokenId: knowledgeBitTokenId };
+  return {
+    ClaimContract,
+    KnowledgeBitContract,
+    claimTokenId,
+    knowledgeBitTokenId,
+  };
 };
 
 describe("Knowledge Bit", function () {
@@ -56,28 +60,44 @@ describe("Knowledge Bit", function () {
   it("should mint NFT", async function () {
     const metadataCID =
       "bafyreih36wt6w6bpfuvdabj572gjbqxbd4gb3xihc5tq7rdz6wrcmhtsgi/metadata.json";
-    const { KnowledgeBitContract, tokenId } =
-      await deployKnowledgeBitContractAndMintNFT(metadataCID);
+    const {
+      ClaimContract,
+      KnowledgeBitContract,
+      claimTokenId,
+      knowledgeBitTokenId,
+    } = await deployKnowledgeBitContractAndMintNFT(metadataCID);
 
-    const tokenURI = await KnowledgeBitContract.tokenURI(tokenId);
+    const tokenURI = await KnowledgeBitContract.tokenURI(knowledgeBitTokenId);
+    const claimKnowledgeBitTokenIds = await ClaimContract.knowledgeBitsOf(
+      claimTokenId
+    );
 
-    expect(tokenId).to.equal(0);
+    expect(
+      claimKnowledgeBitTokenIds.map((claimKnowledgeBitTokenId) =>
+        claimKnowledgeBitTokenId.toNumber()
+      )
+    )
+      .to.be.an("array")
+      .that.include(knowledgeBitTokenId);
+    expect(knowledgeBitTokenId).to.equal(0);
     expect(tokenURI).to.equal(`ipfs://${metadataCID}`);
   });
 
   it("should upvote", async function () {
-    const { KnowledgeBitContract, tokenId } =
+    const { KnowledgeBitContract, knowledgeBitTokenId } =
       await deployKnowledgeBitContractAndMintNFT();
     const [account] = await ethers.getSigners();
 
-    const upvotesCount = await KnowledgeBitContract.upvotesCountOf(tokenId);
+    const upvotesCount = await KnowledgeBitContract.upvotesCountOf(
+      knowledgeBitTokenId
+    );
 
-    await expect(KnowledgeBitContract.upvote(tokenId))
+    await expect(KnowledgeBitContract.upvote(knowledgeBitTokenId))
       .to.emit(KnowledgeBitContract, "Upvote")
-      .withArgs(tokenId, account.address);
+      .withArgs(knowledgeBitTokenId, account.address);
 
     const updatedUpvotesCount = await KnowledgeBitContract.upvotesCountOf(
-      tokenId
+      knowledgeBitTokenId
     );
 
     expect(upvotesCount.toNumber() + 1).to.equal(
@@ -86,25 +106,29 @@ describe("Knowledge Bit", function () {
   });
 
   it("should upvote removing existing downvote", async function () {
-    const { KnowledgeBitContract, tokenId } =
+    const { KnowledgeBitContract, knowledgeBitTokenId } =
       await deployKnowledgeBitContractAndMintNFT();
     const [account] = await ethers.getSigners();
 
-    const downvoteTx = await KnowledgeBitContract.downvote(tokenId);
+    const downvoteTx = await KnowledgeBitContract.downvote(knowledgeBitTokenId);
     await downvoteTx.wait();
 
-    const upvotesCount = await KnowledgeBitContract.upvotesCountOf(tokenId);
-    const downvotesCount = await KnowledgeBitContract.downvotesCountOf(tokenId);
+    const upvotesCount = await KnowledgeBitContract.upvotesCountOf(
+      knowledgeBitTokenId
+    );
+    const downvotesCount = await KnowledgeBitContract.downvotesCountOf(
+      knowledgeBitTokenId
+    );
 
-    await expect(KnowledgeBitContract.upvote(tokenId))
+    await expect(KnowledgeBitContract.upvote(knowledgeBitTokenId))
       .to.emit(KnowledgeBitContract, "Upvote")
-      .withArgs(tokenId, account.address);
+      .withArgs(knowledgeBitTokenId, account.address);
 
     const updatedUpvotesCount = await KnowledgeBitContract.upvotesCountOf(
-      tokenId
+      knowledgeBitTokenId
     );
     const updatedDownvotesCount = await KnowledgeBitContract.downvotesCountOf(
-      tokenId
+      knowledgeBitTokenId
     );
 
     expect(upvotesCount.toNumber() + 1).to.equal(
@@ -116,18 +140,20 @@ describe("Knowledge Bit", function () {
   });
 
   it("should downvote", async function () {
-    const { KnowledgeBitContract, tokenId } =
+    const { KnowledgeBitContract, knowledgeBitTokenId } =
       await deployKnowledgeBitContractAndMintNFT();
     const [account] = await ethers.getSigners();
 
-    const downvotesCount = await KnowledgeBitContract.downvotesCountOf(tokenId);
+    const downvotesCount = await KnowledgeBitContract.downvotesCountOf(
+      knowledgeBitTokenId
+    );
 
-    await expect(KnowledgeBitContract.downvote(tokenId))
+    await expect(KnowledgeBitContract.downvote(knowledgeBitTokenId))
       .to.emit(KnowledgeBitContract, "Downvote")
-      .withArgs(tokenId, account.address);
+      .withArgs(knowledgeBitTokenId, account.address);
 
     const updatedDownvotesCount = await KnowledgeBitContract.downvotesCountOf(
-      tokenId
+      knowledgeBitTokenId
     );
 
     expect(downvotesCount.toNumber() + 1).to.equal(
@@ -136,25 +162,29 @@ describe("Knowledge Bit", function () {
   });
 
   it("should downvote removing existing upvote", async function () {
-    const { KnowledgeBitContract, tokenId } =
+    const { KnowledgeBitContract, knowledgeBitTokenId } =
       await deployKnowledgeBitContractAndMintNFT();
     const [account] = await ethers.getSigners();
 
-    const upvoteTx = await KnowledgeBitContract.upvote(tokenId);
+    const upvoteTx = await KnowledgeBitContract.upvote(knowledgeBitTokenId);
     await upvoteTx.wait();
 
-    const downvotesCount = await KnowledgeBitContract.downvotesCountOf(tokenId);
-    const upvotesCount = await KnowledgeBitContract.upvotesCountOf(tokenId);
+    const downvotesCount = await KnowledgeBitContract.downvotesCountOf(
+      knowledgeBitTokenId
+    );
+    const upvotesCount = await KnowledgeBitContract.upvotesCountOf(
+      knowledgeBitTokenId
+    );
 
-    await expect(KnowledgeBitContract.downvote(tokenId))
+    await expect(KnowledgeBitContract.downvote(knowledgeBitTokenId))
       .to.emit(KnowledgeBitContract, "Downvote")
-      .withArgs(tokenId, account.address);
+      .withArgs(knowledgeBitTokenId, account.address);
 
     const updatedDownvotesCount = await KnowledgeBitContract.downvotesCountOf(
-      tokenId
+      knowledgeBitTokenId
     );
     const updatedUpvotesCount = await KnowledgeBitContract.upvotesCountOf(
-      tokenId
+      knowledgeBitTokenId
     );
 
     expect(downvotesCount.toNumber() + 1).to.equal(
@@ -166,21 +196,23 @@ describe("Knowledge Bit", function () {
   });
 
   it("should unvote removing existing upvote", async function () {
-    const { KnowledgeBitContract, tokenId } =
+    const { KnowledgeBitContract, knowledgeBitTokenId } =
       await deployKnowledgeBitContractAndMintNFT();
     const [account] = await ethers.getSigners();
 
-    const upvoteTx = await KnowledgeBitContract.upvote(tokenId);
+    const upvoteTx = await KnowledgeBitContract.upvote(knowledgeBitTokenId);
     await upvoteTx.wait();
 
-    const upvotesCount = await KnowledgeBitContract.upvotesCountOf(tokenId);
+    const upvotesCount = await KnowledgeBitContract.upvotesCountOf(
+      knowledgeBitTokenId
+    );
 
-    await expect(KnowledgeBitContract.unvote(tokenId))
+    await expect(KnowledgeBitContract.unvote(knowledgeBitTokenId))
       .to.emit(KnowledgeBitContract, "Unvote")
-      .withArgs(tokenId, account.address);
+      .withArgs(knowledgeBitTokenId, account.address);
 
     const updatedUpvotesCount = await KnowledgeBitContract.upvotesCountOf(
-      tokenId
+      knowledgeBitTokenId
     );
 
     expect(upvotesCount.toNumber() - 1).to.equal(
@@ -189,21 +221,23 @@ describe("Knowledge Bit", function () {
   });
 
   it("should unvote removing existing downvote", async function () {
-    const { KnowledgeBitContract, tokenId } =
+    const { KnowledgeBitContract, knowledgeBitTokenId } =
       await deployKnowledgeBitContractAndMintNFT();
     const [account] = await ethers.getSigners();
 
-    const downvoteTx = await KnowledgeBitContract.downvote(tokenId);
+    const downvoteTx = await KnowledgeBitContract.downvote(knowledgeBitTokenId);
     await downvoteTx.wait();
 
-    const downvotesCount = await KnowledgeBitContract.downvotesCountOf(tokenId);
+    const downvotesCount = await KnowledgeBitContract.downvotesCountOf(
+      knowledgeBitTokenId
+    );
 
-    await expect(KnowledgeBitContract.unvote(tokenId))
+    await expect(KnowledgeBitContract.unvote(knowledgeBitTokenId))
       .to.emit(KnowledgeBitContract, "Unvote")
-      .withArgs(tokenId, account.address);
+      .withArgs(knowledgeBitTokenId, account.address);
 
     const updatedDownvotesCount = await KnowledgeBitContract.downvotesCountOf(
-      tokenId
+      knowledgeBitTokenId
     );
 
     expect(downvotesCount.toNumber() - 1).to.equal(

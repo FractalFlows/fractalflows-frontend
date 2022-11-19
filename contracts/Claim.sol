@@ -12,7 +12,8 @@ contract Claim is ERC721URIStorage {
   using Counters for Counters.Counter;
   Counters.Counter private _tokenIds;
 
-  mapping(uint => mapping(uint => bool)) private _knowledgeBits;
+  mapping(uint => uint[]) private _knowledgeBits;
+  mapping(uint => mapping(uint => uint)) private _knowledgeBitsIndexes;
 
   constructor() ERC721("Fractal Flows Claims", "FFC") {}
 
@@ -42,12 +43,13 @@ contract Claim is ERC721URIStorage {
 
   function addKnowledgeBit(uint tokenId, uint knowledgeBitTokenId) public {
     require(_exists(tokenId), "Claim NFT doesn't exist.");
-    require(_knowledgeBits[tokenId][knowledgeBitTokenId] != true, "Knowledge bit has already been added to claim.");
+    require(_knowledgeBitsIndexes[tokenId][knowledgeBitTokenId] == 0, "Knowledge bit has already been added to claim.");
     
-    _knowledgeBits[tokenId][knowledgeBitTokenId] = true;
+    _knowledgeBits[tokenId].push(knowledgeBitTokenId);
+    _knowledgeBitsIndexes[tokenId][knowledgeBitTokenId] = _knowledgeBits[tokenId].length;
   }
 
-  // function knowledgeBitsOf(uint tokenId) public view virtual returns (mapping(uint => bool)) {
-  //   return _knowledgeBits[tokenId];
-  // }
+  function knowledgeBitsOf(uint tokenId) public view virtual returns (uint[] memory) {
+    return _knowledgeBits[tokenId];
+  }
 }
