@@ -2,7 +2,9 @@ const { expect } = require("chai");
 
 describe("Claim", function () {
   it("should return correct name", async function () {
-    const ClaimContractFactory = await hre.ethers.getContractFactory("Claim");
+    const ClaimContractFactory = await hre.ethers.getContractFactory(
+      "contracts/Claim.sol:Claim"
+    );
     const ClaimContract = await ClaimContractFactory.deploy();
 
     await ClaimContract.deployed();
@@ -12,7 +14,9 @@ describe("Claim", function () {
   });
 
   it("should mint NFT", async function () {
-    const ClaimContractFactory = await hre.ethers.getContractFactory("Claim");
+    const ClaimContractFactory = await hre.ethers.getContractFactory(
+      "contracts/Claim.sol:Claim"
+    );
     const ClaimContract = await ClaimContractFactory.deploy();
 
     const claimMetadataCID =
