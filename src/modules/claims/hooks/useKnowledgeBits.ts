@@ -1,10 +1,13 @@
 import { gql, useQuery } from "@apollo/client";
 import { compact, concat, filter, findIndex, get } from "lodash-es";
+import { BigNumber } from "ethers";
 
 import { ClaimsService } from "../services/claims";
 import type { KnowledgeBitProps } from "../interfaces";
 import { ClaimsCache } from "../cache";
 import { apolloClient } from "common/services/apollo/client";
+import { AccountCtrl, ContractCtrl } from "@web3modal/core";
+import KnowledgeBitContractABI from "../../../../artifacts/contracts/KnowledgeBit.sol/KnowledgeBit.json";
 
 export const getKnowledgeBit = async ({ id }: { id: string }) =>
   await ClaimsService.getKnowledgeBit({ id });
@@ -14,11 +17,32 @@ export const saveKnowledgeBitOnIPFS = async ({
 }: {
   knowledgeBit: KnowledgeBitProps;
 }) => {
-  const savedKnowledgeBit = await ClaimsService.saveKnowledgeBitOnIPFS({
-    knowledgeBit,
+  const savedKnowledgeBitMetadataURI =
+    await ClaimsService.saveKnowledgeBitOnIPFS({
+      knowledgeBit,
+    });
+
+  return savedKnowledgeBitMetadataURI;
+};
+
+export const mintKnowledgeBitNFT = async ({
+  metadataURI,
+  claimTokenId,
+}: {
+  metadataURI: string;
+  claimTokenId: string;
+}) => {
+  const mintKnowledgeBitNFTTx = await ContractCtrl.write({
+    address: process.env.NEXT_PUBLIC_KNOWLEDGE_BIT_CONTRACT_ADDRESS as string,
+    chainId: Number(process.env.NEXT_PUBLIC_NETWORK_ID),
+    abi: KnowledgeBitContractABI.abi,
+    functionName: "mintToken",
+    args: [metadataURI.replace(/^ipfs:\/\//, ""), claimTokenId || "0"],
   });
 
-  return savedKnowledgeBit;
+  const mintKnowledgeBitNFTTxReceipt = mintKnowledgeBitNFTTx.wait();
+
+  console.log(mintKnowledgeBitNFTTxReceipt);
 };
 
 export const createKnowledgeBit = async ({
@@ -88,6 +112,7 @@ export const useKnowledgeBits = () => {
   return {
     getKnowledgeBit,
     saveKnowledgeBitOnIPFS,
+    mintKnowledgeBitNFT,
     createKnowledgeBit,
     updateKnowledgeBit,
     deleteKnowledgeBit,

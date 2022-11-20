@@ -12,6 +12,7 @@ import DoneIcon from "@mui/icons-material/Done";
 import ClearIcon from "@mui/icons-material/Clear";
 import CircularProgress from "@mui/material/CircularProgress";
 import { grey } from "@mui/material/colors";
+import { Link } from "./Link";
 
 export enum TransactionStepStatus {
   UNSTARTED,
@@ -29,6 +30,7 @@ export enum TransactionStepOperation {
 export interface TransactionStep {
   status: TransactionStepStatus;
   operation: TransactionStepOperation;
+  retry?: () => any;
 }
 
 export const TransactionProgressModal = ({
@@ -137,7 +139,7 @@ export const TransactionProgressModal = ({
   useEffect(() => {
     _setIsDialogOpen(open);
   }, [open]);
-
+  console.log(steps);
   return (
     <>
       <Dialog
@@ -163,7 +165,7 @@ export const TransactionProgressModal = ({
                 width: { xs: "initial", sm: "350px" },
               }}
             >
-              {steps.map(({ status, operation }, i) => (
+              {steps.map(({ status, operation, retry }, i) => (
                 <>
                   <Stack
                     key={operation}
@@ -173,6 +175,19 @@ export const TransactionProgressModal = ({
                   >
                     {getStepStatusIcon(status)}
                     <Typography>{operation}</Typography>
+                    {status === TransactionStepStatus.ERROR && retry ? (
+                      <Button
+                        variant="contained"
+                        color="primary"
+                        onClick={retry}
+                        size="small"
+                        sx={{
+                          marginLeft: 1,
+                        }}
+                      >
+                        Try again
+                      </Button>
+                    ) : null}
                   </Stack>
                   {i === steps.length - 1 ? null : (
                     <Stack>

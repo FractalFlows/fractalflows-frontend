@@ -29,7 +29,7 @@ export const ClaimNFTStatusBar = () => {
     //   const { ethersProvider } = await connectEthereumWallet();
     //   const signer = ethersProvider.getSigner();
     //   const ClaimContract = new ethers.Contract(
-    //     process.env.NEXT_PUBLIC_CLAIM_CONTRACT_ID as string,
+    //     process.env.NEXT_PUBLIC_CLAIM_CONTRACT_ADDRESS as string,
     //     ClaimContractABI.abi,
     //     signer
     //   );
@@ -99,7 +99,7 @@ export const ClaimNFTStatusBar = () => {
           &nbsp;
           <Typography variant="body1" noWrap sx={{ maxWidth: 120 }}>
             <Link
-              href={`${process.env.NEXT_PUBLIC_ETH_EXPLORER_URL}/token/${process.env.NEXT_PUBLIC_CLAIM_CONTRACT_ID}?a=${claim?.nftTokenId}`}
+              href={`${process.env.NEXT_PUBLIC_ETH_EXPLORER_URL}/token/${process.env.NEXT_PUBLIC_CLAIM_CONTRACT_ADDRESS}?a=${claim?.nftTokenId}`}
               text
               blank
             >

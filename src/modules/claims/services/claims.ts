@@ -387,7 +387,7 @@ export const ClaimsService = {
     knowledgeBit,
   }: {
     knowledgeBit: KnowledgeBitProps;
-  }): Promise<{ metadataURI: string }> {
+  }): Promise<string> {
     const { data } = await apolloClient.mutate({
       mutation: gql`
         mutation CreateClaim(
