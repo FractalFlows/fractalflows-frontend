@@ -383,6 +383,29 @@ export const ClaimsService = {
     return data.userKnowledgeBitVotes;
   },
 
+  async saveKnowledgeBitOnIPFS({
+    knowledgeBit,
+  }: {
+    knowledgeBit: KnowledgeBitProps;
+  }): Promise<{ metadataURI: string }> {
+    const { data } = await apolloClient.mutate({
+      mutation: gql`
+        mutation CreateClaim(
+          $saveKnowledgeBitOnIPFSInput: CreateKnowledgeBitInput!
+        ) {
+          saveKnowledgeBitOnIPFS(
+            saveKnowledgeBitOnIPFSInput: $saveKnowledgeBitOnIPFSInput
+          )
+        }
+      `,
+      variables: {
+        saveKnowledgeBitOnIPFSInput: knowledgeBit,
+      },
+    });
+
+    return data.saveKnowledgeBitOnIPFS;
+  },
+
   async createKnowledgeBit({
     claimSlug,
     knowledgeBit,
@@ -394,7 +417,7 @@ export const ClaimsService = {
       mutation: gql`
         ${KNOWLEDGE_BIT_FIELDS}
 
-        mutation CreateClaim(
+        mutation CreateKnowledgeBit(
           $claimSlug: String!
           $createKnowledgeBitInput: CreateKnowledgeBitInput!
         ) {

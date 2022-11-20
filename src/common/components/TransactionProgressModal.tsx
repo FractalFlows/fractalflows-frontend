@@ -1,8 +1,7 @@
 import { useEffect, useState } from "react";
-import { LoadingButton } from "@mui/lab";
-import { useSnackbar } from "notistack";
 import {
   Box,
+  Button,
   Dialog,
   DialogContent,
   Stack,
@@ -13,8 +12,6 @@ import DoneIcon from "@mui/icons-material/Done";
 import ClearIcon from "@mui/icons-material/Clear";
 import CircularProgress from "@mui/material/CircularProgress";
 import { grey } from "@mui/material/colors";
-
-import { Link } from "./Link";
 
 export enum TransactionStepStatus {
   UNSTARTED,
@@ -35,30 +32,29 @@ export interface TransactionStep {
 }
 
 export const TransactionProgressModal = ({
+  open = false,
+  subject = "",
   steps = [],
+  onClose = () => {},
+  onComplete = () => {},
 }: {
+  open: boolean;
+  subject?: string;
   steps?: TransactionStep[];
+  onClose?: () => any;
+  onComplete?: () => any;
 }) => {
   const theme = useTheme();
-  //   const { isSignInDialogOpen, setIsSignInDialogOpen } = useApp();
-  //   const [_isSignInDialogOpen, _setIsSignInDialogOpen] =
-  //     useState(isSignInDialogOpen);
-  //   const { signInWithEthereum } = useAuth();
-  //   const { control, handleSubmit: handleSubmitHook } =
-  //     useForm<WalletNoticeFormProps>({
-  //       defaultValues: {
-  //         dontShowNoticeAgain: false,
-  //       },
-  //     });
-  //   const { enqueueSnackbar } = useSnackbar();
+  const [_isDialogOpen, _setIsDialogOpen] = useState<boolean>(open);
 
-  //   const signInCallback = () => {
-  //     AppCache.signInCallback && AppCache.signInCallback();
-  //     AppCache.signInCallback = () => {};
-  //   };
-  //   const handleSignInDialogClose = () => {
-  //     setIsSignInDialogOpen(false);
-  //   };
+  const handleDialogClose = () => {
+    _setIsDialogOpen(false);
+    onClose();
+  };
+  const handleDoneClick = () => {
+    handleDialogClose();
+    onComplete();
+  };
 
   //   const handleEthereumSignIn = async (values?: WalletNoticeFormProps) => {
   //     handleSignInDialogClose();
@@ -138,12 +134,15 @@ export const TransactionProgressModal = ({
     }
   };
 
+  useEffect(() => {
+    _setIsDialogOpen(open);
+  }, [open]);
+
   return (
     <>
       <Dialog
-        // open={_isSignInDialogOpen}
-        open={true}
-        // onClose={handleSignInDialogClose}
+        open={_isDialogOpen}
+        onClose={handleDialogClose}
         fullWidth
         maxWidth="sm"
         aria-labelledby="signin-dialog-title"
@@ -154,14 +153,15 @@ export const TransactionProgressModal = ({
               <Typography variant="h3" component="h1" align="center">
                 Network transaction
               </Typography>
-              <Typography variant="body1" align="center"></Typography>
+              <Typography variant="body1" align="center">
+                {subject}
+              </Typography>
             </Stack>
             <Stack
               sx={{
                 alignSelf: { xs: "initial", sm: "center" },
                 width: { xs: "initial", sm: "350px" },
               }}
-              // spacing={1}
             >
               {steps.map(({ status, operation }, i) => (
                 <>
@@ -189,6 +189,18 @@ export const TransactionProgressModal = ({
                   )}
                 </>
               ))}
+              <Button
+                sx={{ marginTop: 4 }}
+                variant="contained"
+                color="primary"
+                disabled={
+                  steps[steps.length - 1].status !==
+                  TransactionStepStatus.SUCCESS
+                }
+                onClick={handleDoneClick}
+              >
+                Done
+              </Button>
             </Stack>
           </Stack>
         </DialogContent>

@@ -1,4 +1,4 @@
-import type { FC } from "react";
+import { FC, useState } from "react";
 import {
   Box,
   IconButton,
@@ -12,7 +12,7 @@ import DeleteIcon from "@mui/icons-material/Delete";
 import { useForm, useFieldArray, NestedValue } from "react-hook-form";
 import { useSnackbar } from "notistack";
 import { useRouter } from "next/router";
-import { get, isEmpty } from "lodash-es";
+import { findIndex, get, isEmpty } from "lodash-es";
 
 import { Select } from "common/components/Select";
 import {
@@ -24,10 +24,15 @@ import {
 import { validateEmail, validateTwitterHandle } from "common/utils/validate";
 import { registerMui } from "common/utils/registerMui";
 import { mapArray } from "common/utils/mapArray";
-import { useKnowledgeBits } from "../hooks/useKnowledgeBits";
+import { useKnowledgeBits } from "modules/claims/hooks/useKnowledgeBits";
 import { FileInput } from "common/components/FileInput";
 import { Link } from "common/components/Link";
 import { getIPFSURL } from "common/utils/getIPFSURL";
+import {
+  TransactionProgressModal,
+  TransactionStepOperation,
+  TransactionStepStatus,
+} from "common/components/TransactionProgressModal";
 
 const knowledgeBitTypesOptions = [
   {
@@ -102,18 +107,38 @@ interface KnowledgeBitUpsertFormProps {
   side: KnowledgeBitSides;
   type: string;
   customType?: string;
-  file: File;
+  file: File[];
   attributions: NestedValue<AttributionProps[]>;
 }
+
+const DEFAULT_KNOWLEDGE_BIT_NFT_MINT_TRANSACTION_STEPS = [
+  {
+    status: TransactionStepStatus.STARTED,
+    operation: TransactionStepOperation.UPLOAD,
+  },
+  {
+    status: TransactionStepStatus.UNSTARTED,
+    operation: TransactionStepOperation.SIGN,
+  },
+  {
+    status: TransactionStepStatus.UNSTARTED,
+    operation: TransactionStepOperation.INDEX,
+  },
+];
 
 export const KnowledgeBitUpsert: FC<KnowledgeBitUpsertProps> = ({
   knowledgeBit,
   handleClose,
   operation = KnowledgeBitUpsertFormOperation.CREATE,
 }) => {
-  const { createKnowledgeBit, updateKnowledgeBit } = useKnowledgeBits();
+  const { saveKnowledgeBitOnIPFS, createKnowledgeBit, updateKnowledgeBit } =
+    useKnowledgeBits();
   const { enqueueSnackbar } = useSnackbar();
   const router = useRouter();
+  const [isTransactionProgressModalOpen, setIsTransactionProgressModalOpen] =
+    useState(false);
+  const [transactionProgressModalSteps, setTransactionProgressModalSteps] =
+    useState(DEFAULT_KNOWLEDGE_BIT_NFT_MINT_TRANSACTION_STEPS);
   const {
     control,
     register,
@@ -144,35 +169,97 @@ export const KnowledgeBitUpsert: FC<KnowledgeBitUpsertProps> = ({
     name: "attributions",
   });
 
+  const handleTransactionProgressUpdate = (updates = []) => {
+    const updatedTransactionProgressModalSteps = [
+      ...transactionProgressModalSteps,
+    ];
+
+    updates.map(({ operation, update = {} }) => {
+      const stepIndex = findIndex(transactionProgressModalSteps, { operation });
+
+      updatedTransactionProgressModalSteps[stepIndex] = {
+        ...updatedTransactionProgressModalSteps[stepIndex],
+        ...update,
+      };
+    });
+
+    setTransactionProgressModalSteps(updatedTransactionProgressModalSteps);
+  };
+
+  const handleTransactionProgressModalClose = () => {
+    setIsTransactionProgressModalOpen(false);
+  };
+
   const handleSubmit = async (data: KnowledgeBitProps) => {
     const { slug } = router.query;
 
     data.file = data.file[0];
 
-    enqueueSnackbar("Saving knowledge bit on IPFS...", {
-      variant: "info",
-    });
+    const a = async () => {
+      setTransactionProgressModalSteps(
+        DEFAULT_KNOWLEDGE_BIT_NFT_MINT_TRANSACTION_STEPS
+      );
+      setIsTransactionProgressModalOpen(true);
 
-    try {
-      await (operation === KnowledgeBitUpsertFormOperation.CREATE
-        ? createKnowledgeBit({ claimSlug: slug as string, knowledgeBit: data })
-        : updateKnowledgeBit({
-            id: knowledgeBit?.id as string,
-            knowledgeBit: data,
-          }));
+      try {
+        const metadataURI = await saveKnowledgeBitOnIPFS({
+          knowledgeBit: data,
+        });
 
-      // enqueueSnackbar(
-      //   KnowledgeBitUpsertFormOperationText[operation].successFeedback,
-      //   {
-      //     variant: "success",
-      //   }
-      // );
-      // handleClose();
-    } catch (e: any) {
-      enqueueSnackbar(e?.message, {
-        variant: "error",
-      });
-    }
+        return metadataURI;
+      } catch (e: any) {
+        enqueueSnackbar(e?.message, {
+          variant: "error",
+        });
+      }
+    };
+
+    const b = async () => {
+      handleTransactionProgressUpdate([
+        {
+          operation: TransactionStepOperation.UPLOAD,
+          update: { status: TransactionStepStatus.SUCCESS },
+        },
+        {
+          operation: TransactionStepOperation.SIGN,
+          update: { status: TransactionStepStatus.STARTED },
+        },
+      ]);
+
+      try {
+        // const metadataURI = await saveKnowledgeBitOnIPFS({ knowledgeBit });
+        // handleTransactionProgressUpdate({
+        //   operation: TransactionStepOperation.UPLOAD,
+        //   updates: { status: TransactionStepStatus.SUCCESS },
+        // });
+        // return metadataURI;
+      } catch (e: any) {
+        // enqueueSnackbar(e?.message, {
+        //   variant: "error",
+        // });
+      }
+    };
+
+    const x = await a();
+    const y = await b();
+
+    // try {
+    //   await(
+    //     operation === KnowledgeBitUpsertFormOperation.CREATE
+    //       ? createKnowledgeBit({
+    //           claimSlug: slug as string,
+    //           knowledgeBit: data,
+    //         })
+    //       : updateKnowledgeBit({
+    //           id: knowledgeBit?.id as string,
+    //           knowledgeBit: data,
+    //         })
+    //   );
+    // } catch (e: any) {
+    //   enqueueSnackbar(e?.message, {
+    //     variant: "error",
+    //   });
+    // }
   };
 
   const knowledgeBitType = watch("type");
@@ -394,6 +481,14 @@ export const KnowledgeBitUpsert: FC<KnowledgeBitUpsertProps> = ({
           </Stack>
         </Stack>
       </form>
+
+      <TransactionProgressModal
+        subject="Mint Knowledge Bit NFT"
+        open={isTransactionProgressModalOpen}
+        steps={transactionProgressModalSteps}
+        onClose={handleTransactionProgressModalClose}
+        onComplete={handleClose}
+      />
     </Stack>
   );
 };

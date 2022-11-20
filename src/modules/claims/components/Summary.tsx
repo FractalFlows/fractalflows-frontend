@@ -392,8 +392,8 @@ export const ClaimSummary: FC = (props) => {
         </Stack>
       </Stack>
       <Divider />
-      <ClaimNFTStatusBar />
-      <Divider />
+      {/* <ClaimNFTStatusBar /> */}
+      {/* <Divider /> */}
       <Typography variant="body1" sx={{ whiteSpace: "pre-line" }}>
         {claim?.summary}
       </Typography>

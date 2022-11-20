@@ -9,6 +9,18 @@ import { apolloClient } from "common/services/apollo/client";
 export const getKnowledgeBit = async ({ id }: { id: string }) =>
   await ClaimsService.getKnowledgeBit({ id });
 
+export const saveKnowledgeBitOnIPFS = async ({
+  knowledgeBit,
+}: {
+  knowledgeBit: KnowledgeBitProps;
+}) => {
+  const savedKnowledgeBit = await ClaimsService.saveKnowledgeBitOnIPFS({
+    knowledgeBit,
+  });
+
+  return savedKnowledgeBit;
+};
+
 export const createKnowledgeBit = async ({
   claimSlug,
   knowledgeBit,
@@ -75,6 +87,7 @@ export const useKnowledgeBits = () => {
 
   return {
     getKnowledgeBit,
+    saveKnowledgeBitOnIPFS,
     createKnowledgeBit,
     updateKnowledgeBit,
     deleteKnowledgeBit,

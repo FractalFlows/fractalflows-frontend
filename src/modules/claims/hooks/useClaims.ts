@@ -5,12 +5,6 @@ import { createClaim } from "./create";
 import { updateClaim } from "./update";
 import { deleteClaim } from "./delete";
 import { inviteFriends } from "./inviteFriends";
-import {
-  getKnowledgeBit,
-  createKnowledgeBit,
-  updateKnowledgeBit,
-  deleteKnowledgeBit,
-} from "./knowledgeBit";
 import { ClaimsService } from "../services/claims";
 import { PaginationProps } from "modules/interfaces";
 import { ClaimsCache } from "../cache";
@@ -174,9 +168,5 @@ export const useClaims = () => {
     removeFollowerFromClaim,
     inviteFriends,
     requestClaimOwnership,
-    getKnowledgeBit,
-    createKnowledgeBit,
-    updateKnowledgeBit,
-    deleteKnowledgeBit,
   };
 };

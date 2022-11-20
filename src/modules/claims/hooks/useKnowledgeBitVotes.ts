@@ -8,7 +8,7 @@ import type {
 } from "../interfaces";
 import { ClaimsCache } from "../cache";
 import { apolloClient } from "common/services/apollo/client";
-import { getKnowledgeBit } from "./knowledgeBit";
+import { getKnowledgeBit } from "./useKnowledgeBits";
 import { findIndex } from "lodash-es";
 
 const getUserKnowledgeBitVotes = async ({
