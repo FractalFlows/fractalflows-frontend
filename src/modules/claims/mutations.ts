@@ -1,14 +1,5 @@
 import { gql } from "@apollo/client";
-import { KNOWLEDGE_BIT_FIELDS, USER_OPINION_FIELDS } from "./fragments";
-
-export const CREATE_CLAIM = gql`
-  mutation CreateClaim($createClaimInput: CreateClaimInput!) {
-    createClaim(createClaimInput: $createClaimInput) {
-      id
-      slug
-    }
-  }
-`;
+import { USER_OPINION_FIELDS } from "./fragments";
 
 export const UPDATE_CLAIM = gql`
   mutation UpdateClaim($updateClaimInput: UpdateClaimInput!) {

@@ -24,6 +24,7 @@ export enum TransactionStepStatus {
 export enum TransactionStepOperation {
   UPLOAD = "Uploading data to IPFS",
   SIGN = "Signing transaction with wallet",
+  WAIT_ONCHAIN = "Waiting for transaction to complete on-chain",
   INDEX = "Indexing transaction data",
 }
 

@@ -206,7 +206,14 @@ export const ClaimsService = {
 
   async createClaim({ claim }: { claim: ClaimProps }): Promise<ClaimProps> {
     const { data } = await apolloClient.mutate({
-      mutation: CREATE_CLAIM,
+      mutation: gql`
+        mutation CreateClaim($createClaimInput: CreateClaimInput!) {
+          createClaim(createClaimInput: $createClaimInput) {
+            id
+            slug
+          }
+        }
+      `,
       variables: {
         createClaimInput: claim,
       },
@@ -235,19 +242,23 @@ export const ClaimsService = {
     return data.updateClaim;
   },
 
-  async saveClaimMetadataOnIPFS({ id }: { id: string }): Promise<string> {
+  async saveClaimOnIPFS({
+    claim,
+  }: {
+    claim: Partial<ClaimProps>;
+  }): Promise<string> {
     const { data } = await apolloClient.mutate({
       mutation: gql`
-        mutation SaveClaimMetadataOnIPFS($id: String!) {
-          saveClaimMetadataOnIPFS(id: $id)
+        mutation SaveClaimOnIPFS($claim: CreateClaimInput!) {
+          saveClaimOnIPFS(claim: $claim)
         }
       `,
       variables: {
-        id,
+        claim,
       },
     });
 
-    return data.saveClaimMetadataOnIPFS;
+    return data.saveClaimOnIPFS;
   },
 
   async saveClaimTxId({
@@ -390,7 +401,7 @@ export const ClaimsService = {
   }): Promise<string> {
     const { data } = await apolloClient.mutate({
       mutation: gql`
-        mutation CreateClaim(
+        mutation SaveKnowledgeBitOnIPFS(
           $saveKnowledgeBitOnIPFSInput: CreateKnowledgeBitInput!
         ) {
           saveKnowledgeBitOnIPFS(

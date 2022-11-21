@@ -1,30 +1,41 @@
 import { gql, useQuery } from "@apollo/client";
+import { get } from "lodash-es";
+import { ContractCtrl } from "@web3modal/core";
 
 import { getClaim, getPartialClaim, getClaims, getTrendingClaims } from "./get";
-import { createClaim } from "./create";
 import { updateClaim } from "./update";
 import { deleteClaim } from "./delete";
 import { inviteFriends } from "./inviteFriends";
 import { ClaimsService } from "../services/claims";
 import { PaginationProps } from "modules/interfaces";
 import { ClaimsCache } from "../cache";
-import { ClaimNFTStatuses, ClaimProps } from "../interfaces";
+import { ClaimProps } from "../interfaces";
 import { apolloClient } from "common/services/apollo/client";
 import { AuthCache } from "modules/auth/cache";
-import { get } from "lodash-es";
+import ClaimContractABI from "../../../../artifacts/contracts/Claim.sol/Claim.json";
 
-const saveClaimMetadataOnIPFS = async ({ id }: { id: string }) => {
-  return await ClaimsService.saveClaimMetadataOnIPFS({ id });
+const saveClaimOnIPFS = async ({ claim }: { claim: Partial<ClaimProps> }) => {
+  return await ClaimsService.saveClaimOnIPFS({ claim });
 };
 
-const saveClaimTxId = async ({ id, txId }: { id: string; txId: string }) => {
-  await ClaimsService.saveClaimTxId({ id, txId });
-  ClaimsCache.claim({
-    ...ClaimsCache.claim(),
-    nftStatus: ClaimNFTStatuses.MINTING,
-    nftTxId: txId,
+export const mintClaimNFT = async ({
+  metadataURI,
+}: {
+  metadataURI: string;
+}) => {
+  const mintClaimNFTTx = await ContractCtrl.write({
+    address: process.env.NEXT_PUBLIC_CLAIM_CONTRACT_ADDRESS as string,
+    chainId: Number(process.env.NEXT_PUBLIC_NETWORK_ID),
+    abi: ClaimContractABI.abi,
+    functionName: "mintToken",
+    args: [metadataURI.replace(/^ipfs:\/\//, "")],
   });
+
+  return mintClaimNFTTx;
 };
+
+export const createClaim = async ({ claim }: { claim: ClaimProps }) =>
+  await ClaimsService.createClaim({ claim });
 
 const searchClaims = async ({
   term,
@@ -32,21 +43,6 @@ const searchClaims = async ({
   offset,
 }: { term: string } & PaginationProps) => {
   return await ClaimsService.searchClaims({ term, limit, offset });
-};
-
-const setClaimNFTAsMinted = ({
-  tokenId,
-  fractionalizationContractAddress,
-}: {
-  tokenId: string;
-  fractionalizationContractAddress: string;
-}) => {
-  ClaimsCache.claim({
-    ...ClaimsCache.claim(),
-    nftStatus: ClaimNFTStatuses.MINTED,
-    nftFractionalizationContractAddress: fractionalizationContractAddress,
-    nftTokenId: tokenId,
-  });
 };
 
 const getUserClaims = async ({ username }: { username: string }) => {
@@ -157,9 +153,8 @@ export const useClaims = () => {
     getUserContributedClaims,
     getUserFollowingClaims,
     createClaim,
-    saveClaimMetadataOnIPFS,
-    saveClaimTxId,
-    setClaimNFTAsMinted,
+    saveClaimOnIPFS,
+    mintClaimNFT,
     updateClaim,
     deleteClaim,
     disableClaim,

@@ -40,7 +40,7 @@ export const mintKnowledgeBitNFT = async ({
     args: [metadataURI.replace(/^ipfs:\/\//, ""), claimTokenId || "0"],
   });
 
-  const mintKnowledgeBitNFTTxReceipt = mintKnowledgeBitNFTTx.wait();
+  const mintKnowledgeBitNFTTxReceipt = await mintKnowledgeBitNFTTx.wait();
 
   console.log(mintKnowledgeBitNFTTxReceipt);
 };
