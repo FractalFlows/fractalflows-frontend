@@ -38,6 +38,7 @@ import { ConnectTwitter } from "common/components/ConnectTwitter";
 import styles from "./Summary.module.css";
 import { LoadingButton } from "@mui/lab";
 import { ClaimNFTStatusBar } from "./ClaimNFTStatusBar";
+import { getGatewayFromIPFSURI } from "common/utils/ipfs";
 
 enum ClaimCallbackOperations {
   REQUEST_OWNERSHIP = "REQUEST_OWNERSHIP",
@@ -392,8 +393,44 @@ export const ClaimSummary: FC = (props) => {
         </Stack>
       </Stack>
       <Divider />
+      <Stack spacing={2}>
+        <Stack spacing={3} direction="row">
+          <Typography variant="body1">
+            Token ID:&nbsp;
+            <Link
+              href={`${process.env.NEXT_PUBLIC_ETH_EXPLORER_URL}/token/${process.env.NEXT_PUBLIC_CLAIM_CONTRACT_ADDRESS}?a=${claim?.nftTokenId}`}
+              text
+              blank
+            >
+              {claim?.nftTokenId}
+            </Link>
+          </Typography>
+          <Typography variant="body1">
+            Metadata:&nbsp;
+            <Link
+              href={getGatewayFromIPFSURI(claim?.nftMetadataURI)}
+              text
+              blank
+            >
+              IPFS
+            </Link>
+          </Typography>
+          <Typography variant="body1" sx={{ display: "flex" }}>
+            Fractionalization Contract:&nbsp;
+            <Typography noWrap sx={{ maxWidth: 120 }}>
+              <Link
+                href={`${process.env.NEXT_PUBLIC_ETH_EXPLORER_URL}/address/${claim?.nftFractionalizationContractAddress}`}
+                text
+                blank
+              >
+                {claim?.nftFractionalizationContractAddress}
+              </Link>
+            </Typography>
+          </Typography>
+        </Stack>
+      </Stack>
       {/* <ClaimNFTStatusBar /> */}
-      {/* <Divider /> */}
+      <Divider />
       <Typography variant="body1" sx={{ whiteSpace: "pre-line" }}>
         {claim?.summary}
       </Typography>

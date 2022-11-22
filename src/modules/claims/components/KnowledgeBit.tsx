@@ -200,7 +200,6 @@ export const KnowledgeBit: FC<KnowledgeBitComponentProps> = ({
               onClose={handleMenuClose}
             >
               <MenuItem onClick={handleEdit}>Edit</MenuItem>
-              <MenuItem onClick={handleDelete}>Delete</MenuItem>
             </Menu>
           </Stack>
           <Stack alignItems="center" justifyContent="center">

@@ -280,7 +280,7 @@ export const ClaimUpsertForm: FC<ClaimUpsertFormProps> = ({
 
         const { transactionHash } = mintClaimNFTTxReceipt;
         const transferEventTopics = mintClaimNFTTxReceipt.logs[1].topics;
-        const tokenId = transferEventTopics[3].toString();
+        const tokenId = String(parseInt(transferEventTopics[3]));
         const fractionalizationContractAddress = `0x${transferEventTopics[2].slice(
           -40
         )}`;
