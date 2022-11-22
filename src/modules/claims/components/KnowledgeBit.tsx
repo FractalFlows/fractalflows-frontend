@@ -39,7 +39,7 @@ import { useRouter } from "next/router";
 import { useKnowledgeBits } from "../hooks/useKnowledgeBits";
 import { useAuth } from "modules/auth/hooks/useAuth";
 import { UserRole } from "modules/users/interfaces";
-import { getIPFSURL } from "common/utils/getIPFSURL";
+import { getGatewayFromIPFSURI } from "common/utils/ipfs";
 
 enum KnowledgeBitStates {
   UPDATING,
@@ -141,7 +141,7 @@ export const KnowledgeBit: FC<KnowledgeBitComponentProps> = ({
   return (
     <Box>
       <a
-        href={getIPFSURL(knowledgeBit.fileCID, knowledgeBit.filename)}
+        href={getGatewayFromIPFSURI(knowledgeBit.fileURI)}
         target="_blank"
         rel="noreferrer"
       >

@@ -41,8 +41,7 @@ export const KNOWLEDGE_BIT_FIELDS = gql`
     side
     type
     customType
-    filename
-    fileCID
+    fileURI
     attributions {
       origin
       identifier

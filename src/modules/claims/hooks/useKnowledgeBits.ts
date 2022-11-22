@@ -1,12 +1,11 @@
 import { gql, useQuery } from "@apollo/client";
-import { compact, concat, filter, findIndex, get } from "lodash-es";
-import { BigNumber } from "ethers";
+import { compact, concat, filter, findIndex } from "lodash-es";
+import { ContractCtrl } from "@web3modal/core";
 
 import { ClaimsService } from "../services/claims";
 import type { KnowledgeBitProps } from "../interfaces";
 import { ClaimsCache } from "../cache";
 import { apolloClient } from "common/services/apollo/client";
-import { AccountCtrl, ContractCtrl } from "@web3modal/core";
 import KnowledgeBitContractABI from "../../../../artifacts/contracts/KnowledgeBit.sol/KnowledgeBit.json";
 
 export const getKnowledgeBit = async ({ id }: { id: string }) =>
@@ -17,12 +16,12 @@ export const saveKnowledgeBitOnIPFS = async ({
 }: {
   knowledgeBit: KnowledgeBitProps;
 }) => {
-  const savedKnowledgeBitMetadataURI =
+  const saveKnowledgeBitOnIPFSResult =
     await ClaimsService.saveKnowledgeBitOnIPFS({
       knowledgeBit,
     });
 
-  return savedKnowledgeBitMetadataURI;
+  return saveKnowledgeBitOnIPFSResult;
 };
 
 export const mintKnowledgeBitNFT = async ({
@@ -40,9 +39,7 @@ export const mintKnowledgeBitNFT = async ({
     args: [metadataURI.replace(/^ipfs:\/\//, ""), claimTokenId || "0"],
   });
 
-  const mintKnowledgeBitNFTTxReceipt = await mintKnowledgeBitNFTTx.wait();
-
-  console.log(mintKnowledgeBitNFTTxReceipt);
+  return mintKnowledgeBitNFTTx;
 };
 
 export const createKnowledgeBit = async ({

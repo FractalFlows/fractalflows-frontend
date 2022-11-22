@@ -398,15 +398,18 @@ export const ClaimsService = {
     knowledgeBit,
   }: {
     knowledgeBit: KnowledgeBitProps;
-  }): Promise<string> {
+  }): Promise<{ metadataURI: string; fileURI: string }> {
     const { data } = await apolloClient.mutate({
       mutation: gql`
         mutation SaveKnowledgeBitOnIPFS(
-          $saveKnowledgeBitOnIPFSInput: CreateKnowledgeBitInput!
+          $saveKnowledgeBitOnIPFSInput: SaveKnowledgeBitOnIPFSInput!
         ) {
           saveKnowledgeBitOnIPFS(
             saveKnowledgeBitOnIPFSInput: $saveKnowledgeBitOnIPFSInput
-          )
+          ) {
+            metadataURI
+            fileURI
+          }
         }
       `,
       variables: {

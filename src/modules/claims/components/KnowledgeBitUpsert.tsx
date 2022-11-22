@@ -1,4 +1,4 @@
-import { FC, useState } from "react";
+import { FC, useRef, useState } from "react";
 import {
   Box,
   IconButton,
@@ -27,7 +27,6 @@ import { mapArray } from "common/utils/mapArray";
 import { useKnowledgeBits } from "modules/claims/hooks/useKnowledgeBits";
 import { FileInput } from "common/components/FileInput";
 import { Link } from "common/components/Link";
-import { getIPFSURL } from "common/utils/getIPFSURL";
 import {
   TransactionProgressModal,
   TransactionStep,
@@ -35,7 +34,10 @@ import {
   TransactionStepStatus,
 } from "common/components/TransactionProgressModal";
 import { useClaims } from "../hooks/useClaims";
-import { BigNumber } from "ethers";
+import {
+  getFilenameFromIPFSURI,
+  getGatewayFromIPFSURI,
+} from "common/utils/ipfs";
 
 const knowledgeBitTypesOptions = [
   {
@@ -125,6 +127,10 @@ const DEFAULT_KNOWLEDGE_BIT_NFT_MINT_TRANSACTION_STEPS = [
   },
   {
     status: TransactionStepStatus.UNSTARTED,
+    operation: TransactionStepOperation.WAIT_ONCHAIN,
+  },
+  {
+    status: TransactionStepStatus.UNSTARTED,
     operation: TransactionStepOperation.INDEX,
   },
 ];
@@ -147,6 +153,7 @@ export const KnowledgeBitUpsert: FC<KnowledgeBitUpsertProps> = ({
     useState(false);
   const [transactionProgressModalSteps, setTransactionProgressModalSteps] =
     useState(DEFAULT_KNOWLEDGE_BIT_NFT_MINT_TRANSACTION_STEPS);
+  const transactionProgressModalStepsRef = useRef<TransactionStep[]>([]);
   const {
     control,
     register,
@@ -177,6 +184,8 @@ export const KnowledgeBitUpsert: FC<KnowledgeBitUpsertProps> = ({
     name: "attributions",
   });
 
+  transactionProgressModalStepsRef.current = transactionProgressModalSteps;
+
   const handleTransactionProgressUpdate = (
     updates: {
       operation: TransactionStepOperation;
@@ -184,11 +193,13 @@ export const KnowledgeBitUpsert: FC<KnowledgeBitUpsertProps> = ({
     }[] = []
   ) => {
     const updatedTransactionProgressModalSteps = [
-      ...transactionProgressModalSteps,
+      ...transactionProgressModalStepsRef.current,
     ];
 
     updates.map(({ operation, update = {} }) => {
-      const stepIndex = findIndex(transactionProgressModalSteps, { operation });
+      const stepIndex = findIndex(updatedTransactionProgressModalSteps, {
+        operation,
+      });
 
       updatedTransactionProgressModalSteps[stepIndex] = {
         ...updatedTransactionProgressModalSteps[stepIndex],
@@ -203,17 +214,22 @@ export const KnowledgeBitUpsert: FC<KnowledgeBitUpsertProps> = ({
     setIsTransactionProgressModalOpen(false);
   };
 
+  const handleTransactionProgressModalComplete = () => {
+    handleClose();
+  };
+
   const handleSubmit = async (data: KnowledgeBitProps) => {
     const { slug } = router.query;
 
     data.file = data.file[0];
 
-    const handleSubmitIndexKnowledgeBitNFT = async (metadataURI: string) => {
+    const handleIndexKnowledgeBitNFT = async (transactionData: {
+      fileURI: string;
+      nftMetadataURI: string;
+      nftTxHash: string;
+      nftTokenId: string;
+    }) => {
       handleTransactionProgressUpdate([
-        {
-          operation: TransactionStepOperation.SIGN,
-          update: { status: TransactionStepStatus.SUCCESS },
-        },
         {
           operation: TransactionStepOperation.INDEX,
           update: { status: TransactionStepStatus.STARTED },
@@ -221,17 +237,29 @@ export const KnowledgeBitUpsert: FC<KnowledgeBitUpsertProps> = ({
       ]);
 
       try {
-        // await mintKnowledgeBitNFT({
-        //   metadataURI,
-        //   claimTokenId: claim.nftTokenId,
-        // });
+        delete data.file;
+
+        if (operation === KnowledgeBitUpsertFormOperation.CREATE) {
+          await createKnowledgeBit({
+            claimSlug: slug as string,
+            knowledgeBit: { ...data, ...transactionData },
+          });
+        } else {
+          await updateKnowledgeBit({
+            id: knowledgeBit?.id as string,
+            knowledgeBit: data,
+          });
+        }
+
+        handleTransactionProgressUpdate([
+          {
+            operation: TransactionStepOperation.INDEX,
+            update: { status: TransactionStepStatus.SUCCESS },
+          },
+        ]);
       } catch (e: any) {
         console.log(e);
         handleTransactionProgressUpdate([
-          {
-            operation: TransactionStepOperation.SIGN,
-            update: { status: TransactionStepStatus.SUCCESS },
-          },
           {
             operation: TransactionStepOperation.INDEX,
             update: { status: TransactionStepStatus.ERROR },
@@ -240,12 +268,14 @@ export const KnowledgeBitUpsert: FC<KnowledgeBitUpsertProps> = ({
       }
     };
 
-    const handleSubmitMintKnowledgeBitNFT = async (metadataURI: string) => {
+    const handleMintKnowledgeBitNFT = async ({
+      metadataURI,
+      fileURI,
+    }: {
+      metadataURI: string;
+      fileURI: string;
+    }) => {
       handleTransactionProgressUpdate([
-        {
-          operation: TransactionStepOperation.UPLOAD,
-          update: { status: TransactionStepStatus.SUCCESS },
-        },
         {
           operation: TransactionStepOperation.SIGN,
           update: { status: TransactionStepStatus.STARTED },
@@ -253,45 +283,82 @@ export const KnowledgeBitUpsert: FC<KnowledgeBitUpsertProps> = ({
       ]);
 
       try {
-        await mintKnowledgeBitNFT({
+        const mintKnowledgeBitNFTTx = await mintKnowledgeBitNFT({
           metadataURI,
           claimTokenId: claim.nftTokenId,
         });
 
-        await handleSubmitIndexKnowledgeBitNFT(metadataURI);
+        handleTransactionProgressUpdate([
+          {
+            operation: TransactionStepOperation.SIGN,
+            update: {
+              status: TransactionStepStatus.SUCCESS,
+            },
+          },
+          {
+            operation: TransactionStepOperation.WAIT_ONCHAIN,
+            update: {
+              status: TransactionStepStatus.STARTED,
+            },
+          },
+        ]);
+
+        const mintKnowledgeBitNFTTxReceipt = await mintKnowledgeBitNFTTx.wait();
+
+        handleTransactionProgressUpdate([
+          {
+            operation: TransactionStepOperation.WAIT_ONCHAIN,
+            update: {
+              status: TransactionStepStatus.SUCCESS,
+            },
+          },
+        ]);
+
+        const { transactionHash } = mintKnowledgeBitNFTTxReceipt;
+        const transferEventTopics = mintKnowledgeBitNFTTxReceipt.logs[0].topics;
+        const tokenId = transferEventTopics[3].toString();
+
+        await handleIndexKnowledgeBitNFT({
+          fileURI,
+          nftMetadataURI: metadataURI,
+          nftTxHash: transactionHash,
+          nftTokenId: tokenId,
+        });
       } catch (e: any) {
         console.log(e);
         handleTransactionProgressUpdate([
           {
-            operation: TransactionStepOperation.UPLOAD,
-            update: { status: TransactionStepStatus.SUCCESS },
-          },
-          {
             operation: TransactionStepOperation.SIGN,
             update: {
               status: TransactionStepStatus.ERROR,
-              retry: () => handleSubmitMintKnowledgeBitNFT(metadataURI),
+              retry: () => handleMintKnowledgeBitNFT({ metadataURI, fileURI }),
             },
           },
         ]);
       }
     };
 
-    const handleSubmitSaveKnowledgeBitOnIPFS = async (
-      data: KnowledgeBitProps
-    ) => {
+    const handleSaveKnowledgeBitOnIPFS = async (data: KnowledgeBitProps) => {
       setTransactionProgressModalSteps(
         DEFAULT_KNOWLEDGE_BIT_NFT_MINT_TRANSACTION_STEPS
       );
       setIsTransactionProgressModalOpen(true);
 
       try {
-        const metadataURI = await saveKnowledgeBitOnIPFS({
+        const saveKnowledgeBitOnIPFSResult = await saveKnowledgeBitOnIPFS({
           knowledgeBit: data,
         });
 
-        await handleSubmitMintKnowledgeBitNFT(metadataURI);
+        handleTransactionProgressUpdate([
+          {
+            operation: TransactionStepOperation.UPLOAD,
+            update: { status: TransactionStepStatus.SUCCESS },
+          },
+        ]);
+
+        await handleMintKnowledgeBitNFT(saveKnowledgeBitOnIPFSResult);
       } catch (e: any) {
+        console.error(e);
         handleTransactionProgressUpdate([
           {
             operation: TransactionStepOperation.UPLOAD,
@@ -301,25 +368,7 @@ export const KnowledgeBitUpsert: FC<KnowledgeBitUpsertProps> = ({
       }
     };
 
-    await handleSubmitSaveKnowledgeBitOnIPFS(data);
-
-    // try {
-    //   await(
-    //     operation === KnowledgeBitUpsertFormOperation.CREATE
-    //       ? createKnowledgeBit({
-    //           claimSlug: slug as string,
-    //           knowledgeBit: data,
-    //         })
-    //       : updateKnowledgeBit({
-    //           id: knowledgeBit?.id as string,
-    //           knowledgeBit: data,
-    //         })
-    //   );
-    // } catch (e: any) {
-    //   enqueueSnackbar(e?.message, {
-    //     variant: "error",
-    //   });
-    // }
+    await handleSaveKnowledgeBitOnIPFS(data);
   };
 
   const knowledgeBitType = watch("type");
@@ -391,14 +440,11 @@ export const KnowledgeBitUpsert: FC<KnowledgeBitUpsertProps> = ({
               <Typography variant="body1">
                 Current file:{" "}
                 <Link
-                  href={getIPFSURL(
-                    get(knowledgeBit, "fileCID", ""),
-                    get(knowledgeBit, "filename", "")
-                  )}
+                  href={getGatewayFromIPFSURI(knowledgeBit?.fileURI)}
                   text
                   blank
                 >
-                  {get(knowledgeBit, "filename", "")}
+                  {getFilenameFromIPFSURI(knowledgeBit?.fileURI)}
                 </Link>
               </Typography>
             </div>
@@ -547,7 +593,7 @@ export const KnowledgeBitUpsert: FC<KnowledgeBitUpsertProps> = ({
         open={isTransactionProgressModalOpen}
         steps={transactionProgressModalSteps}
         onClose={handleTransactionProgressModalClose}
-        onComplete={handleClose}
+        onComplete={handleTransactionProgressModalComplete}
       />
     </Stack>
   );

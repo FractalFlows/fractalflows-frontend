@@ -53,8 +53,7 @@ export interface KnowledgeBitProps {
   type: KnowledgeBitTypes;
   customType?: string;
   file: File;
-  filename?: string;
-  fileCID?: string;
+  fileURI?: string;
   attributions?: AttributionProps[];
   user: UserProps;
   upvotesCount: number;
@@ -69,12 +68,6 @@ export interface KnowledgeBitVoteProps {
 export enum ClaimOrigins {
   FRACTALFLOWS = "FRACTALFLOWS",
   TWITTER = "Twitter",
-}
-
-export enum ClaimNFTStatuses {
-  NOTMINTED = "NOTMINTED",
-  MINTING = "MINTING",
-  MINTED = "MINTED",
 }
 
 export interface ClaimProps {
@@ -94,8 +87,7 @@ export interface ClaimProps {
   tweetId?: string;
   tweetOwner?: string;
   origin?: ClaimOrigins;
-  nftStatus?: ClaimNFTStatuses;
-  nftTxId?: string;
+  nftTxHash?: string;
   nftTokenId?: string;
   nftFractionalizationContractAddress?: string;
 }

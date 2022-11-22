@@ -54,6 +54,10 @@ export const TransactionProgressModal = ({
     _setIsDialogOpen(false);
     onClose();
   };
+  const handleDialogBackdropClick = (event) => {
+    event.stopPropagation();
+    return false;
+  };
   const handleDoneClick = () => {
     handleDialogClose();
     onComplete();
@@ -140,13 +144,15 @@ export const TransactionProgressModal = ({
   useEffect(() => {
     _setIsDialogOpen(open);
   }, [open]);
-  console.log(steps);
+
   return (
     <>
       <Dialog
         open={_isDialogOpen}
         onClose={handleDialogClose}
         fullWidth
+        onBackdropClick={handleDialogBackdropClick}
+        disableEscapeKeyDown
         maxWidth="sm"
         aria-labelledby="signin-dialog-title"
       >

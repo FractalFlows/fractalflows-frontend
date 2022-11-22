@@ -230,7 +230,6 @@ export const ClaimUpsertForm: FC<ClaimUpsertFormProps> = ({
           },
         ]);
       } catch (e: any) {
-        console.log("error indexing", e);
         handleTransactionProgressUpdate([
           {
             operation: TransactionStepOperation.INDEX,
