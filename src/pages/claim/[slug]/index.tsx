@@ -107,7 +107,6 @@ export async function getStaticProps({ params }: { params: ClaimParamsProps }) {
       revalidate: 5,
     };
   } catch (e) {
-    console.log(e.networkError.result.errors);
     return { notFound: true };
   }
 }

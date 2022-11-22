@@ -292,7 +292,6 @@ export const ClaimUpsertForm: FC<ClaimUpsertFormProps> = ({
           nftFractionalizationContractAddress: fractionalizationContractAddress,
         });
       } catch (e: any) {
-        console.log("error", e.message);
         handleTransactionProgressUpdate([
           {
             operation: TransactionStepOperation.SIGN,

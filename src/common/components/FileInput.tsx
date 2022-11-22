@@ -13,7 +13,6 @@ export interface SelectProps {
   control: any;
   errors: FieldErrors;
   rules?: any;
-  fullWidth?: boolean;
   sx?: any;
 }
 

@@ -18,6 +18,17 @@ export interface AttributionProps {
   identifier: string;
 }
 
+export enum AttributionOrigins {
+  TWITTER = "twitter",
+  EMAIL = "email",
+}
+
+export interface AttributionProps {
+  id?: string;
+  origin: string;
+  identifier: string;
+}
+
 export enum KnowledgeBitTypes {
   PUBLICATION_OR_ARTICLE_OR_REPORT = "PUBLICATION_OR_ARTICLE_OR_REPORT",
   SIMULATION_RESULTS = "SIMULATION_RESULTS",
@@ -33,6 +44,23 @@ export enum KnowledgeBitTypes {
   STATEMENT_OF_HYPOTHESIS = "STATEMENT_OF_HYPOTHESIS",
   DESCRIPTION_OF_METHODOLOGIES = "DESCRIPTION_OF_METHODOLOGIES",
   OTHER = "OTHER",
+}
+
+export enum KnowledgeBitTypesLabels {
+  PUBLICATION_OR_ARTICLE_OR_REPORT = "Publication/Article/Report",
+  SIMULATION_RESULTS = "Simulation Results",
+  EXPERIMENTAL_RESULTS = "Experimental Results",
+  DETAILED_ANALYSIS = "Detailed Analysis",
+  DATA_SET = "Data Set",
+  DETAILED_MATHEMATICAL_FORMULATION = "Detailed Mathematical Formulations",
+  SCRIPTS = "Scripts",
+  SOURCE_CODE = "Source Code",
+  REVIEWS = "Reviews",
+  REPRODUCTION_OF_RESULTS = "Reproduction of Results",
+  STATEMENT_OF_ASSUMPTIONS = "Statement of Assumptions",
+  STATEMENT_OF_HYPOTHESIS = "Statement of Hypothesis",
+  DESCRIPTION_OF_METHODOLOGIES = "Description of Methodologies",
+  OTHER = "Other (please specify)",
 }
 
 export enum KnowledgeBitSides {
@@ -54,6 +82,9 @@ export interface KnowledgeBitProps {
   customType?: string;
   file: File;
   fileURI?: string;
+  nftTxHash: string;
+  nftTokenId: string;
+  nftMetadataURI: string;
   attributions?: AttributionProps[];
   user: UserProps;
   upvotesCount: number;

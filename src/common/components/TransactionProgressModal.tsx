@@ -197,7 +197,7 @@ export const TransactionProgressModal = ({
                     ) : null}
                   </Stack>
                   {i === steps.length - 1 ? null : (
-                    <Stack>
+                    <Stack key={`${operation}-divider`}>
                       <Box
                         sx={{
                           bgcolor: grey[200],

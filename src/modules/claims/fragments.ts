@@ -43,6 +43,7 @@ export const KNOWLEDGE_BIT_FIELDS = gql`
     customType
     fileURI
     attributions {
+      id
       origin
       identifier
     }
@@ -53,6 +54,8 @@ export const KNOWLEDGE_BIT_FIELDS = gql`
     }
     upvotesCount
     downvotesCount
+    nftMetadataURI
+    nftTokenId
   }
 `;
 

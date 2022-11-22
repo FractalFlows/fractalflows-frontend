@@ -16,10 +16,12 @@ import { findIndex, get, isEmpty } from "lodash-es";
 
 import { Select } from "common/components/Select";
 import {
+  AttributionOrigins,
   AttributionProps,
   KnowledgeBitProps,
   KnowledgeBitSides,
   KnowledgeBitTypes,
+  KnowledgeBitTypesLabels,
 } from "modules/claims/interfaces";
 import { validateEmail, validateTwitterHandle } from "common/utils/validate";
 import { registerMui } from "common/utils/registerMui";
@@ -39,47 +41,14 @@ import {
   getGatewayFromIPFSURI,
 } from "common/utils/ipfs";
 
-const knowledgeBitTypesOptions = [
-  {
-    value: KnowledgeBitTypes.PUBLICATION_OR_ARTICLE_OR_REPORT,
-    label: "Publication/Article/Report",
-  },
-  { value: KnowledgeBitTypes.SIMULATION_RESULTS, label: "Simulation Results" },
-  {
-    value: KnowledgeBitTypes.EXPERIMENTAL_RESULTS,
-    label: "Experimental Results",
-  },
-  { value: KnowledgeBitTypes.DETAILED_ANALYSIS, label: "Detailed Analysis" },
-  { value: KnowledgeBitTypes.DATA_SET, label: "Data Set" },
-  {
-    value: KnowledgeBitTypes.DETAILED_MATHEMATICAL_FORMULATION,
-    label: "Detailed Mathematical Formulations",
-  },
-  { value: KnowledgeBitTypes.SCRIPTS, label: "Scripts" },
-  { value: KnowledgeBitTypes.SOURCE_CODE, label: "Source Code" },
-  { value: KnowledgeBitTypes.REVIEWS, label: "Reviews" },
-  {
-    value: KnowledgeBitTypes.REPRODUCTION_OF_RESULTS,
-    label: "Reproduction of Results",
-  },
-  {
-    value: KnowledgeBitTypes.STATEMENT_OF_ASSUMPTIONS,
-    label: "Statement of Assumptions",
-  },
-  {
-    value: KnowledgeBitTypes.STATEMENT_OF_HYPOTHESIS,
-    label: "Statement of Hypothesis",
-  },
-  {
-    value: KnowledgeBitTypes.DESCRIPTION_OF_METHODOLOGIES,
-    label: "Description of Methodologies",
-  },
-  { value: KnowledgeBitTypes.OTHER, label: "Other (please specify)" },
-];
+const knowledgeBitTypesOptions = Object.keys(KnowledgeBitTypes).map((key) => ({
+  value: key,
+  label: KnowledgeBitTypesLabels[key],
+}));
 
-const KnowledgeBitLocationsAttributionOrigins = [
-  { value: "twitter", label: "Twitter" },
-  { value: "email", label: "Email" },
+const KnowledgeBitAttributionOrigins = [
+  { value: AttributionOrigins.TWITTER, label: "Twitter" },
+  { value: AttributionOrigins.EMAIL, label: "Email" },
 ];
 
 export enum KnowledgeBitUpsertFormOperation {
@@ -316,7 +285,7 @@ export const KnowledgeBitUpsert: FC<KnowledgeBitUpsertProps> = ({
 
         const { transactionHash } = mintKnowledgeBitNFTTxReceipt;
         const transferEventTopics = mintKnowledgeBitNFTTxReceipt.logs[0].topics;
-        const tokenId = transferEventTopics[3].toString();
+        const tokenId = String(parseInt(transferEventTopics[3]));
 
         await handleIndexKnowledgeBitNFT({
           fileURI,
@@ -456,7 +425,6 @@ export const KnowledgeBitUpsert: FC<KnowledgeBitUpsertProps> = ({
             ) : null}
             <FileInput
               name="file"
-              fullWidth
               register={register}
               control={control}
               errors={errors}
@@ -511,7 +479,7 @@ export const KnowledgeBitUpsert: FC<KnowledgeBitUpsertProps> = ({
                         name={`attributions.${attributionsFieldIndex}.origin`}
                         fullWidth
                         sx={{ width: { xs: "unset", sm: 150 } }}
-                        options={KnowledgeBitLocationsAttributionOrigins}
+                        options={KnowledgeBitAttributionOrigins}
                         control={control}
                         errors={errors}
                         rules={{
