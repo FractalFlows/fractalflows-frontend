@@ -105,8 +105,13 @@ export const ClaimUpsertForm: FC<ClaimUpsertFormProps> = ({
   claim,
   operation = ClaimUpsertFormOperation.UPDATE,
 }) => {
-  const { createClaim, updateClaim, saveClaimOnIPFS, mintClaimNFT } =
-    useClaims();
+  const {
+    createClaim,
+    updateClaim,
+    saveClaimOnIPFS,
+    mintClaimNFT,
+    updateClaimNFTMetadata,
+  } = useClaims();
   const { searchTags } = useTags();
   const { enqueueSnackbar } = useSnackbar();
   const [isTransactionProgressModalOpen, setIsTransactionProgressModalOpen] =
@@ -198,9 +203,9 @@ export const ClaimUpsertForm: FC<ClaimUpsertFormProps> = ({
   const handleSubmit = async (data: ClaimProps) => {
     const handleIndexClaimNFT = async (transactionData: {
       nftMetadataURI: string;
-      nftTxHash: string;
-      nftTokenId: string;
-      nftFractionalizationContractAddress: string;
+      nftTxHash?: string;
+      nftTokenId?: string;
+      nftFractionalizationContractAddress?: string;
     }) => {
       handleTransactionProgressUpdate([
         {
@@ -218,7 +223,7 @@ export const ClaimUpsertForm: FC<ClaimUpsertFormProps> = ({
         } else {
           const { slug } = await updateClaim({
             id: claim?.id as string,
-            claim: { ...data },
+            claim: { ...data, ...transactionData },
           });
           claimSlugRef.current = slug;
         }
@@ -233,7 +238,7 @@ export const ClaimUpsertForm: FC<ClaimUpsertFormProps> = ({
         handleTransactionProgressUpdate([
           {
             operation: TransactionStepOperation.INDEX,
-            update: { status: TransactionStepStatus.ERROR },
+            update: { status: TransactionStepStatus.ERROR, error: e.message },
           },
         ]);
       }
@@ -248,55 +253,96 @@ export const ClaimUpsertForm: FC<ClaimUpsertFormProps> = ({
       ]);
 
       try {
-        const mintClaimNFTTx = await mintClaimNFT({
-          metadataURI,
-        });
+        if (operation === ClaimUpsertFormOperation.CREATE) {
+          const mintClaimNFTTx = await mintClaimNFT({
+            metadataURI,
+          });
 
-        handleTransactionProgressUpdate([
-          {
-            operation: TransactionStepOperation.SIGN,
-            update: {
-              status: TransactionStepStatus.SUCCESS,
+          handleTransactionProgressUpdate([
+            {
+              operation: TransactionStepOperation.SIGN,
+              update: {
+                status: TransactionStepStatus.SUCCESS,
+              },
             },
-          },
-          {
-            operation: TransactionStepOperation.WAIT_ONCHAIN,
-            update: {
-              status: TransactionStepStatus.STARTED,
+            {
+              operation: TransactionStepOperation.WAIT_ONCHAIN,
+              update: {
+                status: TransactionStepStatus.STARTED,
+                txHash: mintClaimNFTTx.hash,
+              },
             },
-          },
-        ]);
+          ]);
 
-        const mintClaimNFTTxReceipt = await mintClaimNFTTx.wait();
+          const mintClaimNFTTxReceipt = await mintClaimNFTTx.wait();
 
-        handleTransactionProgressUpdate([
-          {
-            operation: TransactionStepOperation.WAIT_ONCHAIN,
-            update: {
-              status: TransactionStepStatus.SUCCESS,
+          handleTransactionProgressUpdate([
+            {
+              operation: TransactionStepOperation.WAIT_ONCHAIN,
+              update: {
+                status: TransactionStepStatus.SUCCESS,
+              },
             },
-          },
-        ]);
+          ]);
 
-        const { transactionHash } = mintClaimNFTTxReceipt;
-        const transferEventTopics = mintClaimNFTTxReceipt.logs[1].topics;
-        const tokenId = String(parseInt(transferEventTopics[3]));
-        const fractionalizationContractAddress = `0x${transferEventTopics[2].slice(
-          -40
-        )}`;
+          const { transactionHash } = mintClaimNFTTxReceipt;
+          const transferEventTopics = mintClaimNFTTxReceipt.logs[1].topics;
+          const tokenId = String(parseInt(transferEventTopics[3]));
+          const fractionalizationContractAddress = `0x${transferEventTopics[2].slice(
+            -40
+          )}`;
 
-        await handleIndexClaimNFT({
-          nftMetadataURI: metadataURI,
-          nftTxHash: transactionHash,
-          nftTokenId: tokenId,
-          nftFractionalizationContractAddress: fractionalizationContractAddress,
-        });
+          await handleIndexClaimNFT({
+            nftMetadataURI: metadataURI,
+            nftTxHash: transactionHash,
+            nftTokenId: tokenId,
+            nftFractionalizationContractAddress:
+              fractionalizationContractAddress,
+          });
+        } else {
+          const updateClaimNFTMetadataTx = await updateClaimNFTMetadata({
+            nftTokenId: claim?.nftTokenId,
+            metadataURI,
+          });
+
+          handleTransactionProgressUpdate([
+            {
+              operation: TransactionStepOperation.SIGN,
+              update: {
+                status: TransactionStepStatus.SUCCESS,
+              },
+            },
+            {
+              operation: TransactionStepOperation.WAIT_ONCHAIN,
+              update: {
+                status: TransactionStepStatus.STARTED,
+                txHash: updateClaimNFTMetadataTx.hash,
+              },
+            },
+          ]);
+
+          await updateClaimNFTMetadataTx.wait();
+
+          handleTransactionProgressUpdate([
+            {
+              operation: TransactionStepOperation.WAIT_ONCHAIN,
+              update: {
+                status: TransactionStepStatus.SUCCESS,
+              },
+            },
+          ]);
+
+          await handleIndexClaimNFT({
+            nftMetadataURI: metadataURI,
+          });
+        }
       } catch (e: any) {
         handleTransactionProgressUpdate([
           {
             operation: TransactionStepOperation.SIGN,
             update: {
               status: TransactionStepStatus.ERROR,
+              error: e.message,
               retry: () => handleMintClaimNFT(metadataURI),
             },
           },
@@ -327,23 +373,13 @@ export const ClaimUpsertForm: FC<ClaimUpsertFormProps> = ({
         handleTransactionProgressUpdate([
           {
             operation: TransactionStepOperation.UPLOAD,
-            update: { status: TransactionStepStatus.ERROR },
+            update: { status: TransactionStepStatus.ERROR, error: e.message },
           },
         ]);
       }
     };
 
     await handleSaveClaimOnIPFS(data);
-
-    // try {
-    //   enqueueSnackbar(ClaimUpsertFormOperationText[operation].successFeedback, {
-    //     variant: "success",
-    //   });
-    // } catch (e: any) {
-    //   enqueueSnackbar(e?.message, {
-    //     variant: "error",
-    //   });
-    // }
   };
 
   const handleTagsSearch = useCallback(
@@ -650,7 +686,9 @@ export const ClaimUpsertForm: FC<ClaimUpsertFormProps> = ({
       </Stack>
 
       <TransactionProgressModal
-        subject="Mint Claim NFT"
+        subject={`${
+          ClaimUpsertFormOperation.CREATE ? "Mint" : "Update"
+        } Claim NFT`}
         open={isTransactionProgressModalOpen}
         steps={transactionProgressModalSteps}
         onClose={handleTransactionProgressModalClose}

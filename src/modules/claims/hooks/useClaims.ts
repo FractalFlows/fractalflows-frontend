@@ -34,6 +34,24 @@ export const mintClaimNFT = async ({
   return mintClaimNFTTx;
 };
 
+export const updateClaimNFTMetadata = async ({
+  nftTokenId,
+  metadataURI,
+}: {
+  nftTokenId: string;
+  metadataURI: string;
+}) => {
+  const updateClaimNFTMetadataTx = await ContractCtrl.write({
+    address: process.env.NEXT_PUBLIC_CLAIM_CONTRACT_ADDRESS as string,
+    chainId: Number(process.env.NEXT_PUBLIC_NETWORK_ID),
+    abi: ClaimContractABI.abi,
+    functionName: "setTokenURI",
+    args: [nftTokenId, metadataURI.replace(/^ipfs:\/\//, "")],
+  });
+
+  return updateClaimNFTMetadataTx;
+};
+
 export const createClaim = async ({ claim }: { claim: ClaimProps }) =>
   await ClaimsService.createClaim({ claim });
 
@@ -155,6 +173,7 @@ export const useClaims = () => {
     createClaim,
     saveClaimOnIPFS,
     mintClaimNFT,
+    updateClaimNFTMetadata,
     updateClaim,
     deleteClaim,
     disableClaim,

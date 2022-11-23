@@ -249,7 +249,7 @@ export const ClaimsService = {
   }): Promise<string> {
     const { data } = await apolloClient.mutate({
       mutation: gql`
-        mutation SaveClaimOnIPFS($claim: CreateClaimInput!) {
+        mutation SaveClaimOnIPFS($claim: ClaimInput!) {
           saveClaimOnIPFS(claim: $claim)
         }
       `,

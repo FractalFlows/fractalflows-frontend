@@ -30,6 +30,7 @@ export const CORE_CLAIM_FIELDS = gql`
         avatar
       }
     }
+    nftTokenId
   }
 `;
 

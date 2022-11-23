@@ -49,6 +49,7 @@ import {
 } from "common/utils/ipfs";
 import { grey } from "@mui/material/colors";
 import { Link } from "common/components/Link";
+import { getAttributionLink } from "common/utils/attributions";
 
 enum KnowledgeBitStates {
   UPDATING,
@@ -155,15 +156,6 @@ export const KnowledgeBit: FC<KnowledgeBitComponentProps> = ({
     (userKnowledgeBitVote) =>
       get(userKnowledgeBitVote, "knowledgeBit.id") === knowledgeBit.id
   );
-
-  const getAttributionLink = ({ origin, identifier }) => {
-    switch (origin) {
-      case AttributionOrigins.EMAIL:
-        return `mailto:${identifier}`;
-      case AttributionOrigins.TWITTER:
-        return `https://twitter.com/${identifier}`;
-    }
-  };
 
   return (
     <Box>
@@ -306,6 +298,7 @@ export const KnowledgeBit: FC<KnowledgeBitComponentProps> = ({
                     href={getGatewayFromIPFSURI(knowledgeBit?.fileURI)}
                     text
                     blank
+                    supressBlankIcon
                   >
                     {getFilenameFromIPFSURI(knowledgeBit?.fileURI)}
                   </Link>
@@ -316,24 +309,26 @@ export const KnowledgeBit: FC<KnowledgeBitComponentProps> = ({
                   <Typography variant="body2" fontWeight={600}>
                     Attributions
                   </Typography>
-                  <Typography variant="body2">
-                    <ul style={{ margin: 0 }}>
-                      {map(
-                        knowledgeBit?.attributions,
-                        ({ id, origin, identifier }) => (
-                          <li key={id} style={{ marginBottom: "4px" }}>
+
+                  <ul style={{ margin: 0 }}>
+                    {map(
+                      knowledgeBit?.attributions,
+                      ({ id, origin, identifier }) => (
+                        <li key={id} style={{ marginBottom: "4px" }}>
+                          <Typography variant="body2">
                             <Link
                               href={getAttributionLink({ origin, identifier })}
                               blank
                               text
+                              supressBlankIcon
                             >
                               {identifier}
                             </Link>
-                          </li>
-                        )
-                      )}
-                    </ul>
-                  </Typography>
+                          </Typography>
+                        </li>
+                      )
+                    )}
+                  </ul>
                 </Stack>
               )}
             </Stack>

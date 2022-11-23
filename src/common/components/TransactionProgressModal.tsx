@@ -31,6 +31,8 @@ export enum TransactionStepOperation {
 export interface TransactionStep {
   status: TransactionStepStatus;
   operation: TransactionStepOperation;
+  txHash?: string;
+  error?: string;
   retry?: () => any;
 }
 
@@ -99,6 +101,7 @@ export const TransactionProgressModal = ({
       display: "flex",
       justifyContent: "center",
       alignItems: "center",
+      flexShrink: 0,
     };
 
     switch (status) {
@@ -172,7 +175,7 @@ export const TransactionProgressModal = ({
                 width: { xs: "initial", sm: "350px" },
               }}
             >
-              {steps.map(({ status, operation, retry }, i) => (
+              {steps.map(({ status, operation, error, txHash, retry }, i) => (
                 <>
                   <Stack
                     key={operation}
@@ -181,20 +184,39 @@ export const TransactionProgressModal = ({
                     spacing={1}
                   >
                     {getStepStatusIcon(status)}
-                    <Typography>{operation}</Typography>
-                    {status === TransactionStepStatus.ERROR && retry ? (
-                      <Button
-                        variant="contained"
-                        color="primary"
-                        onClick={retry}
-                        size="small"
-                        sx={{
-                          marginLeft: 1,
-                        }}
-                      >
-                        Try again
-                      </Button>
-                    ) : null}
+                    <Stack spacing={1} sx={{ alignItems: "flex-start" }}>
+                      <Typography>{operation}</Typography>
+                      {operation === TransactionStepOperation.WAIT_ONCHAIN &&
+                      txHash ? (
+                        <Typography variant="body2">
+                          <Link
+                            href={`${process.env.NEXT_PUBLIC_ETH_EXPLORER_URL}/tx/${txHash}`}
+                            text
+                            blank
+                          >
+                            View transaction
+                          </Link>
+                        </Typography>
+                      ) : null}
+                      {status === TransactionStepStatus.ERROR && error ? (
+                        <Typography variant="body2" color="error">
+                          {error}
+                        </Typography>
+                      ) : null}
+                      {status === TransactionStepStatus.ERROR && retry ? (
+                        <Button
+                          variant="contained"
+                          color="primary"
+                          onClick={retry}
+                          size="small"
+                          sx={{
+                            marginLeft: 1,
+                          }}
+                        >
+                          Try again
+                        </Button>
+                      ) : null}
+                    </Stack>
                   </Stack>
                   {i === steps.length - 1 ? null : (
                     <Stack key={`${operation}-divider`}>
