@@ -113,6 +113,7 @@ export const KnowledgeBitUpsert: FC<KnowledgeBitUpsertProps> = ({
   const {
     saveKnowledgeBitOnIPFS,
     mintKnowledgeBitNFT,
+    updateKnowledgeBitNFTMetadata,
     createKnowledgeBit,
     updateKnowledgeBit,
   } = useKnowledgeBits();
@@ -193,10 +194,10 @@ export const KnowledgeBitUpsert: FC<KnowledgeBitUpsertProps> = ({
     data.file = data.file[0];
 
     const handleIndexKnowledgeBitNFT = async (transactionData: {
-      fileURI: string;
+      fileURI?: string;
       nftMetadataURI: string;
-      nftTxHash: string;
-      nftTokenId: string;
+      nftTxHash?: string;
+      nftTokenId?: string;
     }) => {
       handleTransactionProgressUpdate([
         {
@@ -216,7 +217,7 @@ export const KnowledgeBitUpsert: FC<KnowledgeBitUpsertProps> = ({
         } else {
           await updateKnowledgeBit({
             id: knowledgeBit?.id as string,
-            knowledgeBit: data,
+            knowledgeBit: { ...data, ...transactionData },
           });
         }
 
@@ -227,11 +228,10 @@ export const KnowledgeBitUpsert: FC<KnowledgeBitUpsertProps> = ({
           },
         ]);
       } catch (e: any) {
-        console.log(e);
         handleTransactionProgressUpdate([
           {
             operation: TransactionStepOperation.INDEX,
-            update: { status: TransactionStepStatus.ERROR },
+            update: { status: TransactionStepStatus.ERROR, error: e.message },
           },
         ]);
       }
@@ -252,54 +252,98 @@ export const KnowledgeBitUpsert: FC<KnowledgeBitUpsertProps> = ({
       ]);
 
       try {
-        const mintKnowledgeBitNFTTx = await mintKnowledgeBitNFT({
-          metadataURI,
-          claimTokenId: claim.nftTokenId,
-        });
+        if (operation === KnowledgeBitUpsertFormOperation.CREATE) {
+          const mintKnowledgeBitNFTTx = await mintKnowledgeBitNFT({
+            metadataURI,
+            claimTokenId: claim.nftTokenId,
+          });
 
-        handleTransactionProgressUpdate([
-          {
-            operation: TransactionStepOperation.SIGN,
-            update: {
-              status: TransactionStepStatus.SUCCESS,
+          handleTransactionProgressUpdate([
+            {
+              operation: TransactionStepOperation.SIGN,
+              update: {
+                status: TransactionStepStatus.SUCCESS,
+              },
             },
-          },
-          {
-            operation: TransactionStepOperation.WAIT_ONCHAIN,
-            update: {
-              status: TransactionStepStatus.STARTED,
+            {
+              operation: TransactionStepOperation.WAIT_ONCHAIN,
+              update: {
+                status: TransactionStepStatus.STARTED,
+              },
             },
-          },
-        ]);
+          ]);
 
-        const mintKnowledgeBitNFTTxReceipt = await mintKnowledgeBitNFTTx.wait();
+          const mintKnowledgeBitNFTTxReceipt =
+            await mintKnowledgeBitNFTTx.wait();
 
-        handleTransactionProgressUpdate([
-          {
-            operation: TransactionStepOperation.WAIT_ONCHAIN,
-            update: {
-              status: TransactionStepStatus.SUCCESS,
+          handleTransactionProgressUpdate([
+            {
+              operation: TransactionStepOperation.WAIT_ONCHAIN,
+              update: {
+                status: TransactionStepStatus.SUCCESS,
+              },
             },
-          },
-        ]);
+          ]);
 
-        const { transactionHash } = mintKnowledgeBitNFTTxReceipt;
-        const transferEventTopics = mintKnowledgeBitNFTTxReceipt.logs[0].topics;
-        const tokenId = String(parseInt(transferEventTopics[3]));
+          const { transactionHash } = mintKnowledgeBitNFTTxReceipt;
+          const transferEventTopics =
+            mintKnowledgeBitNFTTxReceipt.logs[0].topics;
+          const tokenId = String(parseInt(transferEventTopics[3]));
 
-        await handleIndexKnowledgeBitNFT({
-          fileURI,
-          nftMetadataURI: metadataURI,
-          nftTxHash: transactionHash,
-          nftTokenId: tokenId,
-        });
+          await handleIndexKnowledgeBitNFT({
+            fileURI,
+            nftMetadataURI: metadataURI,
+            nftTxHash: transactionHash,
+            nftTokenId: tokenId,
+          });
+        } else {
+          const updateKnowledgeBitNFTMetadataTx =
+            await updateKnowledgeBitNFTMetadata({
+              metadataURI,
+              nftTokenId: knowledgeBit?.nftTokenId as string,
+            });
+
+          handleTransactionProgressUpdate([
+            {
+              operation: TransactionStepOperation.SIGN,
+              update: {
+                status: TransactionStepStatus.SUCCESS,
+              },
+            },
+            {
+              operation: TransactionStepOperation.WAIT_ONCHAIN,
+              update: {
+                status: TransactionStepStatus.STARTED,
+                txHash: updateKnowledgeBitNFTMetadataTx.hash,
+              },
+            },
+          ]);
+
+          await updateKnowledgeBitNFTMetadataTx.wait();
+
+          handleTransactionProgressUpdate([
+            {
+              operation: TransactionStepOperation.WAIT_ONCHAIN,
+              update: {
+                status: TransactionStepStatus.SUCCESS,
+              },
+            },
+          ]);
+
+          console.log("fileURI", fileURI);
+
+          await handleIndexKnowledgeBitNFT({
+            ...(fileURI ? { fileURI } : {}),
+            nftMetadataURI: metadataURI,
+          });
+        }
       } catch (e: any) {
-        console.log(e);
         handleTransactionProgressUpdate([
           {
             operation: TransactionStepOperation.SIGN,
             update: {
               status: TransactionStepStatus.ERROR,
+              error: e.message,
               retry: () => handleMintKnowledgeBitNFT({ metadataURI, fileURI }),
             },
           },
@@ -327,11 +371,10 @@ export const KnowledgeBitUpsert: FC<KnowledgeBitUpsertProps> = ({
 
         await handleMintKnowledgeBitNFT(saveKnowledgeBitOnIPFSResult);
       } catch (e: any) {
-        console.error(e);
         handleTransactionProgressUpdate([
           {
             operation: TransactionStepOperation.UPLOAD,
-            update: { status: TransactionStepStatus.ERROR },
+            update: { status: TransactionStepStatus.ERROR, error: e.message },
           },
         ]);
       }
@@ -557,7 +600,9 @@ export const KnowledgeBitUpsert: FC<KnowledgeBitUpsertProps> = ({
       </form>
 
       <TransactionProgressModal
-        subject="Mint Knowledge Bit NFT"
+        subject={`${
+          KnowledgeBitUpsertFormOperation.CREATE ? "Mint" : "Update"
+        } Knowledge Bit NFT`}
         open={isTransactionProgressModalOpen}
         steps={transactionProgressModalSteps}
         onClose={handleTransactionProgressModalClose}

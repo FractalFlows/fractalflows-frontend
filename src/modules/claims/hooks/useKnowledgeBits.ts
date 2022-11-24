@@ -42,6 +42,24 @@ export const mintKnowledgeBitNFT = async ({
   return mintKnowledgeBitNFTTx;
 };
 
+export const updateKnowledgeBitNFTMetadata = async ({
+  nftTokenId,
+  metadataURI,
+}: {
+  nftTokenId: string;
+  metadataURI: string;
+}) => {
+  const updateClaimNFTMetadataTx = await ContractCtrl.write({
+    address: process.env.NEXT_PUBLIC_KNOWLEDGE_BIT_CONTRACT_ADDRESS as string,
+    chainId: Number(process.env.NEXT_PUBLIC_NETWORK_ID),
+    abi: KnowledgeBitContractABI.abi,
+    functionName: "setTokenURI",
+    args: [nftTokenId, metadataURI.replace(/^ipfs:\/\//, "")],
+  });
+
+  return updateClaimNFTMetadataTx;
+};
+
 export const createKnowledgeBit = async ({
   claimSlug,
   knowledgeBit,
@@ -110,6 +128,7 @@ export const useKnowledgeBits = () => {
     getKnowledgeBit,
     saveKnowledgeBitOnIPFS,
     mintKnowledgeBitNFT,
+    updateKnowledgeBitNFTMetadata,
     createKnowledgeBit,
     updateKnowledgeBit,
     deleteKnowledgeBit,
