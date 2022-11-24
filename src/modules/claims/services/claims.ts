@@ -1,15 +1,11 @@
 import { apolloClient } from "common/services/apollo/client";
 
 import {
-  CREATE_CLAIM,
   UPDATE_CLAIM,
   DELETE_CLAIM,
   DISABLE_CLAIM,
   INVITE_FRIENDS,
-  CREATE_KNOWLEDGE_BIT,
-  UPDATE_KNOWLEDGE_BIT,
   DELETE_KNOWLEDGE_BIT,
-  SAVE_KNOWLEDGE_BIT_VOTE,
   CREATE_ARGUMENT,
   SAVE_OPINION,
   ADD_FOLLOWER_TO_CLAIM,
@@ -497,16 +493,26 @@ export const ClaimsService = {
 
   async saveKnowledgeBitVote({
     knowledgeBitId,
-    type,
+    voteType,
   }: {
     knowledgeBitId: string;
-    type: KnowledgeBitVoteTypes;
+    voteType: KnowledgeBitVoteTypes;
   }): Promise<boolean> {
     const { data } = await apolloClient.mutate({
-      mutation: SAVE_KNOWLEDGE_BIT_VOTE,
+      mutation: gql`
+        mutation SaveKnowledgeBitVote(
+          $knowledgeBitId: String!
+          $voteType: KnowledgeBitVoteTypes!
+        ) {
+          saveKnowledgeBitVote(
+            knowledgeBitId: $knowledgeBitId
+            voteType: $voteType
+          )
+        }
+      `,
       variables: {
         knowledgeBitId,
-        type,
+        voteType,
       },
     });
 

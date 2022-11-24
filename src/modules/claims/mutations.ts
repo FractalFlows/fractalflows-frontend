@@ -58,15 +58,6 @@ export const DELETE_KNOWLEDGE_BIT = gql`
   }
 `;
 
-export const SAVE_KNOWLEDGE_BIT_VOTE = gql`
-  mutation SaveKnowledgeBitVote(
-    $knowledgeBitId: String!
-    $type: KnowledgeBitVoteTypes!
-  ) {
-    saveKnowledgeBitVote(knowledgeBitId: $knowledgeBitId, type: $type)
-  }
-`;
-
 export const CREATE_ARGUMENT = gql`
   mutation CreateArgument(
     $claimSlug: String!

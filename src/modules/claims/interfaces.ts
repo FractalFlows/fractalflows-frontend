@@ -71,6 +71,7 @@ export enum KnowledgeBitSides {
 export enum KnowledgeBitVoteTypes {
   UPVOTE = "UPVOTE",
   DOWNVOTE = "DOWNVOTE",
+  UNVOTE = "UNVOTE",
 }
 
 export interface KnowledgeBitProps {

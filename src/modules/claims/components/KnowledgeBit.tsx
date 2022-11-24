@@ -23,6 +23,9 @@ import {
   MoreVert as MoreVertIcon,
 } from "@mui/icons-material";
 import { find, get, isEmpty, map } from "lodash-es";
+import { grey } from "@mui/material/colors";
+import { useSnackbar } from "notistack";
+import { useRouter } from "next/router";
 
 import {
   AttributionOrigins,
@@ -37,9 +40,7 @@ import {
   KnowledgeBitUpsertFormOperation,
 } from "./KnowledgeBitUpsert";
 import { Spinner } from "common/components/Spinner";
-import { useSnackbar } from "notistack";
 import { useKnowledgeBitsVotes } from "../hooks/useKnowledgeBitVotes";
-import { useRouter } from "next/router";
 import { useKnowledgeBits } from "../hooks/useKnowledgeBits";
 import { useAuth } from "modules/auth/hooks/useAuth";
 import { UserRole } from "modules/users/interfaces";
@@ -47,9 +48,9 @@ import {
   getFilenameFromIPFSURI,
   getGatewayFromIPFSURI,
 } from "common/utils/ipfs";
-import { grey } from "@mui/material/colors";
 import { Link } from "common/components/Link";
 import { getAttributionLink } from "common/utils/attributions";
+import { TransactionStepOperation } from "common/components/TransactionProgressModal";
 
 enum KnowledgeBitStates {
   UPDATING,
@@ -68,7 +69,7 @@ export const KnowledgeBit: FC<KnowledgeBitComponentProps> = ({
   const [knowledgeBitState, setKnowledgeBitState] =
     useState<KnowledgeBitStates>();
   const { deleteKnowledgeBit } = useKnowledgeBits();
-  const { userKnowledgeBitVotes, saveKnowledgeBitVote } =
+  const { userKnowledgeBitVotes, saveKnowledgeBitVote, voteKnowledgeBitNFT } =
     useKnowledgeBitsVotes();
   const router = useRouter();
   const [isDetailsOpen, setIsDetailsOpen] = useState(false);
@@ -133,11 +134,74 @@ export const KnowledgeBit: FC<KnowledgeBitComponentProps> = ({
         : KnowledgeBitStates.DOWNVOTING
     );
 
+    const getVoteKnowledgeBitParameters = () => {
+      if (
+        (type === KnowledgeBitVoteTypes.UPVOTE &&
+          get(userVote, "type") === KnowledgeBitVoteTypes.UPVOTE) ||
+        (type === KnowledgeBitVoteTypes.DOWNVOTE &&
+          get(userVote, "type") === KnowledgeBitVoteTypes.DOWNVOTE)
+      ) {
+        return {
+          notificationsPrefix: `Unvote "${knowledgeBit.name}"`,
+          voteType: KnowledgeBitVoteTypes.UNVOTE,
+          voteTypeFn: "unvote",
+        };
+      } else if (type === KnowledgeBitVoteTypes.UPVOTE) {
+        return {
+          notificationsPrefix: `Upvote "${knowledgeBit.name}"`,
+          voteType: KnowledgeBitVoteTypes.UPVOTE,
+          voteTypeFn: "upvote",
+        };
+      } else {
+        return {
+          notificationsPrefix: `Downvote "${knowledgeBit.name}"`,
+          voteType: KnowledgeBitVoteTypes.DOWNVOTE,
+          voteTypeFn: "downvote",
+        };
+      }
+    };
+    const { notificationsPrefix, voteType, voteTypeFn } =
+      getVoteKnowledgeBitParameters();
+
     try {
+      enqueueSnackbar(
+        `${notificationsPrefix}: ${TransactionStepOperation.SIGN}`,
+        {
+          variant: "info",
+          autoHideDuration: 15000,
+        }
+      );
+
+      const voteKnowledgeBitTx = await voteKnowledgeBitNFT({
+        nftTokenId: knowledgeBit.nftTokenId,
+        voteTypeFn,
+      });
+
+      enqueueSnackbar(
+        `${notificationsPrefix}: ${TransactionStepOperation.WAIT_ONCHAIN}`,
+        {
+          variant: "info",
+          autoHideDuration: 15000,
+        }
+      );
+
+      await voteKnowledgeBitTx.wait();
+
+      enqueueSnackbar(
+        `${notificationsPrefix}: ${TransactionStepOperation.INDEX}`,
+        {
+          variant: "info",
+        }
+      );
+
       await saveKnowledgeBitVote({
         knowledgeBitId: knowledgeBit?.id as string,
         claimSlug: get(router.query, "slug") as string,
-        type,
+        voteType,
+      });
+
+      enqueueSnackbar(`${notificationsPrefix}: Success`, {
+        variant: "success",
       });
     } catch (e: any) {
       enqueueSnackbar(e?.message, {
@@ -195,12 +259,19 @@ export const KnowledgeBit: FC<KnowledgeBitComponentProps> = ({
             </Menu>
           </Stack>
           <Stack alignItems="center" justifyContent="center">
-            <Tooltip title="Upvote">
+            <Tooltip
+              title={
+                get(userVote, "type") === KnowledgeBitVoteTypes.UPVOTE
+                  ? "Unvote"
+                  : "Upvote"
+              }
+            >
               <IconButton
                 onClick={requireSignIn(
                   (ev) => handleVote(ev, KnowledgeBitVoteTypes.UPVOTE),
                   (ev) => ev.preventDefault()
                 )}
+                disabled={knowledgeBitState === KnowledgeBitStates.DOWNVOTING}
               >
                 {knowledgeBitState === KnowledgeBitStates.UPVOTING ? (
                   <CircularProgress size={24} />
@@ -216,12 +287,19 @@ export const KnowledgeBit: FC<KnowledgeBitComponentProps> = ({
             </Typography>
           </Stack>
           <Stack alignItems="center" justifyContent="center">
-            <Tooltip title="Downvote">
+            <Tooltip
+              title={
+                get(userVote, "type") === KnowledgeBitVoteTypes.DOWNVOTE
+                  ? "Unvote"
+                  : "Downvote"
+              }
+            >
               <IconButton
                 onClick={requireSignIn(
                   (ev) => handleVote(ev, KnowledgeBitVoteTypes.DOWNVOTE),
                   (ev) => ev.preventDefault()
                 )}
+                disabled={knowledgeBitState === KnowledgeBitStates.UPVOTING}
               >
                 {knowledgeBitState === KnowledgeBitStates.DOWNVOTING ? (
                   <CircularProgress size={24} />
@@ -298,7 +376,6 @@ export const KnowledgeBit: FC<KnowledgeBitComponentProps> = ({
                     href={getGatewayFromIPFSURI(knowledgeBit?.fileURI)}
                     text
                     blank
-                    supressBlankIcon
                   >
                     {getFilenameFromIPFSURI(knowledgeBit?.fileURI)}
                   </Link>

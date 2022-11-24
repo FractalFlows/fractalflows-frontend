@@ -1,15 +1,16 @@
 import { gql, useQuery } from "@apollo/client";
+import { findIndex } from "lodash-es";
+import { ContractCtrl } from "@web3modal/core";
 
 import { ClaimsService } from "../services/claims";
 import type {
-  KnowledgeBitProps,
   KnowledgeBitVoteProps,
   KnowledgeBitVoteTypes,
 } from "../interfaces";
 import { ClaimsCache } from "../cache";
 import { apolloClient } from "common/services/apollo/client";
 import { getKnowledgeBit } from "./useKnowledgeBits";
-import { findIndex } from "lodash-es";
+import KnowledgeBitContractABI from "../../../../artifacts/contracts/KnowledgeBit.sol/KnowledgeBit.json";
 
 const getUserKnowledgeBitVotes = async ({
   claimSlug,
@@ -23,16 +24,34 @@ const getUserKnowledgeBitVotes = async ({
   return userKnowledgeBitVotes;
 };
 
+export const voteKnowledgeBitNFT = async ({
+  nftTokenId,
+  voteTypeFn,
+}: {
+  voteType: "upvote" | "downvote" | "unvote";
+  nftTokenId: string;
+}) => {
+  const updateClaimNFTMetadataTx = await ContractCtrl.write({
+    address: process.env.NEXT_PUBLIC_KNOWLEDGE_BIT_CONTRACT_ADDRESS as string,
+    chainId: Number(process.env.NEXT_PUBLIC_NETWORK_ID),
+    abi: KnowledgeBitContractABI.abi,
+    functionName: voteTypeFn,
+    args: [nftTokenId],
+  });
+
+  return updateClaimNFTMetadataTx;
+};
+
 export const saveKnowledgeBitVote = async ({
   knowledgeBitId,
   claimSlug,
-  type,
+  voteType,
 }: {
   knowledgeBitId: string;
   claimSlug: string;
-  type: KnowledgeBitVoteTypes;
+  voteType: KnowledgeBitVoteTypes;
 }) => {
-  await ClaimsService.saveKnowledgeBitVote({ knowledgeBitId, type });
+  await ClaimsService.saveKnowledgeBitVote({ knowledgeBitId, voteType });
   const [updatedKnowledgeBit] = await Promise.all([
     getKnowledgeBit({
       id: knowledgeBitId,
@@ -67,6 +86,7 @@ export const useKnowledgeBitsVotes = () => {
 
   return {
     userKnowledgeBitVotes,
+    voteKnowledgeBitNFT,
     setUserKnowledgeBitVotes,
     saveKnowledgeBitVote,
     getUserKnowledgeBitVotes,
