@@ -601,7 +601,9 @@ export const KnowledgeBitUpsert: FC<KnowledgeBitUpsertProps> = ({
 
       <TransactionProgressModal
         subject={`${
-          KnowledgeBitUpsertFormOperation.CREATE ? "Mint" : "Update"
+          operation === KnowledgeBitUpsertFormOperation.CREATE
+            ? "Mint"
+            : "Update"
         } Knowledge Bit NFT`}
         open={isTransactionProgressModalOpen}
         steps={transactionProgressModalSteps}

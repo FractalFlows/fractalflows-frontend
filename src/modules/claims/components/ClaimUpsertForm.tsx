@@ -687,7 +687,7 @@ export const ClaimUpsertForm: FC<ClaimUpsertFormProps> = ({
 
       <TransactionProgressModal
         subject={`${
-          ClaimUpsertFormOperation.CREATE ? "Mint" : "Update"
+          operation === ClaimUpsertFormOperation.CREATE ? "Mint" : "Update"
         } Claim NFT`}
         open={isTransactionProgressModalOpen}
         steps={transactionProgressModalSteps}
