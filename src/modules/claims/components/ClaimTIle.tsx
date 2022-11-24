@@ -66,87 +66,87 @@ export const ClaimTile: FC<{ claim: ClaimProps }> = ({ claim }) => {
 
   return (
     <>
-      <Link href={`/claim/${claim?.slug}`}>
-        <Paper variant="outlined" sx={{ p: 3, width: "100%" }}>
-          <Stack spacing={1}>
-            <Stack direction={{ xs: "column", md: "row" }} spacing={1}>
+      <Paper variant="outlined" sx={{ p: 3, width: "100%" }}>
+        <Stack spacing={1}>
+          <Stack direction={{ xs: "column", md: "row" }} spacing={1}>
+            <Link href={`/claim/${claim?.slug}`}>
               <Typography variant="h5" component="h2" flexGrow={1}>
                 {claim?.title}
               </Typography>
-              {get(session, "user.role") === UserRole.ADMIN &&
-              get(claim, "disabled") ? (
-                <Button
-                  variant="contained"
-                  color="primary"
-                  onClick={handleReenableClick}
-                  flexShrink={0}
-                >
-                  Re-enable
-                </Button>
-              ) : null}
-            </Stack>
+            </Link>
+            {get(session, "user.role") === UserRole.ADMIN &&
+            get(claim, "disabled") ? (
+              <Button
+                variant="contained"
+                color="primary"
+                onClick={handleReenableClick}
+                flexShrink={0}
+              >
+                Re-enable
+              </Button>
+            ) : null}
+          </Stack>
 
-            <Stack
-              direction={{ xs: "column", md: "row" }}
-              sx={{ alignItems: { xs: "", md: "center" } }}
-              spacing={4}
-            >
-              <Stack spacing={2} flexGrow={1}>
-                {claim?.user ? (
-                  <AuthorBlock
-                    user={claim?.user}
-                    origin={claim?.origin}
-                    createdAt={claim?.createdAt}
-                    size={25}
-                  />
-                ) : null}
-                {claim?.summary ? (
-                  <Typography variant="body1" title={claim.summary}>
-                    {claim.summary.substring(0, 350)}
-                    {claim.summary.length > 350 ? "..." : ""}
+          <Stack
+            direction={{ xs: "column", md: "row" }}
+            sx={{ alignItems: { xs: "", md: "center" } }}
+            spacing={4}
+          >
+            <Stack spacing={2} flexGrow={1}>
+              {claim?.user ? (
+                <AuthorBlock
+                  user={claim?.user}
+                  origin={claim?.origin}
+                  createdAt={claim?.createdAt}
+                  size={25}
+                />
+              ) : null}
+              {claim?.summary ? (
+                <Typography variant="body1" title={claim.summary}>
+                  {claim.summary.substring(0, 350)}
+                  {claim.summary.length > 350 ? "..." : ""}
+                </Typography>
+              ) : null}
+              {isEmpty(claim?.tags) ? null : (
+                <Stack direction="row" spacing={1}>
+                  {claim?.tags?.map(({ id, label, slug }: TagProps) => (
+                    <Link href={`/tag/${slug}`} key={id}>
+                      <Chip label={label} />
+                    </Link>
+                  ))}
+                </Stack>
+              )}
+              <Stack
+                direction={{ xs: "column", md: "row" }}
+                spacing={{ xs: 1, md: 4 }}
+              >
+                <Stack direction="row" spacing={1}>
+                  <ArrowDownwardIcon color="error" sx={{ fontSize: 20 }} />
+                  <Typography variant="body1">
+                    {refutingKnowledgeBitsCount} knowledge bit
+                    {refutingKnowledgeBitsCount === 1 ? "" : "s"} refuting it
                   </Typography>
-                ) : null}
-                {isEmpty(claim?.tags) ? null : (
-                  <Stack direction="row" spacing={1}>
-                    {claim?.tags?.map(({ id, label, slug }: TagProps) => (
-                      <Link href={`/tag/${slug}`} key={id}>
-                        <Chip label={label} />
-                      </Link>
-                    ))}
-                  </Stack>
-                )}
-                <Stack
-                  direction={{ xs: "column", md: "row" }}
-                  spacing={{ xs: 1, md: 4 }}
-                >
-                  <Stack direction="row" spacing={1}>
-                    <ArrowDownwardIcon color="error" sx={{ fontSize: 20 }} />
-                    <Typography variant="body1">
-                      {refutingKnowledgeBitsCount} knowledge bit
-                      {refutingKnowledgeBitsCount === 1 ? "" : "s"} refuting it
-                    </Typography>
-                  </Stack>
-                  <Stack direction="row" spacing={1}>
-                    <ArrowUpwardIcon color="success" sx={{ fontSize: 20 }} />
-                    <Typography variant="body1">
-                      {supportingKnowledgeBitsCount} knowledge bit
-                      {supportingKnowledgeBitsCount === 1 ? "" : "s"} supporting
-                      it
-                    </Typography>
-                  </Stack>
+                </Stack>
+                <Stack direction="row" spacing={1}>
+                  <ArrowUpwardIcon color="success" sx={{ fontSize: 20 }} />
+                  <Typography variant="body1">
+                    {supportingKnowledgeBitsCount} knowledge bit
+                    {supportingKnowledgeBitsCount === 1 ? "" : "s"} supporting
+                    it
+                  </Typography>
                 </Stack>
               </Stack>
-              <Stack sx={{ width: 300, flexShrink: 0 }}>
-                <Histogram
-                  opinions={claim.opinions}
-                  height={100}
-                  placement={HistogramPlacement.CLAIM_TILE}
-                />
-              </Stack>
+            </Stack>
+            <Stack sx={{ width: 300, flexShrink: 0 }}>
+              <Histogram
+                opinions={claim.opinions}
+                height={100}
+                placement={HistogramPlacement.CLAIM_TILE}
+              />
             </Stack>
           </Stack>
-        </Paper>
-      </Link>
+        </Stack>
+      </Paper>
       <Dialog
         open={isReenableDialogOpen}
         onClose={handleReenableDialogClose}

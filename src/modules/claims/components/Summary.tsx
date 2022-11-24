@@ -38,6 +38,8 @@ import { ConnectTwitter } from "common/components/ConnectTwitter";
 import styles from "./Summary.module.css";
 import { LoadingButton } from "@mui/lab";
 import { ClaimNFTStatusBar } from "./ClaimNFTStatusBar";
+import { getGatewayFromIPFSURI } from "common/utils/ipfs";
+import { getAttributionLink } from "common/utils/attributions";
 
 enum ClaimCallbackOperations {
   REQUEST_OWNERSHIP = "REQUEST_OWNERSHIP",
@@ -392,7 +394,41 @@ export const ClaimSummary: FC = (props) => {
         </Stack>
       </Stack>
       <Divider />
-      <ClaimNFTStatusBar />
+      <Stack spacing={2}>
+        <Stack spacing={3} direction="row">
+          <Typography variant="body1">
+            Token ID:&nbsp;
+            <Link
+              href={`${process.env.NEXT_PUBLIC_ETH_EXPLORER_URL}/token/${process.env.NEXT_PUBLIC_CLAIM_CONTRACT_ADDRESS}?a=${claim?.nftTokenId}`}
+              text
+              blank
+            >
+              {claim?.nftTokenId}
+            </Link>
+          </Typography>
+          <Typography variant="body1">
+            Metadata:&nbsp;
+            <Link
+              href={getGatewayFromIPFSURI(claim?.nftMetadataURI)}
+              text
+              blank
+            >
+              IPFS
+            </Link>
+          </Typography>
+          <Typography variant="body1">
+            Fractionalization Contract:&nbsp;
+            <Link
+              href={`${process.env.NEXT_PUBLIC_ETH_EXPLORER_URL}/address/${claim?.nftFractionalizationContractAddress}`}
+              text
+              blank
+              maxWidth={120}
+            >
+              {claim?.nftFractionalizationContractAddress}
+            </Link>
+          </Typography>
+        </Stack>
+      </Stack>
       <Divider />
       <Typography variant="body1" sx={{ whiteSpace: "pre-line" }}>
         {claim?.summary}
@@ -414,16 +450,34 @@ export const ClaimSummary: FC = (props) => {
           <ul className={styles.sources}>
             {map(claim?.sources, ({ id, url }) => (
               <li key={id}>
-                <a
-                  href={url}
-                  rel="noreferrer"
-                  className="styled-link"
-                  target="_blank"
-                >
+                <Link href={url} blank text supressBlankIcon>
                   <Typography variant="body1" sx={{ display: "inline" }}>
                     {url}
                   </Typography>
-                </a>
+                </Link>
+              </li>
+            ))}
+          </ul>
+        </Stack>
+      )}
+      {isEmpty(claim?.attributions) ? null : (
+        <Stack spacing={1} alignItems="flex-start">
+          <Typography variant="body1" fontWeight="600">
+            Attributions
+          </Typography>
+          <ul>
+            {map(claim?.attributions, ({ id, origin, identifier }) => (
+              <li key={id} style={{ marginBottom: "4px" }}>
+                <Typography variant="body1">
+                  <Link
+                    href={getAttributionLink({ origin, identifier })}
+                    blank
+                    text
+                    supressBlankIcon
+                  >
+                    {identifier}
+                  </Link>
+                </Typography>
               </li>
             ))}
           </ul>

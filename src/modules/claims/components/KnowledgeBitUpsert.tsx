@@ -1,4 +1,4 @@
-import type { FC } from "react";
+import { FC, useRef, useState } from "react";
 import {
   Box,
   IconButton,
@@ -12,104 +12,43 @@ import DeleteIcon from "@mui/icons-material/Delete";
 import { useForm, useFieldArray, NestedValue } from "react-hook-form";
 import { useSnackbar } from "notistack";
 import { useRouter } from "next/router";
-import { get, isEmpty } from "lodash-es";
+import { findIndex, get, isEmpty } from "lodash-es";
 
 import { Select } from "common/components/Select";
 import {
+  AttributionOrigins,
   AttributionProps,
-  KnowledgeBitLocations,
   KnowledgeBitProps,
   KnowledgeBitSides,
   KnowledgeBitTypes,
+  KnowledgeBitTypesLabels,
 } from "modules/claims/interfaces";
-import {
-  validateEmail,
-  validateTwitterHandle,
-  validateURL,
-} from "common/utils/validate";
+import { validateEmail, validateTwitterHandle } from "common/utils/validate";
 import { registerMui } from "common/utils/registerMui";
 import { mapArray } from "common/utils/mapArray";
-import { useKnowledgeBits } from "../hooks/useKnowledgeBits";
+import { useKnowledgeBits } from "modules/claims/hooks/useKnowledgeBits";
+import { FileInput } from "common/components/FileInput";
+import { Link } from "common/components/Link";
+import {
+  TransactionProgressModal,
+  TransactionStep,
+  TransactionStepOperation,
+  TransactionStepStatus,
+} from "common/components/TransactionProgressModal";
+import { useClaims } from "../hooks/useClaims";
+import {
+  getFilenameFromIPFSURI,
+  getGatewayFromIPFSURI,
+} from "common/utils/ipfs";
 
-const knowledgeBitTypesOptions = [
-  {
-    value: KnowledgeBitTypes.PUBLICATION_OR_ARTICLE_OR_REPORT,
-    label: "Publication/Article/Report",
-  },
-  { value: KnowledgeBitTypes.SIMULATION_RESULTS, label: "Simulation Results" },
-  {
-    value: KnowledgeBitTypes.EXPERIMENTAL_RESULTS,
-    label: "Experimental Results",
-  },
-  { value: KnowledgeBitTypes.DETAILED_ANALYSIS, label: "Detailed Analysis" },
-  { value: KnowledgeBitTypes.DATA_SET, label: "Data Set" },
-  {
-    value: KnowledgeBitTypes.DETAILED_MATHEMATICAL_FORMULATION,
-    label: "Detailed Mathematical Formulations",
-  },
-  { value: KnowledgeBitTypes.SCRIPTS, label: "Scripts" },
-  { value: KnowledgeBitTypes.SOURCE_CODE, label: "Source Code" },
-  { value: KnowledgeBitTypes.REVIEWS, label: "Reviews" },
-  {
-    value: KnowledgeBitTypes.REPRODUCTION_OF_RESULTS,
-    label: "Reproduction of Results",
-  },
-  {
-    value: KnowledgeBitTypes.STATEMENT_OF_ASSUMPTIONS,
-    label: "Statement of Assumptions",
-  },
-  {
-    value: KnowledgeBitTypes.STATEMENT_OF_HYPOTHESIS,
-    label: "Statement of Hypothesis",
-  },
-  {
-    value: KnowledgeBitTypes.DESCRIPTION_OF_METHODOLOGIES,
-    label: "Description of Methodologies",
-  },
-  { value: KnowledgeBitTypes.OTHER, label: "Other (please specify)" },
-];
+const knowledgeBitTypesOptions = Object.keys(KnowledgeBitTypes).map((key) => ({
+  value: key,
+  label: KnowledgeBitTypesLabels[key],
+}));
 
-const knowledgeBitLocationsOptions = [
-  { value: KnowledgeBitLocations.EMAIL, label: "Email" },
-  { value: KnowledgeBitLocations.WEBSITE, label: "Website" },
-  { value: KnowledgeBitLocations.PDF, label: "PDF file" },
-  { value: KnowledgeBitLocations.DATABASE, label: "Database" },
-  { value: KnowledgeBitLocations.GIT, label: "Git/GitHub/BitBucket" },
-  { value: KnowledgeBitLocations.DROPBOX, label: "Dropbox" },
-  { value: KnowledgeBitLocations.BOX, label: "Box" },
-  { value: KnowledgeBitLocations.GOOGLE_DRIVE, label: "Google Drive" },
-  { value: KnowledgeBitLocations.ONEDRIVE, label: "OneDrive" },
-  { value: KnowledgeBitLocations.STACK_OVERFLOW, label: "Stack Overflow" },
-  { value: KnowledgeBitLocations.FIGSHARE, label: "Figshare" },
-  { value: KnowledgeBitLocations.SLIDESHARE, label: "SlideShare" },
-  { value: KnowledgeBitLocations.KAGGLE, label: "Kaggle" },
-  { value: KnowledgeBitLocations.IPFS, label: "IPFS" },
-  { value: KnowledgeBitLocations.DAT, label: "Dat" },
-  { value: KnowledgeBitLocations.JUPYTER, label: "Jupyter" },
-  { value: KnowledgeBitLocations.BLOG, label: "Blog" },
-  { value: KnowledgeBitLocations.YOUTUBE, label: "YouTube" },
-  {
-    value: KnowledgeBitLocations.SCIENTIFIC_PUBLISHER,
-    label: "Scientific Publisher",
-  },
-  { value: KnowledgeBitLocations.PUBPEER, label: "PubPeer" },
-  { value: KnowledgeBitLocations.ZENODO, label: "Zenodo" },
-  { value: KnowledgeBitLocations.OPENAIRE, label: "OpenAire" },
-  { value: KnowledgeBitLocations.RE3DATA, label: "re3Data" },
-  { value: KnowledgeBitLocations.ETHEREUM_SWARM, label: "Ethereum Swarm" },
-  { value: KnowledgeBitLocations.BIT_TORRENT, label: "BitTorrent" },
-  { value: KnowledgeBitLocations.RESEARCH_GATE, label: "ResearchGate" },
-  { value: KnowledgeBitLocations.ACADEMIA_EDU, label: "Academia.edu" },
-  { value: KnowledgeBitLocations.RESEARCH_ID, label: "ResearchID" },
-  { value: KnowledgeBitLocations.HAL_ARCHIVES, label: "HAL-Archives" },
-  { value: KnowledgeBitLocations.ARXIV, label: "arXiv" },
-  { value: KnowledgeBitLocations.WIKIPEDIA, label: "Wikipedia" },
-  { value: KnowledgeBitLocations.OTHER, label: "Other (please specify)" },
-];
-
-const KnowledgeBitLocationsAttributionOrigins = [
-  { value: "twitter", label: "Twitter" },
-  { value: "email", label: "Email" },
+const KnowledgeBitAttributionOrigins = [
+  { value: AttributionOrigins.TWITTER, label: "Twitter" },
+  { value: AttributionOrigins.EMAIL, label: "Email" },
 ];
 
 export enum KnowledgeBitUpsertFormOperation {
@@ -142,20 +81,49 @@ interface KnowledgeBitUpsertFormProps {
   side: KnowledgeBitSides;
   type: string;
   customType?: string;
-  location: string;
-  customLocation?: string;
-  url: string;
+  file: File[];
   attributions: NestedValue<AttributionProps[]>;
 }
+
+const DEFAULT_KNOWLEDGE_BIT_NFT_MINT_TRANSACTION_STEPS = [
+  {
+    status: TransactionStepStatus.STARTED,
+    operation: TransactionStepOperation.UPLOAD,
+  },
+  {
+    status: TransactionStepStatus.UNSTARTED,
+    operation: TransactionStepOperation.SIGN,
+  },
+  {
+    status: TransactionStepStatus.UNSTARTED,
+    operation: TransactionStepOperation.WAIT_ONCHAIN,
+  },
+  {
+    status: TransactionStepStatus.UNSTARTED,
+    operation: TransactionStepOperation.INDEX,
+  },
+];
 
 export const KnowledgeBitUpsert: FC<KnowledgeBitUpsertProps> = ({
   knowledgeBit,
   handleClose,
   operation = KnowledgeBitUpsertFormOperation.CREATE,
 }) => {
-  const { createKnowledgeBit, updateKnowledgeBit } = useKnowledgeBits();
+  const { claim } = useClaims();
+  const {
+    saveKnowledgeBitOnIPFS,
+    mintKnowledgeBitNFT,
+    updateKnowledgeBitNFTMetadata,
+    createKnowledgeBit,
+    updateKnowledgeBit,
+  } = useKnowledgeBits();
   const { enqueueSnackbar } = useSnackbar();
   const router = useRouter();
+  const [isTransactionProgressModalOpen, setIsTransactionProgressModalOpen] =
+    useState(false);
+  const [transactionProgressModalSteps, setTransactionProgressModalSteps] =
+    useState(DEFAULT_KNOWLEDGE_BIT_NFT_MINT_TRANSACTION_STEPS);
+  const transactionProgressModalStepsRef = useRef<TransactionStep[]>([]);
   const {
     control,
     register,
@@ -169,9 +137,7 @@ export const KnowledgeBitUpsert: FC<KnowledgeBitUpsertProps> = ({
       side: get(knowledgeBit, "side"),
       type: get(knowledgeBit, "type", ""),
       customType: get(knowledgeBit, "customType", ""),
-      location: get(knowledgeBit, "location", ""),
-      customLocation: get(knowledgeBit, "customLocation", ""),
-      url: get(knowledgeBit, "url", ""),
+      file: undefined,
       attributions: mapArray(knowledgeBit?.attributions, [
         "id",
         "origin",
@@ -188,32 +154,236 @@ export const KnowledgeBitUpsert: FC<KnowledgeBitUpsertProps> = ({
     name: "attributions",
   });
 
+  transactionProgressModalStepsRef.current = transactionProgressModalSteps;
+
+  const handleTransactionProgressUpdate = (
+    updates: {
+      operation: TransactionStepOperation;
+      update: Partial<TransactionStep>;
+    }[] = []
+  ) => {
+    const updatedTransactionProgressModalSteps = [
+      ...transactionProgressModalStepsRef.current,
+    ];
+
+    updates.map(({ operation, update = {} }) => {
+      const stepIndex = findIndex(updatedTransactionProgressModalSteps, {
+        operation,
+      });
+
+      updatedTransactionProgressModalSteps[stepIndex] = {
+        ...updatedTransactionProgressModalSteps[stepIndex],
+        ...update,
+      };
+    });
+
+    setTransactionProgressModalSteps(updatedTransactionProgressModalSteps);
+  };
+
+  const handleTransactionProgressModalClose = () => {
+    setIsTransactionProgressModalOpen(false);
+  };
+
+  const handleTransactionProgressModalComplete = () => {
+    handleClose();
+  };
+
   const handleSubmit = async (data: KnowledgeBitProps) => {
     const { slug } = router.query;
 
-    try {
-      await (operation === KnowledgeBitUpsertFormOperation.CREATE
-        ? createKnowledgeBit({ claimSlug: slug as string, knowledgeBit: data })
-        : updateKnowledgeBit({
-            id: knowledgeBit?.id as string,
-            knowledgeBit: data,
-          }));
-      enqueueSnackbar(
-        KnowledgeBitUpsertFormOperationText[operation].successFeedback,
+    data.file = data.file[0];
+
+    const handleIndexKnowledgeBitNFT = async (transactionData: {
+      fileURI?: string;
+      nftMetadataURI: string;
+      nftTxHash?: string;
+      nftTokenId?: string;
+    }) => {
+      handleTransactionProgressUpdate([
         {
-          variant: "success",
+          operation: TransactionStepOperation.INDEX,
+          update: { status: TransactionStepStatus.STARTED },
+        },
+      ]);
+
+      try {
+        delete data.file;
+
+        if (operation === KnowledgeBitUpsertFormOperation.CREATE) {
+          await createKnowledgeBit({
+            claimSlug: slug as string,
+            knowledgeBit: { ...data, ...transactionData },
+          });
+        } else {
+          await updateKnowledgeBit({
+            id: knowledgeBit?.id as string,
+            knowledgeBit: { ...data, ...transactionData },
+          });
         }
+
+        handleTransactionProgressUpdate([
+          {
+            operation: TransactionStepOperation.INDEX,
+            update: { status: TransactionStepStatus.SUCCESS },
+          },
+        ]);
+      } catch (e: any) {
+        handleTransactionProgressUpdate([
+          {
+            operation: TransactionStepOperation.INDEX,
+            update: { status: TransactionStepStatus.ERROR, error: e.message },
+          },
+        ]);
+      }
+    };
+
+    const handleMintKnowledgeBitNFT = async ({
+      metadataURI,
+      fileURI,
+    }: {
+      metadataURI: string;
+      fileURI: string;
+    }) => {
+      handleTransactionProgressUpdate([
+        {
+          operation: TransactionStepOperation.SIGN,
+          update: { status: TransactionStepStatus.STARTED },
+        },
+      ]);
+
+      try {
+        if (operation === KnowledgeBitUpsertFormOperation.CREATE) {
+          const mintKnowledgeBitNFTTx = await mintKnowledgeBitNFT({
+            metadataURI,
+            claimTokenId: claim.nftTokenId,
+          });
+
+          handleTransactionProgressUpdate([
+            {
+              operation: TransactionStepOperation.SIGN,
+              update: {
+                status: TransactionStepStatus.SUCCESS,
+              },
+            },
+            {
+              operation: TransactionStepOperation.WAIT_ONCHAIN,
+              update: {
+                status: TransactionStepStatus.STARTED,
+              },
+            },
+          ]);
+
+          const mintKnowledgeBitNFTTxReceipt =
+            await mintKnowledgeBitNFTTx.wait();
+
+          handleTransactionProgressUpdate([
+            {
+              operation: TransactionStepOperation.WAIT_ONCHAIN,
+              update: {
+                status: TransactionStepStatus.SUCCESS,
+              },
+            },
+          ]);
+
+          const { transactionHash } = mintKnowledgeBitNFTTxReceipt;
+          const transferEventTopics =
+            mintKnowledgeBitNFTTxReceipt.logs[0].topics;
+          const tokenId = String(parseInt(transferEventTopics[3]));
+
+          await handleIndexKnowledgeBitNFT({
+            fileURI,
+            nftMetadataURI: metadataURI,
+            nftTxHash: transactionHash,
+            nftTokenId: tokenId,
+          });
+        } else {
+          const updateKnowledgeBitNFTMetadataTx =
+            await updateKnowledgeBitNFTMetadata({
+              metadataURI,
+              nftTokenId: knowledgeBit?.nftTokenId as string,
+            });
+
+          handleTransactionProgressUpdate([
+            {
+              operation: TransactionStepOperation.SIGN,
+              update: {
+                status: TransactionStepStatus.SUCCESS,
+              },
+            },
+            {
+              operation: TransactionStepOperation.WAIT_ONCHAIN,
+              update: {
+                status: TransactionStepStatus.STARTED,
+                txHash: updateKnowledgeBitNFTMetadataTx.hash,
+              },
+            },
+          ]);
+
+          await updateKnowledgeBitNFTMetadataTx.wait();
+
+          handleTransactionProgressUpdate([
+            {
+              operation: TransactionStepOperation.WAIT_ONCHAIN,
+              update: {
+                status: TransactionStepStatus.SUCCESS,
+              },
+            },
+          ]);
+
+          console.log("fileURI", fileURI);
+
+          await handleIndexKnowledgeBitNFT({
+            ...(fileURI ? { fileURI } : {}),
+            nftMetadataURI: metadataURI,
+          });
+        }
+      } catch (e: any) {
+        handleTransactionProgressUpdate([
+          {
+            operation: TransactionStepOperation.SIGN,
+            update: {
+              status: TransactionStepStatus.ERROR,
+              error: e.message,
+              retry: () => handleMintKnowledgeBitNFT({ metadataURI, fileURI }),
+            },
+          },
+        ]);
+      }
+    };
+
+    const handleSaveKnowledgeBitOnIPFS = async (data: KnowledgeBitProps) => {
+      setTransactionProgressModalSteps(
+        DEFAULT_KNOWLEDGE_BIT_NFT_MINT_TRANSACTION_STEPS
       );
-      handleClose();
-    } catch (e: any) {
-      enqueueSnackbar(e?.message, {
-        variant: "error",
-      });
-    }
+      setIsTransactionProgressModalOpen(true);
+
+      try {
+        const saveKnowledgeBitOnIPFSResult = await saveKnowledgeBitOnIPFS({
+          knowledgeBit: data,
+        });
+
+        handleTransactionProgressUpdate([
+          {
+            operation: TransactionStepOperation.UPLOAD,
+            update: { status: TransactionStepStatus.SUCCESS },
+          },
+        ]);
+
+        await handleMintKnowledgeBitNFT(saveKnowledgeBitOnIPFSResult);
+      } catch (e: any) {
+        handleTransactionProgressUpdate([
+          {
+            operation: TransactionStepOperation.UPLOAD,
+            update: { status: TransactionStepStatus.ERROR, error: e.message },
+          },
+        ]);
+      }
+    };
+
+    await handleSaveKnowledgeBitOnIPFS(data);
   };
 
   const knowledgeBitType = watch("type");
-  const knowledgeBitLocation = watch("location");
 
   return (
     <Stack alignItems="center" spacing={3}>
@@ -276,51 +446,37 @@ export const KnowledgeBitUpsert: FC<KnowledgeBitUpsertProps> = ({
               })}
             ></TextField>
           ) : null}
-          <Select
-            label="Location"
-            name="location"
-            fullWidth
-            options={knowledgeBitLocationsOptions}
-            control={control}
-            errors={errors}
-            rules={{
-              required: true,
-              deps: ["customLocation"],
-            }}
-          />
-          {knowledgeBitLocation === KnowledgeBitLocations.OTHER ? (
-            <TextField
-              label="Other location"
-              fullWidth
-              {...registerMui({
-                register,
-                name: "customLocation",
-                props: {
-                  validate: {
-                    required: (customLocation) =>
-                      knowledgeBitLocation === KnowledgeBitLocations.OTHER &&
-                      isEmpty(customLocation) === false,
-                  },
-                },
-                errors,
-              })}
-            ></TextField>
+
+          {operation === KnowledgeBitUpsertFormOperation.UPDATE ? (
+            <div>
+              <Typography variant="body1">
+                Current file:{" "}
+                <Link
+                  href={getGatewayFromIPFSURI(knowledgeBit?.fileURI)}
+                  text
+                  blank
+                >
+                  {getFilenameFromIPFSURI(knowledgeBit?.fileURI)}
+                </Link>
+              </Typography>
+            </div>
           ) : null}
-          <TextField
-            label="URL"
-            fullWidth
-            {...registerMui({
-              register,
-              name: "url",
-              props: {
-                required: true,
-                validate: {
-                  url: (url) => validateURL(url),
-                },
-              },
-              errors,
-            })}
-          ></TextField>
+
+          <Stack direction="row" alignItems="center">
+            {operation === KnowledgeBitUpsertFormOperation.UPDATE ? (
+              <Typography variant="body1">New file:&nbsp;</Typography>
+            ) : null}
+            <FileInput
+              name="file"
+              register={register}
+              control={control}
+              errors={errors}
+              rules={{
+                required: operation === KnowledgeBitUpsertFormOperation.CREATE,
+              }}
+            />
+          </Stack>
+
           <Stack spacing={3}>
             <Box>
               <Typography variant="body1" sx={{ fontWeight: 700 }}>
@@ -366,7 +522,7 @@ export const KnowledgeBitUpsert: FC<KnowledgeBitUpsertProps> = ({
                         name={`attributions.${attributionsFieldIndex}.origin`}
                         fullWidth
                         sx={{ width: { xs: "unset", sm: 150 } }}
-                        options={KnowledgeBitLocationsAttributionOrigins}
+                        options={KnowledgeBitAttributionOrigins}
                         control={control}
                         errors={errors}
                         rules={{
@@ -442,6 +598,18 @@ export const KnowledgeBitUpsert: FC<KnowledgeBitUpsertProps> = ({
           </Stack>
         </Stack>
       </form>
+
+      <TransactionProgressModal
+        subject={`${
+          operation === KnowledgeBitUpsertFormOperation.CREATE
+            ? "Mint"
+            : "Update"
+        } Knowledge Bit NFT`}
+        open={isTransactionProgressModalOpen}
+        steps={transactionProgressModalSteps}
+        onClose={handleTransactionProgressModalClose}
+        onComplete={handleTransactionProgressModalComplete}
+      />
     </Stack>
   );
 };

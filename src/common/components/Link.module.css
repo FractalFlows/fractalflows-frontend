@@ -1,4 +1,6 @@
 .text {
+  display: inline-flex;
+  align-items: center;
   color: var(--fractalflows-colors-primary);
 }
 

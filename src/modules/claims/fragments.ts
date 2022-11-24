@@ -30,6 +30,7 @@ export const CORE_CLAIM_FIELDS = gql`
         avatar
       }
     }
+    nftTokenId
   }
 `;
 
@@ -41,10 +42,9 @@ export const KNOWLEDGE_BIT_FIELDS = gql`
     side
     type
     customType
-    location
-    customLocation
-    url
+    fileURI
     attributions {
+      id
       origin
       identifier
     }
@@ -55,6 +55,8 @@ export const KNOWLEDGE_BIT_FIELDS = gql`
     }
     upvotesCount
     downvotesCount
+    nftMetadataURI
+    nftTokenId
   }
 `;
 

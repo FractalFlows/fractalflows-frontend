@@ -1,14 +1,5 @@
 import { gql } from "@apollo/client";
-import { KNOWLEDGE_BIT_FIELDS, USER_OPINION_FIELDS } from "./fragments";
-
-export const CREATE_CLAIM = gql`
-  mutation CreateClaim($createClaimInput: CreateClaimInput!) {
-    createClaim(createClaimInput: $createClaimInput) {
-      id
-      slug
-    }
-  }
-`;
+import { USER_OPINION_FIELDS } from "./fragments";
 
 export const UPDATE_CLAIM = gql`
   mutation UpdateClaim($updateClaimInput: UpdateClaimInput!) {
@@ -61,46 +52,9 @@ export const INVITE_FRIENDS = gql`
   }
 `;
 
-export const CREATE_KNOWLEDGE_BIT = gql`
-  ${KNOWLEDGE_BIT_FIELDS}
-
-  mutation CreateClaim(
-    $claimSlug: String!
-    $createKnowledgeBitInput: CreateKnowledgeBitInput!
-  ) {
-    createKnowledgeBit(
-      claimSlug: $claimSlug
-      createKnowledgeBitInput: $createKnowledgeBitInput
-    ) {
-      ...KnowledgeBitFields
-    }
-  }
-`;
-
-export const UPDATE_KNOWLEDGE_BIT = gql`
-  ${KNOWLEDGE_BIT_FIELDS}
-
-  mutation UpdateKnowledgeBit(
-    $updateKnowledgeBitInput: UpdateKnowledgeBitInput!
-  ) {
-    updateKnowledgeBit(updateKnowledgeBitInput: $updateKnowledgeBitInput) {
-      ...KnowledgeBitFields
-    }
-  }
-`;
-
 export const DELETE_KNOWLEDGE_BIT = gql`
   mutation DeleteKnowledgeBit($id: String!) {
     deleteKnowledgeBit(id: $id)
-  }
-`;
-
-export const SAVE_KNOWLEDGE_BIT_VOTE = gql`
-  mutation SaveKnowledgeBitVote(
-    $knowledgeBitId: String!
-    $type: KnowledgeBitVoteTypes!
-  ) {
-    saveKnowledgeBitVote(knowledgeBitId: $knowledgeBitId, type: $type)
   }
 `;
 

@@ -1,13 +1,64 @@
 import { gql, useQuery } from "@apollo/client";
-import { compact, concat, filter, findIndex, get } from "lodash-es";
+import { compact, concat, filter, findIndex } from "lodash-es";
+import { ContractCtrl } from "@web3modal/core";
 
 import { ClaimsService } from "../services/claims";
 import type { KnowledgeBitProps } from "../interfaces";
 import { ClaimsCache } from "../cache";
 import { apolloClient } from "common/services/apollo/client";
+import KnowledgeBitContractABI from "../../../../artifacts/contracts/KnowledgeBit.sol/KnowledgeBit.json";
 
 export const getKnowledgeBit = async ({ id }: { id: string }) =>
   await ClaimsService.getKnowledgeBit({ id });
+
+export const saveKnowledgeBitOnIPFS = async ({
+  knowledgeBit,
+}: {
+  knowledgeBit: KnowledgeBitProps;
+}) => {
+  const saveKnowledgeBitOnIPFSResult =
+    await ClaimsService.saveKnowledgeBitOnIPFS({
+      knowledgeBit,
+    });
+
+  return saveKnowledgeBitOnIPFSResult;
+};
+
+export const mintKnowledgeBitNFT = async ({
+  metadataURI,
+  claimTokenId,
+}: {
+  metadataURI: string;
+  claimTokenId: string;
+}) => {
+  const mintKnowledgeBitNFTTx = await ContractCtrl.write({
+    address: process.env.NEXT_PUBLIC_KNOWLEDGE_BIT_CONTRACT_ADDRESS as string,
+    chainId: Number(process.env.NEXT_PUBLIC_NETWORK_ID),
+    abi: KnowledgeBitContractABI.abi,
+    functionName: "mintToken",
+    args: [metadataURI.replace(/^ipfs:\/\//, ""), claimTokenId || "0"],
+  });
+
+  return mintKnowledgeBitNFTTx;
+};
+
+export const updateKnowledgeBitNFTMetadata = async ({
+  nftTokenId,
+  metadataURI,
+}: {
+  nftTokenId: string;
+  metadataURI: string;
+}) => {
+  const updateClaimNFTMetadataTx = await ContractCtrl.write({
+    address: process.env.NEXT_PUBLIC_KNOWLEDGE_BIT_CONTRACT_ADDRESS as string,
+    chainId: Number(process.env.NEXT_PUBLIC_NETWORK_ID),
+    abi: KnowledgeBitContractABI.abi,
+    functionName: "setTokenURI",
+    args: [nftTokenId, metadataURI.replace(/^ipfs:\/\//, "")],
+  });
+
+  return updateClaimNFTMetadataTx;
+};
 
 export const createKnowledgeBit = async ({
   claimSlug,
@@ -75,6 +126,9 @@ export const useKnowledgeBits = () => {
 
   return {
     getKnowledgeBit,
+    saveKnowledgeBitOnIPFS,
+    mintKnowledgeBitNFT,
+    updateKnowledgeBitNFTMetadata,
     createKnowledgeBit,
     updateKnowledgeBit,
     deleteKnowledgeBit,

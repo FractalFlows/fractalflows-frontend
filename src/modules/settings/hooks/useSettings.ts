@@ -17,11 +17,10 @@ const sendUpdateEmailVerificationCode = async ({
 }: {
   email: string;
 }) => {
-  const verificationCode = await SettingsService.sendUpdateEmailVerificationCode(
-    {
+  const verificationCode =
+    await SettingsService.sendUpdateEmailVerificationCode({
       email,
-    }
-  );
+    });
   return verificationCode;
 };
 

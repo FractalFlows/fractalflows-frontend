@@ -6,6 +6,7 @@ import {
   Dialog,
   DialogActions,
   DialogTitle,
+  Divider,
   IconButton,
   Menu,
   MenuItem,
@@ -21,10 +22,16 @@ import {
   ThumbDownAlt as ThumbDownAltIcon,
   MoreVert as MoreVertIcon,
 } from "@mui/icons-material";
-import { find, get } from "lodash-es";
+import { find, get, isEmpty, map } from "lodash-es";
+import { grey } from "@mui/material/colors";
+import { useSnackbar } from "notistack";
+import { useRouter } from "next/router";
 
 import {
+  AttributionOrigins,
   KnowledgeBitProps,
+  KnowledgeBitTypes,
+  KnowledgeBitTypesLabels,
   KnowledgeBitVoteTypes,
 } from "modules/claims/interfaces";
 import { AvatarWithUsername } from "modules/users/components/AvatarWithUsername";
@@ -33,12 +40,17 @@ import {
   KnowledgeBitUpsertFormOperation,
 } from "./KnowledgeBitUpsert";
 import { Spinner } from "common/components/Spinner";
-import { useSnackbar } from "notistack";
 import { useKnowledgeBitsVotes } from "../hooks/useKnowledgeBitVotes";
-import { useRouter } from "next/router";
 import { useKnowledgeBits } from "../hooks/useKnowledgeBits";
 import { useAuth } from "modules/auth/hooks/useAuth";
 import { UserRole } from "modules/users/interfaces";
+import {
+  getFilenameFromIPFSURI,
+  getGatewayFromIPFSURI,
+} from "common/utils/ipfs";
+import { Link } from "common/components/Link";
+import { getAttributionLink } from "common/utils/attributions";
+import { TransactionStepOperation } from "common/components/TransactionProgressModal";
 
 enum KnowledgeBitStates {
   UPDATING,
@@ -57,27 +69,35 @@ export const KnowledgeBit: FC<KnowledgeBitComponentProps> = ({
   const [knowledgeBitState, setKnowledgeBitState] =
     useState<KnowledgeBitStates>();
   const { deleteKnowledgeBit } = useKnowledgeBits();
-  const { userKnowledgeBitVotes, saveKnowledgeBitVote } =
+  const { userKnowledgeBitVotes, saveKnowledgeBitVote, voteKnowledgeBitNFT } =
     useKnowledgeBitsVotes();
   const router = useRouter();
+  const [isDetailsOpen, setIsDetailsOpen] = useState(false);
   const [menuAnchorEl, setMenuAnchorEl] = useState<Element>();
   const isMenuOpen = Boolean(menuAnchorEl);
   const [isDeleting, setIsDeleting] = useState(false);
   const { enqueueSnackbar } = useSnackbar();
   const { session, requireSignIn } = useAuth();
 
+  const handleDetailsToggle = () => {
+    setIsDetailsOpen(!isDetailsOpen);
+  };
   const handleMenuOpen = (event: SyntheticEvent) => {
     event.preventDefault();
+    event.stopPropagation();
     setMenuAnchorEl(event.currentTarget);
   };
-  const handleMenuClose = () => {
+  const handleMenuClose = (event?: SyntheticEvent) => {
+    event?.stopPropagation();
     setMenuAnchorEl(undefined);
   };
-  const handleEdit = () => {
+  const handleEdit = (event: SyntheticEvent) => {
+    event.stopPropagation();
     setKnowledgeBitState(KnowledgeBitStates.UPDATING);
     handleMenuClose();
   };
-  const handleDelete = () => {
+  const handleDelete = (event: SyntheticEvent) => {
+    event.stopPropagation();
     setKnowledgeBitState(KnowledgeBitStates.DELETING);
     handleMenuClose();
   };
@@ -102,10 +122,11 @@ export const KnowledgeBit: FC<KnowledgeBitComponentProps> = ({
   const handleDeleteDialogClose = () => setKnowledgeBitState(undefined);
 
   const handleVote = async (
-    ev: SyntheticEvent,
+    event: SyntheticEvent,
     type: KnowledgeBitVoteTypes
   ) => {
-    ev.preventDefault();
+    event.preventDefault();
+    event.stopPropagation();
 
     setKnowledgeBitState(
       type === KnowledgeBitVoteTypes.UPVOTE
@@ -113,11 +134,74 @@ export const KnowledgeBit: FC<KnowledgeBitComponentProps> = ({
         : KnowledgeBitStates.DOWNVOTING
     );
 
+    const getVoteKnowledgeBitParameters = () => {
+      if (
+        (type === KnowledgeBitVoteTypes.UPVOTE &&
+          get(userVote, "type") === KnowledgeBitVoteTypes.UPVOTE) ||
+        (type === KnowledgeBitVoteTypes.DOWNVOTE &&
+          get(userVote, "type") === KnowledgeBitVoteTypes.DOWNVOTE)
+      ) {
+        return {
+          notificationsPrefix: `Unvote "${knowledgeBit.name}"`,
+          voteType: KnowledgeBitVoteTypes.UNVOTE,
+          voteTypeFn: "unvote",
+        };
+      } else if (type === KnowledgeBitVoteTypes.UPVOTE) {
+        return {
+          notificationsPrefix: `Upvote "${knowledgeBit.name}"`,
+          voteType: KnowledgeBitVoteTypes.UPVOTE,
+          voteTypeFn: "upvote",
+        };
+      } else {
+        return {
+          notificationsPrefix: `Downvote "${knowledgeBit.name}"`,
+          voteType: KnowledgeBitVoteTypes.DOWNVOTE,
+          voteTypeFn: "downvote",
+        };
+      }
+    };
+    const { notificationsPrefix, voteType, voteTypeFn } =
+      getVoteKnowledgeBitParameters();
+
     try {
+      enqueueSnackbar(
+        `${notificationsPrefix}: ${TransactionStepOperation.SIGN}`,
+        {
+          variant: "info",
+          autoHideDuration: 15000,
+        }
+      );
+
+      const voteKnowledgeBitTx = await voteKnowledgeBitNFT({
+        nftTokenId: knowledgeBit.nftTokenId,
+        voteTypeFn,
+      });
+
+      enqueueSnackbar(
+        `${notificationsPrefix}: ${TransactionStepOperation.WAIT_ONCHAIN}`,
+        {
+          variant: "info",
+          autoHideDuration: 15000,
+        }
+      );
+
+      await voteKnowledgeBitTx.wait();
+
+      enqueueSnackbar(
+        `${notificationsPrefix}: ${TransactionStepOperation.INDEX}`,
+        {
+          variant: "info",
+        }
+      );
+
       await saveKnowledgeBitVote({
         knowledgeBitId: knowledgeBit?.id as string,
         claimSlug: get(router.query, "slug") as string,
-        type,
+        voteType,
+      });
+
+      enqueueSnackbar(`${notificationsPrefix}: Success`, {
+        variant: "success",
       });
     } catch (e: any) {
       enqueueSnackbar(e?.message, {
@@ -139,13 +223,19 @@ export const KnowledgeBit: FC<KnowledgeBitComponentProps> = ({
 
   return (
     <Box>
-      <a href={knowledgeBit.url} target="_blank" rel="noreferrer">
-        <Paper variant="outlined" sx={{ p: { xs: 1, sm: 2 } }}>
-          <Stack direction="row">
-            <Stack spacing={1} alignItems="flex-start" flexGrow={1}>
-              <Typography variant="body1">{knowledgeBit?.name}</Typography>
+      <Paper variant="outlined">
+        <Stack
+          direction="row"
+          sx={{ p: { xs: 1, sm: 2 }, cursor: "pointer" }}
+          onClick={handleDetailsToggle}
+        >
+          <Stack spacing={1} alignItems="flex-start" flexGrow={1}>
+            <Typography variant="body1">{knowledgeBit?.name}</Typography>
+            <div onClick={(event) => event.stopPropagation()}>
               <AvatarWithUsername user={knowledgeBit?.user} size={20} />
-            </Stack>
+            </div>
+          </Stack>
+          <Stack justifyContent="center">
             {canManageKnowledgeBit ? (
               <IconButton onClick={handleMenuOpen}>
                 <MoreVertIcon />
@@ -166,65 +256,175 @@ export const KnowledgeBit: FC<KnowledgeBitComponentProps> = ({
               onClose={handleMenuClose}
             >
               <MenuItem onClick={handleEdit}>Edit</MenuItem>
-              <MenuItem onClick={handleDelete}>Delete</MenuItem>
             </Menu>
-            <Stack alignItems="center">
-              <Tooltip title="Upvote">
-                <IconButton
-                  onClick={requireSignIn(
-                    (ev) => handleVote(ev, KnowledgeBitVoteTypes.UPVOTE),
-                    (ev) => ev.preventDefault()
-                  )}
-                >
-                  {knowledgeBitState === KnowledgeBitStates.UPVOTING ? (
-                    <CircularProgress size={24} />
-                  ) : get(userVote, "type") === KnowledgeBitVoteTypes.UPVOTE ? (
-                    <ThumbUpAltIcon />
-                  ) : (
-                    <ThumbUpOffAltIcon />
-                  )}
-                </IconButton>
-              </Tooltip>
-              <Typography variant="caption">
-                {knowledgeBit?.upvotesCount}
-              </Typography>
-            </Stack>
-            <Stack alignItems="center">
-              <Tooltip title="Downvote">
-                <IconButton
-                  onClick={requireSignIn(
-                    (ev) => handleVote(ev, KnowledgeBitVoteTypes.DOWNVOTE),
-                    (ev) => ev.preventDefault()
-                  )}
-                >
-                  {knowledgeBitState === KnowledgeBitStates.DOWNVOTING ? (
-                    <CircularProgress size={24} />
-                  ) : get(userVote, "type") ===
-                    KnowledgeBitVoteTypes.DOWNVOTE ? (
-                    <ThumbDownAltIcon />
-                  ) : (
-                    <ThumbDownOffAltIconIcon />
-                  )}
-                </IconButton>
-              </Tooltip>
-              <Typography variant="caption">
-                {knowledgeBit?.downvotesCount}
-              </Typography>
-            </Stack>
           </Stack>
-        </Paper>
-      </a>
-      {knowledgeBitState === KnowledgeBitStates.UPDATING ? (
-        <Paper variant="outlined">
-          <Box sx={{ p: { xs: 2, sm: 4 } }}>
-            <KnowledgeBitUpsert
-              knowledgeBit={knowledgeBit}
-              operation={KnowledgeBitUpsertFormOperation.UPDATE}
-              handleClose={() => setKnowledgeBitState(undefined)}
-            />
-          </Box>
-        </Paper>
-      ) : null}
+          <Stack alignItems="center" justifyContent="center">
+            <Tooltip
+              title={
+                get(userVote, "type") === KnowledgeBitVoteTypes.UPVOTE
+                  ? "Unvote"
+                  : "Upvote"
+              }
+            >
+              <IconButton
+                onClick={requireSignIn(
+                  (ev) => handleVote(ev, KnowledgeBitVoteTypes.UPVOTE),
+                  (ev) => ev.preventDefault()
+                )}
+                disabled={knowledgeBitState === KnowledgeBitStates.DOWNVOTING}
+              >
+                {knowledgeBitState === KnowledgeBitStates.UPVOTING ? (
+                  <CircularProgress size={24} />
+                ) : get(userVote, "type") === KnowledgeBitVoteTypes.UPVOTE ? (
+                  <ThumbUpAltIcon />
+                ) : (
+                  <ThumbUpOffAltIcon />
+                )}
+              </IconButton>
+            </Tooltip>
+            <Typography variant="caption">
+              {knowledgeBit?.upvotesCount}
+            </Typography>
+          </Stack>
+          <Stack alignItems="center" justifyContent="center">
+            <Tooltip
+              title={
+                get(userVote, "type") === KnowledgeBitVoteTypes.DOWNVOTE
+                  ? "Unvote"
+                  : "Downvote"
+              }
+            >
+              <IconButton
+                onClick={requireSignIn(
+                  (ev) => handleVote(ev, KnowledgeBitVoteTypes.DOWNVOTE),
+                  (ev) => ev.preventDefault()
+                )}
+                disabled={knowledgeBitState === KnowledgeBitStates.UPVOTING}
+              >
+                {knowledgeBitState === KnowledgeBitStates.DOWNVOTING ? (
+                  <CircularProgress size={24} />
+                ) : get(userVote, "type") === KnowledgeBitVoteTypes.DOWNVOTE ? (
+                  <ThumbDownAltIcon />
+                ) : (
+                  <ThumbDownOffAltIconIcon />
+                )}
+              </IconButton>
+            </Tooltip>
+            <Typography variant="caption">
+              {knowledgeBit?.downvotesCount}
+            </Typography>
+          </Stack>
+        </Stack>
+
+        {isDetailsOpen ? (
+          <>
+            <Divider />
+            <Stack sx={{ bgcolor: grey[50], p: { xs: 1, sm: 2 } }} spacing={2}>
+              <Stack spacing={3} direction="row">
+                <Typography variant="body2">
+                  Token ID:&nbsp;
+                  <Link
+                    href={`${process.env.NEXT_PUBLIC_ETH_EXPLORER_URL}/token/${process.env.NEXT_PUBLIC_KNOWLEDGE_BIT_CONTRACT_ADDRESS}?a=${knowledgeBit?.nftTokenId}`}
+                    text
+                    blank
+                  >
+                    {knowledgeBit?.nftTokenId}
+                  </Link>
+                </Typography>
+                <Typography variant="body2">
+                  Metadata:&nbsp;
+                  <Link
+                    href={getGatewayFromIPFSURI(knowledgeBit?.nftMetadataURI)}
+                    text
+                    blank
+                  >
+                    IPFS
+                  </Link>
+                </Typography>
+              </Stack>
+            </Stack>
+            <Divider />
+            <Stack sx={{ bgcolor: grey[50], p: { xs: 1, sm: 2 } }} spacing={2}>
+              <Stack spacing={1}>
+                <Typography variant="body2" fontWeight={600}>
+                  Summary
+                </Typography>
+                <Typography
+                  variant="body2"
+                  sx={{
+                    fontWeight: knowledgeBit?.summary ? undefined : 100,
+                    fontStyle: knowledgeBit?.summary ? "normal" : "italic",
+                  }}
+                >
+                  {knowledgeBit?.summary || "Summary not provided"}
+                </Typography>
+              </Stack>
+              <Stack spacing={1}>
+                <Typography variant="body2" fontWeight={600}>
+                  Type
+                </Typography>
+                <Typography variant="body2">
+                  {KnowledgeBitTypesLabels[knowledgeBit?.type]}
+                </Typography>
+              </Stack>
+              <Stack spacing={1}>
+                <Typography variant="body2" fontWeight={600}>
+                  File
+                </Typography>
+                <Typography variant="body2">
+                  <Link
+                    href={getGatewayFromIPFSURI(knowledgeBit?.fileURI)}
+                    text
+                    blank
+                  >
+                    {getFilenameFromIPFSURI(knowledgeBit?.fileURI)}
+                  </Link>
+                </Typography>
+              </Stack>
+              {isEmpty(knowledgeBit?.attributions) ? null : (
+                <Stack spacing={1}>
+                  <Typography variant="body2" fontWeight={600}>
+                    Attributions
+                  </Typography>
+
+                  <ul style={{ margin: 0 }}>
+                    {map(
+                      knowledgeBit?.attributions,
+                      ({ id, origin, identifier }) => (
+                        <li key={id} style={{ marginBottom: "4px" }}>
+                          <Typography variant="body2">
+                            <Link
+                              href={getAttributionLink({ origin, identifier })}
+                              blank
+                              text
+                              supressBlankIcon
+                            >
+                              {identifier}
+                            </Link>
+                          </Typography>
+                        </li>
+                      )
+                    )}
+                  </ul>
+                </Stack>
+              )}
+            </Stack>
+          </>
+        ) : null}
+
+        {knowledgeBitState === KnowledgeBitStates.UPDATING ? (
+          <>
+            <Divider />
+            <Box sx={{ p: { xs: 2, sm: 4 } }}>
+              <KnowledgeBitUpsert
+                knowledgeBit={knowledgeBit}
+                operation={KnowledgeBitUpsertFormOperation.UPDATE}
+                handleClose={() => setKnowledgeBitState(undefined)}
+              />
+            </Box>
+          </>
+        ) : null}
+      </Paper>
 
       <Dialog
         open={knowledgeBitState === KnowledgeBitStates.DELETING}
