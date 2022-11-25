@@ -15,7 +15,7 @@ import "@web3modal/ui";
 
 import { muiTheme } from "common/config/muiTheme";
 import { apolloClient } from "common/services/apollo/client";
-import { createEmotionCache } from "common/utils/createEmotionCache";
+import { createEmotionCache } from "common/utils/emotion";
 import { useAuth } from "modules/auth/hooks/useAuth";
 import { Header } from "common/components/Header";
 import { Footer } from "common/components/Footer";
@@ -34,9 +34,7 @@ ConfigCtrl.setConfig({
 ClientCtrl.setEthereumClient({
   appName: "Fractal Flows",
   autoConnect: true,
-  chains: [
-    process.env.NEXT_PUBLIC_NETWORK_ID === "5" ? chains.goerli : chains.mainnet,
-  ],
+  chains: [chains.goerli],
   // chains: [chains.goerli, chains.mainnet],
   providers: [
     providers.walletConnectProvider({

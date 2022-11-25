@@ -26,18 +26,21 @@ const deployKnowledgeBitContractAndMintNFT = async (
   const { ClaimContract, KnowledgeBitContract } =
     await deployKnowledgeBitContract();
 
-  const mintClaimTokenTx = await ClaimContract.mintToken(metadataCID);
-  const mintClaimTokenTxReceipt = await mintClaimTokenTx.wait();
-  const claimTokenId = parseInt(mintClaimTokenTxReceipt.events[1].topics[3]);
-
-  const mintKnowledgeBitTokenTx = await KnowledgeBitContract.mintToken(
+  const claimTokenId = Math.ceil(Math.random() * Math.pow(10, 11));
+  const mintClaimTokenTx = await ClaimContract.mintToken(
     metadataCID,
     claimTokenId
   );
-  const mintKnowledgeBitTokenTxReceipt = await mintKnowledgeBitTokenTx.wait();
-  const knowledgeBitTokenId = parseInt(
-    mintKnowledgeBitTokenTxReceipt.events[0].topics[3]
+
+  await mintClaimTokenTx.wait();
+
+  const knowledgeBitTokenId = Math.ceil(Math.random() * Math.pow(10, 11));
+  const mintKnowledgeBitTokenTx = await KnowledgeBitContract.mintToken(
+    metadataCID,
+    knowledgeBitTokenId,
+    claimTokenId
   );
+  await mintKnowledgeBitTokenTx.wait();
 
   return {
     ClaimContract,
@@ -57,7 +60,7 @@ describe("Knowledge Bit", function () {
     expect(await KnowledgeBitContract.symbol()).to.equal("FFKB");
   });
 
-  it("should mint NFT", async function () {
+  it.only("should mint NFT", async function () {
     const metadataCID =
       "bafyreih36wt6w6bpfuvdabj572gjbqxbd4gb3xihc5tq7rdz6wrcmhtsgi/metadata.json";
     const {
@@ -79,7 +82,6 @@ describe("Knowledge Bit", function () {
     )
       .to.be.an("array")
       .that.include(knowledgeBitTokenId);
-    expect(knowledgeBitTokenId).to.equal(0);
     expect(tokenURI).to.equal(`ipfs://${metadataCID}`);
   });
 

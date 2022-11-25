@@ -3,19 +3,13 @@
 pragma solidity ^0.8.9;
 
 import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
-import "@openzeppelin/contracts/token/ERC721/IERC721Receiver.sol";
+import "@openzeppelin/contracts/access/Ownable.sol";
 
-contract ClaimFractionalizer is ERC20, IERC721Receiver {
-  constructor(string memory name, string memory symbol) ERC20(name, symbol) {
-    _mint(msg.sender, 25);
-  }
+contract ClaimFractionalizer is ERC20, Ownable {
 
-  function onERC721Received(
-    address _operator,
-    address _from,
-    uint256 _tokenId,
-    bytes memory _data
-  ) public pure override returns(bytes4) {
-    return this.onERC721Received.selector;
+  constructor(string memory name, string memory symbol) ERC20(name, symbol) { }
+
+  function mint(address account, uint256 amount) public onlyOwner {
+    _mint(account, amount * 10**uint(decimals()));
   }
 }

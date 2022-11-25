@@ -65,33 +65,6 @@ export const TransactionProgressModal = ({
     onComplete();
   };
 
-  //   const handleEthereumSignIn = async (values?: WalletNoticeFormProps) => {
-  //     handleSignInDialogClose();
-
-  //     if (values?.dontShowNoticeAgain) {
-  //       localStorage.setItem("dontShowNewToWalletNoticeAgain", "true");
-  //     }
-
-  //     try {
-  //       await signInWithEthereum(signInCallback);
-  //     } catch (e) {
-  //       enqueueSnackbar(e?.message || e, {
-  //         variant: "error",
-  //       });
-  //     }
-  //   };
-
-  //   useEffect(() => {
-  //     if (
-  //       isSignInDialogOpen &&
-  //       localStorage.getItem("dontShowNewToWalletNoticeAgain") === "true"
-  //     ) {
-  //       handleEthereumSignIn();
-  //     } else {
-  //       _setIsSignInDialogOpen(isSignInDialogOpen);
-  //     }
-  //   }, [isSignInDialogOpen]);
-
   const getStepStatusIcon = (status: TransactionStepStatus) => {
     const iconSize = 15;
     const commonIconStyles = {

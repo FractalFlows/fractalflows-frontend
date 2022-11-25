@@ -3,15 +3,12 @@
 pragma solidity ^0.8.9;
 
 import "@openzeppelin/contracts/token/ERC721/extensions/ERC721URIStorage.sol";
-import "@openzeppelin/contracts/utils/Counters.sol";
 import "hardhat/console.sol";
 
 import "./ClaimFractionalizer.sol";
 
 contract Claim is ERC721URIStorage {
-  using Counters for Counters.Counter;
-  Counters.Counter private _tokenIds;
-
+  mapping(uint => address) private _fractionalizationContracts;
   mapping(uint => uint[]) private _knowledgeBits;
   mapping(uint => mapping(uint => uint)) private _knowledgeBitsIndexes;
 
@@ -21,35 +18,38 @@ contract Claim is ERC721URIStorage {
     return "ipfs://";
   }
 
-  function mintToken (string memory metadataURI) public returns (uint256) {
-    uint256 newTokenId = _tokenIds.current();
+  function mintToken (string memory metadataURI, uint tokenId) public {
+    _safeMint(msg.sender, tokenId);
+    _setTokenURI(tokenId, metadataURI);
 
     ClaimFractionalizer claimFractionalizer = new ClaimFractionalizer(
       "Fractal Flows Claim Fractionalizer",
-      string(abi.encodePacked("FFC-", Strings.toString(newTokenId)))
+      string(abi.encodePacked("FFCF-", Strings.toString(tokenId)))
     );
+    _fractionalizationContracts[tokenId] = address(claimFractionalizer);
 
-    _safeMint(address(claimFractionalizer), newTokenId);
-    _setTokenURI(newTokenId, metadataURI);
-
-    _tokenIds.increment();
-
-    return newTokenId;
+    claimFractionalizer.mint(msg.sender, 25 * 10 ** 18);
   }
 
   function setTokenURI(uint tokenId, string memory metadataURI) public {
     _setTokenURI(tokenId, metadataURI);
   }
 
-  function addKnowledgeBit(uint tokenId, uint knowledgeBitTokenId) public {
-    require(_exists(tokenId), "Claim NFT doesn't exist.");
+  function addKnowledgeBit(uint tokenId, uint knowledgeBitTokenId, address sender) external {
+    require(_exists(tokenId), "Claim doesn't exist.");
     require(_knowledgeBitsIndexes[tokenId][knowledgeBitTokenId] == 0, "Knowledge bit has already been added to claim.");
     
     _knowledgeBits[tokenId].push(knowledgeBitTokenId);
     _knowledgeBitsIndexes[tokenId][knowledgeBitTokenId] = _knowledgeBits[tokenId].length;
+
+    ClaimFractionalizer(_fractionalizationContracts[tokenId]).mint(sender, 50 * 10 ** 18);
+  }
+
+  function fractionalizationContractOf(uint tokenId) public view virtual returns (address) {
+    return _fractionalizationContracts[tokenId];
   }
 
   function knowledgeBitsOf(uint tokenId) public view virtual returns (uint[] memory) {
     return _knowledgeBits[tokenId];
-  }
+  }  
 }

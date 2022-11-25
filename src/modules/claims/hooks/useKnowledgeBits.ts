@@ -7,6 +7,7 @@ import type { KnowledgeBitProps } from "../interfaces";
 import { ClaimsCache } from "../cache";
 import { apolloClient } from "common/services/apollo/client";
 import KnowledgeBitContractABI from "../../../../artifacts/contracts/KnowledgeBit.sol/KnowledgeBit.json";
+import { generateNFTId } from "common/utils/nfts";
 
 export const getKnowledgeBit = async ({ id }: { id: string }) =>
   await ClaimsService.getKnowledgeBit({ id });
@@ -36,7 +37,11 @@ export const mintKnowledgeBitNFT = async ({
     chainId: Number(process.env.NEXT_PUBLIC_NETWORK_ID),
     abi: KnowledgeBitContractABI.abi,
     functionName: "mintToken",
-    args: [metadataURI.replace(/^ipfs:\/\//, ""), claimTokenId || "0"],
+    args: [
+      metadataURI.replace(/^ipfs:\/\//, ""),
+      generateNFTId(),
+      claimTokenId,
+    ],
   });
 
   return mintKnowledgeBitNFTTx;

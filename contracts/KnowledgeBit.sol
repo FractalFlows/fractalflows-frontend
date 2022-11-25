@@ -3,16 +3,12 @@
 pragma solidity ^0.8.9;
 
 import "@openzeppelin/contracts/token/ERC721/extensions/ERC721URIStorage.sol";
-import "@openzeppelin/contracts/utils/Counters.sol";
 
 interface Claim {
-  function addKnowledgeBit(uint, uint) external;
+  function addKnowledgeBit(uint, uint, address) external;
 }
 
 contract KnowledgeBit is ERC721URIStorage {
-  using Counters for Counters.Counter;
-  Counters.Counter private _tokenIds;
-
   event Upvote(uint, address);
   event Downvote(uint, address);
   event Unvote(uint, address);
@@ -31,17 +27,11 @@ contract KnowledgeBit is ERC721URIStorage {
     return "ipfs://";
   }
 
-  function mintToken (string memory metadataURI, uint claimTokenId) public returns (uint) {
-    uint newTokenId = _tokenIds.current();
-
-    _safeMint(msg.sender, newTokenId);
-    _setTokenURI(newTokenId, metadataURI);
-
-    _tokenIds.increment();
+  function mintToken (string memory metadataURI, uint tokenId, uint claimTokenId) public {
+    _safeMint(msg.sender, tokenId);
+    _setTokenURI(tokenId, metadataURI);
     
-    Claim(_claimContractAddress).addKnowledgeBit(claimTokenId, newTokenId);
-
-    return newTokenId;
+    Claim(_claimContractAddress).addKnowledgeBit(claimTokenId, tokenId, msg.sender);
   }
 
   function setTokenURI(uint tokenId, string memory metadataURI) public {

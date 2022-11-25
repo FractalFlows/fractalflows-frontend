@@ -269,6 +269,7 @@ export const KnowledgeBitUpsert: FC<KnowledgeBitUpsertProps> = ({
               operation: TransactionStepOperation.WAIT_ONCHAIN,
               update: {
                 status: TransactionStepStatus.STARTED,
+                txHash: mintKnowledgeBitNFTTx.hash,
               },
             },
           ]);
@@ -329,8 +330,6 @@ export const KnowledgeBitUpsert: FC<KnowledgeBitUpsertProps> = ({
               },
             },
           ]);
-
-          console.log("fileURI", fileURI);
 
           await handleIndexKnowledgeBitNFT({
             ...(fileURI ? { fileURI } : {}),

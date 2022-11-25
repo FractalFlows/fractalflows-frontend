@@ -111,6 +111,7 @@ export const ClaimUpsertForm: FC<ClaimUpsertFormProps> = ({
     saveClaimOnIPFS,
     mintClaimNFT,
     updateClaimNFTMetadata,
+    getClaimNFTFractionalizationContractOf,
   } = useClaims();
   const { searchTags } = useTags();
   const { enqueueSnackbar } = useSnackbar();
@@ -286,16 +287,17 @@ export const ClaimUpsertForm: FC<ClaimUpsertFormProps> = ({
           ]);
 
           const { transactionHash } = mintClaimNFTTxReceipt;
-          const transferEventTopics = mintClaimNFTTxReceipt.logs[1].topics;
-          const tokenId = String(parseInt(transferEventTopics[3]));
-          const fractionalizationContractAddress = `0x${transferEventTopics[2].slice(
-            -40
-          )}`;
+          const transferEventTopics = mintClaimNFTTxReceipt.logs[0].topics;
+          const nftTokenId = String(parseInt(transferEventTopics[3]));
+          const fractionalizationContractAddress =
+            await getClaimNFTFractionalizationContractOf({
+              nftTokenId,
+            });
 
           await handleIndexClaimNFT({
             nftMetadataURI: metadataURI,
             nftTxHash: transactionHash,
-            nftTokenId: tokenId,
+            nftTokenId,
             nftFractionalizationContractAddress:
               fractionalizationContractAddress,
           });
