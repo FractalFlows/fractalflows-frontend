@@ -1,4 +1,5 @@
 const { expect } = require("chai");
+const { generateNFTId } = require("./utils");
 
 describe("Claim", function () {
   it("should return correct name", async function () {
@@ -24,7 +25,7 @@ describe("Claim", function () {
 
     await ClaimContract.deployed();
 
-    const claimTokenId = Math.ceil(Math.random() * Math.pow(10, 11));
+    const claimTokenId = generateNFTId();
     const mintClaimTx = await ClaimContract.mintToken(
       claimMetadataCID,
       claimTokenId

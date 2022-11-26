@@ -14,6 +14,7 @@ contract KnowledgeBit is ERC721URIStorage {
   event Unvote(uint, address);
 
   mapping(uint => mapping(address => int)) private _votes;
+  mapping(uint => mapping(address => bool)) private _hasOnceVoted;
   mapping(uint => uint) private _downvotesCount;
   mapping(uint => uint) private _upvotesCount;
 
@@ -38,28 +39,42 @@ contract KnowledgeBit is ERC721URIStorage {
     _setTokenURI(tokenId, metadataURI);
   }
 
+  function exists(uint tokenId) public view returns (bool) {
+    return _exists(tokenId);
+  }
+
   function upvote (uint tokenId) public {
-    require(_votes[tokenId][msg.sender] != 1, "You have already upvoted this knowledge bit.");
+    require(_votes[tokenId][msg.sender] != 1, "You have already upvoted this knowledge bit");
 
     if (_votes[tokenId][msg.sender] == -1) {
       _downvotesCount[tokenId] -= 1;
     }
 
-    _votes[tokenId][msg.sender] = 1; 
+    _votes[tokenId][msg.sender] = 1;
     _upvotesCount[tokenId] += 1;
+
+    // if (_hasOnceVoted[tokenId][msg.sender] == false) {
+    //   Claim(_claimContractAddress).addKnowledgeBitVoteReward(claimTokenId, msg.sender);
+    //   _hasOnceVoted[tokenId][msg.sender] = true;
+    // }
 
     emit Upvote(tokenId, msg.sender);
   }
 
   function downvote (uint tokenId) public {
-    require(_votes[tokenId][msg.sender] != -1, "You have already downvoted this knowledge bit.");
+    require(_votes[tokenId][msg.sender] != -1, "You have already downvoted this knowledge bit");
 
     if (_votes[tokenId][msg.sender] == 1) {
       _upvotesCount[tokenId] -= 1;
     }
 
-    _votes[tokenId][msg.sender] = -1; 
+    _votes[tokenId][msg.sender] = -1;
     _downvotesCount[tokenId] += 1;
+
+    // if (_hasOnceVoted[tokenId][msg.sender] == false) {
+    //   Claim(_claimContractAddress).addKnowledgeBitVote(claimTokenId, msg.sender);
+    //   _hasOnceVoted[tokenId][msg.sender] = true;
+    // }
 
     emit Downvote(tokenId, msg.sender);
   }
@@ -82,5 +97,10 @@ contract KnowledgeBit is ERC721URIStorage {
 
   function downvotesCountOf(uint tokenId) public view virtual returns (uint) {
     return _downvotesCount[tokenId];
+  }
+
+  function _beforeTokenTransfer(address from, address to, uint256 tokenId) internal override virtual {
+    require(from == address(0), "Token transfer is blocked");   
+    super._beforeTokenTransfer(from, to, tokenId);  
   }
 }

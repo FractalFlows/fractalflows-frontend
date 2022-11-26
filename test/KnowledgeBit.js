@@ -1,4 +1,5 @@
 const { expect } = require("chai");
+const { generateNFTId, convertBigNumbersToNumber } = require("./utils");
 
 const deployKnowledgeBitContract = async () => {
   const ClaimContractFactory = await hre.ethers.getContractFactory(
@@ -26,15 +27,14 @@ const deployKnowledgeBitContractAndMintNFT = async (
   const { ClaimContract, KnowledgeBitContract } =
     await deployKnowledgeBitContract();
 
-  const claimTokenId = Math.ceil(Math.random() * Math.pow(10, 11));
+  const claimTokenId = generateNFTId();
   const mintClaimTokenTx = await ClaimContract.mintToken(
     metadataCID,
     claimTokenId
   );
-
   await mintClaimTokenTx.wait();
 
-  const knowledgeBitTokenId = Math.ceil(Math.random() * Math.pow(10, 11));
+  const knowledgeBitTokenId = generateNFTId();
   const mintKnowledgeBitTokenTx = await KnowledgeBitContract.mintToken(
     metadataCID,
     knowledgeBitTokenId,
@@ -60,7 +60,7 @@ describe("Knowledge Bit", function () {
     expect(await KnowledgeBitContract.symbol()).to.equal("FFKB");
   });
 
-  it.only("should mint NFT", async function () {
+  it("should mint NFT", async function () {
     const metadataCID =
       "bafyreih36wt6w6bpfuvdabj572gjbqxbd4gb3xihc5tq7rdz6wrcmhtsgi/metadata.json";
     const {
@@ -75,11 +75,7 @@ describe("Knowledge Bit", function () {
       claimTokenId
     );
 
-    expect(
-      claimKnowledgeBitTokenIds.map((claimKnowledgeBitTokenId) =>
-        claimKnowledgeBitTokenId.toNumber()
-      )
-    )
+    expect(convertBigNumbersToNumber(claimKnowledgeBitTokenIds))
       .to.be.an("array")
       .that.include(knowledgeBitTokenId);
     expect(tokenURI).to.equal(`ipfs://${metadataCID}`);
