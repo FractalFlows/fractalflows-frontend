@@ -12,13 +12,8 @@ interface Claim {
   function claimOfArgument(uint) external view returns (uint);
 }
 
-interface KnowledgeBit {
-  function exists(uint) external view returns (bool);
-}
-
 contract Argument is ERC721URIStorage {
   address private _claimContractAddress;
-  address private _knowledgeBitContractAddress;
 
   struct Comment {
     address owner;
@@ -37,11 +32,9 @@ contract Argument is ERC721URIStorage {
   }
 
   constructor(
-    address claimContractAddress,
-    address knowledgeBitContractAddress
+    address claimContractAddress
   ) ERC721("Fractal Flows Arguments", "FFA") {
     _claimContractAddress = claimContractAddress;
-    _knowledgeBitContractAddress = knowledgeBitContractAddress;
   }
 
   function _baseURI() internal pure override returns (string memory) {
@@ -50,10 +43,6 @@ contract Argument is ERC721URIStorage {
 
   function _checkIfKnowledgeBitIdsBelongToClaim(uint claimTokenId, uint[] memory knowledgeBitIds) private view {
     for (uint i = 0; i < knowledgeBitIds.length; i++) {
-      require(
-        KnowledgeBit(_knowledgeBitContractAddress).exists(knowledgeBitIds[i]),
-        string(abi.encodePacked("Knowledge bit ", Strings.toString(knowledgeBitIds[i]), " doesn't exist"))
-      );
       require(
         Claim(_claimContractAddress).knowledgeBitIndexOf(claimTokenId, knowledgeBitIds[i]) != 0,
         string(abi.encodePacked(

@@ -24,12 +24,21 @@ async function main() {
     "contracts/Argument.sol:Argument"
   );
   const ArgumentContract = await ArgumentContractFactory.deploy(
-    ClaimContract.address,
-    KnowledgeBitContract.address
+    ClaimContract.address
   );
   await ArgumentContract.deployed();
 
   console.log("Deployed Argument contract to:", ArgumentContract.address);
+
+  const OpinionContractFactory = await hre.ethers.getContractFactory(
+    "contracts/Opinion.sol:Opinion"
+  );
+  const OpinionContract = await OpinionContractFactory.deploy(
+    ClaimContract.address
+  );
+  await OpinionContract.deployed();
+
+  console.log("Deployed Opinion contract to:", OpinionContract.address);
 }
 
 main()

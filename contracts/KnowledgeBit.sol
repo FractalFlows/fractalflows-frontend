@@ -39,10 +39,6 @@ contract KnowledgeBit is ERC721URIStorage {
     _setTokenURI(tokenId, metadataURI);
   }
 
-  function exists(uint tokenId) public view returns (bool) {
-    return _exists(tokenId);
-  }
-
   function upvote (uint tokenId) public {
     require(_votes[tokenId][msg.sender] != 1, "You have already upvoted this knowledge bit");
 

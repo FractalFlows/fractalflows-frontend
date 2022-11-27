@@ -17,6 +17,11 @@ contract Claim is ERC721URIStorage {
   mapping(uint => mapping(uint => uint)) private _argumentsIndexes;
   mapping(uint => uint) private _argumentToClaim;
 
+
+  mapping(uint => uint[]) private _opinions;
+  mapping(uint => mapping(uint => uint)) private _opinionsIndexes;
+  mapping(uint => uint) private _opinionToClaim;
+
   modifier claimExists(uint tokenId) {
     require(_exists(tokenId), "Claim doesn't exist");
     _;
@@ -38,7 +43,7 @@ contract Claim is ERC721URIStorage {
     );
     _fractionalizationContracts[tokenId] = address(claimFractionalizer);
 
-    claimFractionalizer.mint(msg.sender, 50 * 10 ** 18);
+    claimFractionalizer.mint(msg.sender, 50);
   }
 
   function setTokenURI(uint tokenId, string memory metadataURI) public {
@@ -46,7 +51,7 @@ contract Claim is ERC721URIStorage {
   }
 
   function _rewardContribution(uint tokenId, address account, uint amount) private {
-    ClaimFractionalizer(_fractionalizationContracts[tokenId]).mint(account, amount * 10 ** 18);
+    ClaimFractionalizer(_fractionalizationContracts[tokenId]).mint(account, amount);
   }
 
   function addKnowledgeBit(uint tokenId, uint knowledgeBitTokenId, address account) external claimExists(tokenId) {
@@ -73,7 +78,17 @@ contract Claim is ERC721URIStorage {
   }
 
   function addArgumentComment(uint tokenId, address account) external claimExists(tokenId) {
-    ClaimFractionalizer(_fractionalizationContracts[tokenId]).mint(account, 3 * 10 ** 18);
+    _rewardContribution(tokenId, account, 3);
+  }
+
+  function addOpinion(uint tokenId, uint opinionTokenId, address account) external claimExists(tokenId) {
+    require(_opinionsIndexes[tokenId][opinionTokenId] == 0, "Opinion has already been added to claim");
+    
+    _opinions[tokenId].push(opinionTokenId);
+    _opinionsIndexes[tokenId][opinionTokenId] = _opinions[tokenId].length;
+    _opinionToClaim[opinionTokenId] = tokenId;
+
+    _rewardContribution(tokenId, account, 5);
   }
 
   function fractionalizationContractOf(uint tokenId) public view virtual claimExists(tokenId) returns (address) {
@@ -95,8 +110,23 @@ contract Claim is ERC721URIStorage {
     return _arguments[tokenId];
   }
 
+  function argumentIndexOf(
+    uint tokenId,
+    uint argumentTokenId
+  ) public view virtual claimExists(tokenId) returns (uint) {
+    return _argumentsIndexes[tokenId][argumentTokenId];
+  }  
+
+  function opinionsOf(uint tokenId) public view virtual claimExists(tokenId) returns (uint[] memory) {
+    return _opinions[tokenId];
+  }
+
   function claimOfArgument(uint argumentTokenId) public view virtual returns (uint) {
     return _argumentToClaim[argumentTokenId];
+  }
+
+  function claimOfOpinion(uint opinionTokenId) public view virtual returns (uint) {
+    return _opinionToClaim[opinionTokenId];
   }
 
   function _beforeTokenTransfer(address from, address to, uint256 tokenId) internal override virtual {

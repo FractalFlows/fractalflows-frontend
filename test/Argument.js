@@ -23,8 +23,7 @@ const deployArgumentContract = async () => {
     "contracts/Argument.sol:Argument"
   );
   const ArgumentContract = await ArgumentContractFactory.deploy(
-    ClaimContract.address,
-    KnowledgeBitContract.address
+    ClaimContract.address
   );
   await ArgumentContract.deployed();
 
@@ -80,8 +79,6 @@ describe("Argument", function () {
   });
 
   it("should mint NFT", async function () {
-    const metadataCID =
-      "bafyreih36wt6w6bpfuvdabj572gjbqxbd4gb3xihc5tq7rdz6wrcmhtsgi/metadata.json";
     const {
       ClaimContract,
       ArgumentContract,
@@ -137,7 +134,7 @@ describe("Argument", function () {
         claimTokenId
       )
     ).to.be.revertedWith(
-      `Knowledge bit ${unexistingKnowledgeBitTokenId} doesn't exist`
+      `Knowledge bit ${unexistingKnowledgeBitTokenId} doesn't belong to claim ${claimTokenId}`
     );
   });
 

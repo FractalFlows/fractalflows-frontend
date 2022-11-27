@@ -10,6 +10,6 @@ contract ClaimFractionalizer is ERC20, Ownable {
   constructor(string memory name, string memory symbol) ERC20(name, symbol) { }
 
   function mint(address account, uint256 amount) public onlyOwner {
-    _mint(account, amount * 10**uint(decimals()));
+    _mint(account, amount * 10 ** uint(decimals()));
   }
 }
