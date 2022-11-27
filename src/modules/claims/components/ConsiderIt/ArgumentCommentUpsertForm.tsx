@@ -16,15 +16,6 @@ import {
   TransactionStepStatus,
 } from "common/components/TransactionProgressModal";
 
-const ArgumentCommentUpsertFormOperationTexts = {
-  [UpsertFormOperation.CREATE]: {
-    successFeedback: "Your new comment has been succesfully added!",
-  },
-  [UpsertFormOperation.UPDATE]: {
-    successFeedback: "Your comment has been succesfully edited!",
-  },
-};
-
 const argumentCommentFormDefaultValues = {
   content: "",
 };
@@ -68,14 +59,15 @@ export const ArgumentCommentUpsertForm: FC<ArgumentCommentUpsertFormProps> = ({
   const {
     createArgumentComment,
     updateArgumentComment,
-    saveArgumenCommentOnIPFS,
+    saveArgumentCommentOnIPFS,
+    addArgumentCommentToNFT,
   } = useArgumentComments();
-  const { enqueueSnackbar } = useSnackbar();
   const [isTransactionProgressModalOpen, setIsTransactionProgressModalOpen] =
     useState(false);
   const [transactionProgressModalSteps, setTransactionProgressModalSteps] =
     useState(DEFAULT_ARGUMENT_COMMENT_NFT_MINT_TRANSACTION_STEPS);
   const transactionProgressModalStepsRef = useRef<TransactionStep[]>([]);
+  const savedArgumentComment = useRef<ArgumentCommentProps>({});
   const {
     register,
     reset,
@@ -86,39 +78,6 @@ export const ArgumentCommentUpsertForm: FC<ArgumentCommentUpsertFormProps> = ({
       content: get(argumentComment, "content", ""),
     },
   });
-
-  // const handleSubmit = async (data: ArgumentCommentUpsertFormDataProps) => {
-  //   try {
-  //     const savedArgumentComment = await (operation ===
-  //     UpsertFormOperation.CREATE
-  //       ? createArgumentComment({
-  //           argumentComment: {
-  //             content: data.content,
-  //             argument: { id: get(argumentComment, "argument.id") },
-  //           },
-  //         })
-  //       : updateArgumentComment({
-  //           argumentComment: {
-  //             id: get(argumentComment, "id"),
-  //             content: data.content,
-  //             argument: { id: get(argumentComment, "argument.id") },
-  //           },
-  //         }));
-  //     enqueueSnackbar(
-  //       ArgumentCommentUpsertFormOperationTexts[operation].successFeedback,
-  //       {
-  //         variant: "success",
-  //       }
-  //     );
-  //     reset(argumentCommentFormDefaultValues);
-  //     handleSuccess && handleSuccess(savedArgumentComment);
-  //     handleClose && handleClose();
-  //   } catch (e: any) {
-  //     enqueueSnackbar(e?.message, {
-  //       variant: "error",
-  //     });
-  //   }
-  // };
 
   transactionProgressModalStepsRef.current = transactionProgressModalSteps;
 
@@ -146,123 +105,132 @@ export const ArgumentCommentUpsertForm: FC<ArgumentCommentUpsertFormProps> = ({
     setTransactionProgressModalSteps(updatedTransactionProgressModalSteps);
   };
 
+  const handleTransactionProgressModalClose = () => {
+    setIsTransactionProgressModalOpen(false);
+  };
+
+  const handleTransactionProgressModalComplete = () => {
+    reset(argumentCommentFormDefaultValues);
+    handleSuccess && handleSuccess(savedArgumentComment.current);
+    handleClose && handleClose();
+  };
+
   const handleSubmit = async (data: ArgumentCommentUpsertFormDataProps) => {
-    // const handleIndexArgumentNFT = async (transactionData: {
-    //   nftMetadataURI: string;
-    //   nftTxHash?: string;
-    //   nftTokenId?: string;
-    // }) => {
-    //   handleTransactionProgressUpdate([
-    //     {
-    //       operation: TransactionStepOperation.INDEX,
-    //       update: { status: TransactionStepStatus.STARTED },
-    //     },
-    //   ]);
+    const handleIndexArgumentCommentNFT = async (transactionData: {
+      nftMetadataURI: string;
+      nftTxHash?: string;
+      nftIndex?: string;
+    }) => {
+      handleTransactionProgressUpdate([
+        {
+          operation: TransactionStepOperation.INDEX,
+          update: { status: TransactionStepStatus.STARTED },
+        },
+      ]);
 
-    //   const getArgument = () => ({
-    //     summary: data.summary,
-    //     side: argument.side,
-    //     evidences: mapArray(data.evidences, ["id"]),
-    //   });
+      try {
+        if (operation === UpsertFormOperation.CREATE) {
+          savedArgumentComment.current = await createArgumentComment({
+            argumentComment: {
+              content: data.content,
+              argument: { id: get(argumentComment, "argument.id") },
+              ...transactionData,
+            },
+          });
+        }
 
-    //   try {
-    //     if (operation === UpsertFormOperation.CREATE) {
-    //       const addedArgument = await createArgument({
-    //         claimSlug,
-    //         argument: {
-    //           ...getArgument(),
-    //           ...transactionData,
-    //         },
-    //       });
-    //       addArgumentToOpinion(addedArgument);
-    //       setArguments([...argumentsList, addedArgument]);
-    //     }
+        //  updateArgumentComment({
+        //           argumentComment: {
+        //             id: get(argumentComment, "id"),
+        //             content: data.content,
+        //             argument: { id: get(argumentComment, "argument.id") },
+        //           },
+        //         }));
 
-    //     handleTransactionProgressUpdate([
-    //       {
-    //         operation: TransactionStepOperation.INDEX,
-    //         update: { status: TransactionStepStatus.SUCCESS },
-    //       },
-    //     ]);
-    //   } catch (e: any) {
-    //     handleTransactionProgressUpdate([
-    //       {
-    //         operation: TransactionStepOperation.INDEX,
-    //         update: { status: TransactionStepStatus.ERROR, error: e.message },
-    //       },
-    //     ]);
-    //   }
-    // };
+        handleTransactionProgressUpdate([
+          {
+            operation: TransactionStepOperation.INDEX,
+            update: { status: TransactionStepStatus.SUCCESS },
+          },
+        ]);
+      } catch (e: any) {
+        handleTransactionProgressUpdate([
+          {
+            operation: TransactionStepOperation.INDEX,
+            update: { status: TransactionStepStatus.ERROR, error: e.message },
+          },
+        ]);
+      }
+    };
 
-    // const handleMintArgumentNFT = async ({
-    //   metadataURI,
-    // }: {
-    //   metadataURI: string;
-    // }) => {
-    //   handleTransactionProgressUpdate([
-    //     {
-    //       operation: TransactionStepOperation.SIGN,
-    //       update: { status: TransactionStepStatus.STARTED },
-    //     },
-    //   ]);
+    const handleAddArgumentCommentToNFT = async ({
+      metadataURI,
+    }: {
+      metadataURI: string;
+    }) => {
+      handleTransactionProgressUpdate([
+        {
+          operation: TransactionStepOperation.SIGN,
+          update: { status: TransactionStepStatus.STARTED },
+        },
+      ]);
 
-    //   try {
-    //     if (operation === UpsertFormOperation.CREATE) {
-    //       const mintArgumentNFTTx = await mintArgumentNFT({
-    //         metadataURI,
-    //         knowledgeBitIds: [],
-    //         claimTokenId: claim.nftTokenId,
-    //       });
+      try {
+        if (operation === UpsertFormOperation.CREATE) {
+          const mintArgumentNFTTx = await addArgumentCommentToNFT({
+            argumentTokenId: argumentComment.argument.nftTokenId,
+            metadataURI,
+          });
 
-    //       handleTransactionProgressUpdate([
-    //         {
-    //           operation: TransactionStepOperation.SIGN,
-    //           update: {
-    //             status: TransactionStepStatus.SUCCESS,
-    //           },
-    //         },
-    //         {
-    //           operation: TransactionStepOperation.WAIT_ONCHAIN,
-    //           update: {
-    //             status: TransactionStepStatus.STARTED,
-    //             txHash: mintArgumentNFTTx.hash,
-    //           },
-    //         },
-    //       ]);
+          handleTransactionProgressUpdate([
+            {
+              operation: TransactionStepOperation.SIGN,
+              update: {
+                status: TransactionStepStatus.SUCCESS,
+              },
+            },
+            {
+              operation: TransactionStepOperation.WAIT_ONCHAIN,
+              update: {
+                status: TransactionStepStatus.STARTED,
+                txHash: mintArgumentNFTTx.hash,
+              },
+            },
+          ]);
 
-    //       const mintArgumentNFTTxReceipt = await mintArgumentNFTTx.wait();
+          const mintArgumentNFTTxReceipt = await mintArgumentNFTTx.wait();
 
-    //       handleTransactionProgressUpdate([
-    //         {
-    //           operation: TransactionStepOperation.WAIT_ONCHAIN,
-    //           update: {
-    //             status: TransactionStepStatus.SUCCESS,
-    //           },
-    //         },
-    //       ]);
+          handleTransactionProgressUpdate([
+            {
+              operation: TransactionStepOperation.WAIT_ONCHAIN,
+              update: {
+                status: TransactionStepStatus.SUCCESS,
+              },
+            },
+          ]);
 
-    //       const transferEventTopics = mintArgumentNFTTxReceipt.logs[0].topics;
-    //       const tokenId = String(parseInt(transferEventTopics[3]));
+          const transferEventTopics = mintArgumentNFTTxReceipt.logs[0].topics;
+          const nftIndex = String(parseInt(transferEventTopics[1]));
 
-    //       await handleIndexArgumentNFT({
-    //         nftMetadataURI: metadataURI,
-    //         nftTxHash: mintArgumentNFTTx.hash,
-    //         nftTokenId: tokenId,
-    //       });
-    //     }
-    //   } catch (e: any) {
-    //     handleTransactionProgressUpdate([
-    //       {
-    //         operation: TransactionStepOperation.SIGN,
-    //         update: {
-    //           status: TransactionStepStatus.ERROR,
-    //           error: e.message,
-    //           retry: () => handleMintArgumentNFT({ metadataURI }),
-    //         },
-    //       },
-    //     ]);
-    //   }
-    // };
+          await handleIndexArgumentCommentNFT({
+            nftMetadataURI: metadataURI,
+            nftTxHash: mintArgumentNFTTx.hash,
+            nftIndex: nftIndex,
+          });
+        }
+      } catch (e: any) {
+        handleTransactionProgressUpdate([
+          {
+            operation: TransactionStepOperation.SIGN,
+            update: {
+              status: TransactionStepStatus.ERROR,
+              error: e.message,
+              retry: () => handleMintArgumentNFT({ metadataURI }),
+            },
+          },
+        ]);
+      }
+    };
 
     const handleSaveArgumentCommentOnIPFS = async (
       data: ArgumentCommentUpsertFormDataProps
@@ -273,12 +241,13 @@ export const ArgumentCommentUpsertForm: FC<ArgumentCommentUpsertFormProps> = ({
       setIsTransactionProgressModalOpen(true);
 
       try {
-        const saveArgumentCommentOnIPFSResult = await saveArgumenCommentOnIPFS({
-          argument: {
-            summary: data.summary,
-            side: argument.side,
-          },
-        });
+        const saveArgumentCommentOnIPFSResult = await saveArgumentCommentOnIPFS(
+          {
+            argumentComment: {
+              content: data.content,
+            },
+          }
+        );
 
         handleTransactionProgressUpdate([
           {
@@ -287,7 +256,9 @@ export const ArgumentCommentUpsertForm: FC<ArgumentCommentUpsertFormProps> = ({
           },
         ]);
 
-        // await handleMintArgumentNFT({ metadataURI: saveArgumentOnIPFSResult });
+        await handleAddArgumentCommentToNFT({
+          metadataURI: saveArgumentCommentOnIPFSResult,
+        });
       } catch (e: any) {
         handleTransactionProgressUpdate([
           {
@@ -347,7 +318,9 @@ export const ArgumentCommentUpsertForm: FC<ArgumentCommentUpsertFormProps> = ({
 
       <TransactionProgressModal
         subject={`${
-          operation === UpsertFormOperation.CREATE ? "Mint" : "Update"
+          operation === UpsertFormOperation.CREATE
+            ? "Add Comment to"
+            : "Update Comment of"
         } Argument NFT`}
         open={isTransactionProgressModalOpen}
         steps={transactionProgressModalSteps}

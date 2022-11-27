@@ -212,35 +212,6 @@ export const GET_USER_KNOWLEDGE_BITS_VOTES = gql`
   }
 `;
 
-export const GET_ARGUMENT = gql`
-  ${CORE_ARGUMENT_FIELDS}
-
-  query GetArgument($id: String!) {
-    argument(id: $id) {
-      ...CoreArgumentFields
-
-      evidences {
-        id
-        name
-        nftMetadataURI
-      }
-      comments {
-        id
-        content
-        createdAt
-        user {
-          id
-          username
-          avatar
-        }
-        argument {
-          id
-        }
-      }
-    }
-  }
-`;
-
 export const GET_ARGUMENTS = gql`
   ${CORE_ARGUMENT_FIELDS}
 

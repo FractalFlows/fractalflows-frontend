@@ -44,7 +44,7 @@ import type {
 } from "../interfaces";
 import type { PaginationProps } from "modules/interfaces";
 import { gql } from "@apollo/client";
-import { KNOWLEDGE_BIT_FIELDS } from "../fragments";
+import { CORE_ARGUMENT_FIELDS, KNOWLEDGE_BIT_FIELDS } from "../fragments";
 
 export const ClaimsService = {
   async getClaim({
@@ -573,7 +573,34 @@ export const ClaimsService = {
 
   async getArgument({ id }: { id: string }): Promise<ArgumentProps> {
     const { data } = await apolloClient.query({
-      query: GET_ARGUMENT,
+      query: gql`
+        ${CORE_ARGUMENT_FIELDS}
+
+        query GetArgument($id: String!) {
+          argument(id: $id) {
+            ...CoreArgumentFields
+
+            evidences {
+              id
+              name
+            }
+            comments {
+              id
+              content
+              createdAt
+              user {
+                id
+                username
+                avatar
+              }
+              argument {
+                id
+                nftTokenId
+              }
+            }
+          }
+        }
+      `,
       variables: {
         id,
       },

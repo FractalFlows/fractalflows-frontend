@@ -72,6 +72,8 @@ export const CORE_ARGUMENT_FIELDS = gql`
     comments {
       id
     }
+    nftTokenId
+    nftMetadataURI
   }
 `;
 

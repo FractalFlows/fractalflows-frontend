@@ -26,7 +26,7 @@ export const AvatarWithUsername: FC<AvatarProps> = ({ user, size = 40 }) => (
         variant="body1"
         fontWeight="600"
         noWrap
-        sx={{ maxWidth: 200 }}
+        sx={{ maxWidth: 150 }}
       >
         {user?.username}{" "}
         {user?.username === "fractalflowsbot" ? (

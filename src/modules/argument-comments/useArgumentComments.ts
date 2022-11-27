@@ -1,8 +1,41 @@
+import { ContractCtrl } from "@web3modal/core";
 import { concat, get, findIndex, compact, filter } from "lodash-es";
 
 import { ClaimsCache } from "modules/claims/cache";
 import { ArgumentCommentProps } from "./interfaces";
 import { ArgumentCommentsService } from "./services";
+import ArgumentContractABI from "../../../artifacts/contracts/Argument.sol/Argument.json";
+
+export const saveArgumentCommentOnIPFS = async ({
+  argumentComment,
+}: {
+  argumentComment: Partial<ArgumentCommentProps>;
+}) => {
+  const saveArgumentCommentOnIPFSResult =
+    await ArgumentCommentsService.saveOnIPFS({
+      argumentComment,
+    });
+
+  return saveArgumentCommentOnIPFSResult;
+};
+
+export const addArgumentCommentToNFT = async ({
+  argumentTokenId,
+  metadataURI,
+}: {
+  argumentTokenId: string;
+  metadataURI: string;
+}) => {
+  const mintArgumentNFTTx = await ContractCtrl.write({
+    address: process.env.NEXT_PUBLIC_ARGUMENT_CONTRACT_ADDRESS as string,
+    chainId: Number(process.env.NEXT_PUBLIC_NETWORK_ID),
+    abi: ArgumentContractABI.abi,
+    functionName: "addComment",
+    args: [argumentTokenId, metadataURI.replace(/^ipfs:\/\//, "")],
+  });
+
+  return mintArgumentNFTTx;
+};
 
 export const createArgumentComment = async ({
   argumentComment,
@@ -67,6 +100,8 @@ export const deleteArgumentComment = async ({
 
 export const useArgumentComments = () => {
   return {
+    saveArgumentCommentOnIPFS,
+    addArgumentCommentToNFT,
     createArgumentComment,
     updateArgumentComment,
     deleteArgumentComment,
