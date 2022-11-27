@@ -519,6 +519,25 @@ export const ClaimsService = {
     return data.saveKnowledgeBitVote;
   },
 
+  async saveArgumentOnIPFS({
+    argument,
+  }: {
+    argument: ArgumentProps;
+  }): Promise<string> {
+    const { data } = await apolloClient.mutate({
+      mutation: gql`
+        mutation SaveArgumentOnIPFS($saveArgumentOnIPFSInput: ArgumentInput!) {
+          saveArgumentOnIPFS(saveArgumentOnIPFSInput: $saveArgumentOnIPFSInput)
+        }
+      `,
+      variables: {
+        saveArgumentOnIPFSInput: argument,
+      },
+    });
+
+    return data.saveArgumentOnIPFS;
+  },
+
   async createArgument({
     claimSlug,
     argument,

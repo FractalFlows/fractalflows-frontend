@@ -218,10 +218,11 @@ export const GET_ARGUMENT = gql`
   query GetArgument($id: String!) {
     argument(id: $id) {
       ...CoreArgumentFields
+
       evidences {
         id
         name
-        url
+        nftMetadataURI
       }
       comments {
         id

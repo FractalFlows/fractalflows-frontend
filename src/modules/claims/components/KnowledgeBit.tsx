@@ -222,7 +222,7 @@ export const KnowledgeBit: FC<KnowledgeBitComponentProps> = ({
   );
 
   return (
-    <Box>
+    <Box id={`knowledge-bit-${knowledgeBit?.id}`}>
       <Paper variant="outlined">
         <Stack
           direction="row"

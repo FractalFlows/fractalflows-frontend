@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { Fragment, useEffect, useState } from "react";
 import {
   Box,
   Button,
@@ -149,13 +149,8 @@ export const TransactionProgressModal = ({
               }}
             >
               {steps.map(({ status, operation, error, txHash, retry }, i) => (
-                <>
-                  <Stack
-                    key={operation}
-                    direction="row"
-                    alignItems="center"
-                    spacing={1}
-                  >
+                <Fragment key={operation}>
+                  <Stack direction="row" alignItems="center" spacing={1}>
                     {getStepStatusIcon(status)}
                     <Stack spacing={1} sx={{ alignItems: "flex-start" }}>
                       <Typography>{operation}</Typography>
@@ -192,7 +187,7 @@ export const TransactionProgressModal = ({
                     </Stack>
                   </Stack>
                   {i === steps.length - 1 ? null : (
-                    <Stack key={`${operation}-divider`}>
+                    <Stack>
                       <Box
                         sx={{
                           bgcolor: grey[200],
@@ -204,7 +199,7 @@ export const TransactionProgressModal = ({
                       />
                     </Stack>
                   )}
-                </>
+                </Fragment>
               ))}
               <Button
                 sx={{ marginTop: 4 }}

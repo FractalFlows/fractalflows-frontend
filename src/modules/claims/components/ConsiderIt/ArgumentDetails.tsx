@@ -28,7 +28,10 @@ interface ArgumentDetailsProps {
   argumentId: string;
 }
 
-export const ArgumentDetails: FC<ArgumentDetailsProps> = ({ argumentId }) => {
+export const ArgumentDetails: FC<ArgumentDetailsProps> = ({
+  argumentId,
+  handleClose,
+}) => {
   const { session, isSignedIn } = useAuth();
   const { setIsSignInDialogOpen } = useApp();
   const [argument, setArgument] = useState({} as ArgumentProps);
@@ -90,10 +93,19 @@ export const ArgumentDetails: FC<ArgumentDetailsProps> = ({ argumentId }) => {
               No evidences
             </NoResults>
           ) : (
-            map(argument.evidences, ({ id, name, url }) => (
-              <a href={url} target="_blank" rel="noreferrer">
-                <Chip key={id} label={name} />
-              </a>
+            map(argument.evidences, ({ id, name }) => (
+              <Chip
+                key={id}
+                label={name}
+                onClick={() => {
+                  setTimeout(() => {
+                    document
+                      .getElementById(`knowledge-bit-${id}`)
+                      ?.scrollIntoView({ behavior: "smooth", block: "center" });
+                  }, 0);
+                  handleClose();
+                }}
+              />
             ))
           )}
         </Stack>

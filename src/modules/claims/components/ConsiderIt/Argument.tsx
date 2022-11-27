@@ -1,5 +1,12 @@
 import { DragEvent, FC, MouseEvent, useRef, useState } from "react";
-import { Button, Paper, Popover, Stack, Typography } from "@mui/material";
+import {
+  Button,
+  Drawer,
+  Paper,
+  Popover,
+  Stack,
+  Typography,
+} from "@mui/material";
 
 import { Avatar } from "modules/users/components/Avatar";
 import { formatDate } from "common/utils/format";
@@ -95,6 +102,21 @@ export const Argument: FC<ArgumentCompProps> = ({
         </Stack>
       </Paper>
 
+      <Drawer
+        anchor="right"
+        open={showDetails}
+        onClose={handleCloseDetails}
+        PaperProps={{
+          sx: { width: { xs: "90%", md: 450 } },
+        }}
+      >
+        <ArgumentDetails
+          argumentId={get(argument, "id")}
+          handleClose={handleCloseDetails}
+        />
+      </Drawer>
+
+      {/* 
       <Popover
         open={showDetails}
         anchorEl={detailsAnchor.current}
@@ -120,7 +142,7 @@ export const Argument: FC<ArgumentCompProps> = ({
         disableScrollLock
       >
         <ArgumentDetails argumentId={get(argument, "id")} />
-      </Popover>
+      </Popover> */}
 
       {placement === ArgumentPlacements.OPINION ? null : (
         <div className={styles.argument__referrers}>
