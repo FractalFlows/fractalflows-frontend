@@ -241,7 +241,9 @@ export const ArgumentUpsertForm: FC<ArgumentUpsertFormProps> = ({
         if (operation === UpsertFormOperation.CREATE) {
           const mintArgumentNFTTx = await mintArgumentNFT({
             metadataURI,
-            knowledgeBitIds: [],
+            knowledgeBitIds: data.evidences?.map(
+              ({ nftTokenId }) => nftTokenId
+            ),
             claimTokenId: claim.nftTokenId,
           });
 
@@ -281,43 +283,39 @@ export const ArgumentUpsertForm: FC<ArgumentUpsertFormProps> = ({
             nftTokenId: tokenId,
           });
         } else {
-          const updateKnowledgeBitNFTMetadataTx =
-            await updateArgumentNFTMetadata({
-              metadataURI,
-              nftTokenId: knowledgeBit?.nftTokenId as string,
-            });
-
-          handleTransactionProgressUpdate([
-            {
-              operation: TransactionStepOperation.SIGN,
-              update: {
-                status: TransactionStepStatus.SUCCESS,
-              },
-            },
-            {
-              operation: TransactionStepOperation.WAIT_ONCHAIN,
-              update: {
-                status: TransactionStepStatus.STARTED,
-                txHash: updateKnowledgeBitNFTMetadataTx.hash,
-              },
-            },
-          ]);
-
-          await updateKnowledgeBitNFTMetadataTx.wait();
-
-          handleTransactionProgressUpdate([
-            {
-              operation: TransactionStepOperation.WAIT_ONCHAIN,
-              update: {
-                status: TransactionStepStatus.SUCCESS,
-              },
-            },
-          ]);
-
-          // await handleIndexKnowledgeBitNFT({
-          //   ...(fileURI ? { fileURI } : {}),
-          //   nftMetadataURI: metadataURI,
-          // });
+          // const updateKnowledgeBitNFTMetadataTx =
+          //   await updateArgumentNFTMetadata({
+          //     metadataURI,
+          //     nftTokenId: knowledgeBit?.nftTokenId as string,
+          //   });
+          // handleTransactionProgressUpdate([
+          //   {
+          //     operation: TransactionStepOperation.SIGN,
+          //     update: {
+          //       status: TransactionStepStatus.SUCCESS,
+          //     },
+          //   },
+          //   {
+          //     operation: TransactionStepOperation.WAIT_ONCHAIN,
+          //     update: {
+          //       status: TransactionStepStatus.STARTED,
+          //       txHash: updateKnowledgeBitNFTMetadataTx.hash,
+          //     },
+          //   },
+          // ]);
+          // await updateKnowledgeBitNFTMetadataTx.wait();
+          // handleTransactionProgressUpdate([
+          //   {
+          //     operation: TransactionStepOperation.WAIT_ONCHAIN,
+          //     update: {
+          //       status: TransactionStepStatus.SUCCESS,
+          //     },
+          //   },
+          // ]);
+          // // await handleIndexKnowledgeBitNFT({
+          // //   ...(fileURI ? { fileURI } : {}),
+          // //   nftMetadataURI: metadataURI,
+          // // });
         }
       } catch (e: any) {
         handleTransactionProgressUpdate([
@@ -372,9 +370,10 @@ export const ArgumentUpsertForm: FC<ArgumentUpsertFormProps> = ({
         argument.side === ArgumentSides.CON
           ? KnowledgeBitSides.REFUTING
           : KnowledgeBitSides.SUPPORTING,
-    }).map(({ id, name }: KnowledgeBitProps) => ({
+    }).map(({ id, name, nftTokenId }: KnowledgeBitProps) => ({
       id,
       label: name,
+      nftTokenId,
     }));
 
     setEvidencesOptions(evidencesOptions);

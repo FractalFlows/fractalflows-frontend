@@ -15,6 +15,8 @@ import {
 } from "common/components/TransactionProgressModal";
 import { findIndex, isEmpty } from "lodash-es";
 import { useClaims } from "modules/claims/hooks/useClaims";
+import { getGatewayFromIPFSURI } from "common/utils/ipfs";
+import { Link } from "common/components/Link";
 
 export const Opine: FC = () => {
   const {
@@ -49,23 +51,6 @@ export const Opine: FC = () => {
   const handleDragLeave = () => {
     setIsDraggingOver(false);
   };
-  // const handleSaveOpinion = async () => {
-  //   setIsSavingOpinion(true);
-
-  //   try {
-  //     await saveOpinion({ opinion: userOpinion });
-  //     enqueueSnackbar("Your opinion has been succesfully saved!", {
-  //       variant: "success",
-  //     });
-  //     setIsOpining(false);
-  //   } catch (e: any) {
-  //     enqueueSnackbar(e?.message, {
-  //       variant: "error",
-  //     });
-  //   } finally {
-  //     setIsSavingOpinion(false);
-  //   }
-  // };
 
   const handleTransactionProgressModalClose = () => {
     setIsTransactionProgressModalOpen(false);
@@ -195,11 +180,13 @@ export const Opine: FC = () => {
             nftTokenId,
           });
         } else {
-          const updateKnowledgeBitNFTMetadataTx =
-            await updateArgumentNFTMetadata({
-              metadataURI,
-              nftTokenId: knowledgeBit?.nftTokenId as string,
-            });
+          const updateOpinionNFTMetadataTx = await updateOpinionNFTMetadata({
+            metadataURI,
+            argumentTokenIds: userOpinion.arguments.map(
+              ({ nftTokenId }) => nftTokenId
+            ),
+            nftTokenId: userOpinion?.nftTokenId as string,
+          });
 
           handleTransactionProgressUpdate([
             {
@@ -212,12 +199,12 @@ export const Opine: FC = () => {
               operation: TransactionStepOperation.WAIT_ONCHAIN,
               update: {
                 status: TransactionStepStatus.STARTED,
-                txHash: updateKnowledgeBitNFTMetadataTx.hash,
+                txHash: updateOpinionNFTMetadataTx.hash,
               },
             },
           ]);
 
-          await updateKnowledgeBitNFTMetadataTx.wait();
+          await updateOpinionNFTMetadataTx.wait();
 
           handleTransactionProgressUpdate([
             {
@@ -228,10 +215,9 @@ export const Opine: FC = () => {
             },
           ]);
 
-          // await handleIndexKnowledgeBitNFT({
-          //   ...(fileURI ? { fileURI } : {}),
-          //   nftMetadataURI: metadataURI,
-          // });
+          await handleIndexOpinionNFT({
+            nftMetadataURI: metadataURI,
+          });
         }
       } catch (e: any) {
         setIsSavingOpinion(false);
@@ -311,6 +297,32 @@ export const Opine: FC = () => {
             <OpineColumn side={ArgumentSides.PRO} />
           </div>
         </Paper>
+
+        {isEmpty(userOpinion.nftTokenId) ? null : (
+          <Stack spacing={3} direction="row" justifyContent="center">
+            <Typography variant="body2">
+              Token ID:&nbsp;
+              <Link
+                href={`${process.env.NEXT_PUBLIC_ETH_EXPLORER_URL}/token/${process.env.NEXT_PUBLIC_OPINION_CONTRACT_ADDRESS}?a=${userOpinion?.nftTokenId}`}
+                text
+                blank
+              >
+                {userOpinion?.nftTokenId}
+              </Link>
+            </Typography>
+            <Typography variant="body2">
+              Metadata:&nbsp;
+              <Link
+                href={getGatewayFromIPFSURI(userOpinion?.nftMetadataURI)}
+                text
+                blank
+              >
+                IPFS
+              </Link>
+            </Typography>
+          </Stack>
+        )}
+
         <LoadingButton
           loading={isSavingOpinion}
           variant="contained"

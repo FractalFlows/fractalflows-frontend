@@ -113,6 +113,7 @@ export const USER_OPINION_FIELDS = gql`
       comments {
         id
       }
+      nftTokenId
     }
     user {
       username
@@ -121,5 +122,7 @@ export const USER_OPINION_FIELDS = gql`
     claim {
       id
     }
+    nftTokenId
+    nftMetadataURI
   }
 `;

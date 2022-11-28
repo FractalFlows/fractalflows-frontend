@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Button, Stack, Typography } from "@mui/material";
+import { Button, Divider, Stack, Typography } from "@mui/material";
 
 import { ArgumentSides, OpinionProps } from "modules/claims/interfaces";
 import { ArgumentColumn } from "./ArgumentColumn";
@@ -34,13 +34,14 @@ export const Opinion = () => {
 
   return (
     <Stack spacing={5}>
-      <Stack spacing={3}>
+      <Stack spacing={2}>
         <Typography variant="h4" align="center" title={opinion?.user?.username}>
           <span style={{ maxWidth: 250, display: "inline-flex" }}>
             <b className="text-overflow-ellipsis">{opinion?.user?.username}</b>
           </span>
           &apos;s opinion
         </Typography>
+        <Divider />
         <Stack spacing={3} direction="row" justifyContent="center">
           <Typography variant="body2">
             Token ID:&nbsp;
@@ -63,6 +64,7 @@ export const Opinion = () => {
             </Link>
           </Typography>
         </Stack>
+        <Divider />
       </Stack>
 
       <Stack direction={{ xs: "column", md: "row" }} spacing={5}>
