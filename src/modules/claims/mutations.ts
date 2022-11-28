@@ -78,6 +78,7 @@ export const CREATE_ARGUMENT = gql`
       comments {
         id
       }
+      nftTokenId
     }
   }
 `;

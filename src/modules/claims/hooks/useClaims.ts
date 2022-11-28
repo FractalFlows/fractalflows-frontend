@@ -13,6 +13,7 @@ import { ClaimProps } from "../interfaces";
 import { apolloClient } from "common/services/apollo/client";
 import { AuthCache } from "modules/auth/cache";
 import ClaimContractABI from "../../../../artifacts/contracts/Claim.sol/Claim.json";
+import { generateNFTId } from "common/utils/nfts";
 
 const saveClaimOnIPFS = async ({ claim }: { claim: Partial<ClaimProps> }) => {
   return await ClaimsService.saveClaimOnIPFS({ claim });
@@ -28,7 +29,7 @@ export const mintClaimNFT = async ({
     chainId: Number(process.env.NEXT_PUBLIC_NETWORK_ID),
     abi: ClaimContractABI.abi,
     functionName: "mintToken",
-    args: [metadataURI.replace(/^ipfs:\/\//, "")],
+    args: [metadataURI.replace(/^ipfs:\/\//, ""), generateNFTId()],
   });
 
   return mintClaimNFTTx;
@@ -50,6 +51,22 @@ export const updateClaimNFTMetadata = async ({
   });
 
   return updateClaimNFTMetadataTx;
+};
+
+export const getClaimNFTFractionalizationContractOf = async ({
+  nftTokenId,
+}: {
+  nftTokenId: string;
+}): Promise<string> => {
+  const fractionalizationContract = await ContractCtrl.read({
+    address: process.env.NEXT_PUBLIC_CLAIM_CONTRACT_ADDRESS as string,
+    chainId: Number(process.env.NEXT_PUBLIC_NETWORK_ID),
+    abi: ClaimContractABI.abi,
+    functionName: "fractionalizationContractOf",
+    args: [nftTokenId],
+  });
+
+  return fractionalizationContract;
 };
 
 export const createClaim = async ({ claim }: { claim: ClaimProps }) =>
@@ -174,6 +191,7 @@ export const useClaims = () => {
     saveClaimOnIPFS,
     mintClaimNFT,
     updateClaimNFTMetadata,
+    getClaimNFTFractionalizationContractOf,
     updateClaim,
     deleteClaim,
     disableClaim,

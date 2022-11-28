@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { Fragment, useEffect, useState } from "react";
 import {
   Box,
   Button,
@@ -36,6 +36,25 @@ export interface TransactionStep {
   retry?: () => any;
 }
 
+export const DEFAULT_NFT_MINT_TRANSACTION_STEPS = [
+  {
+    status: TransactionStepStatus.STARTED,
+    operation: TransactionStepOperation.UPLOAD,
+  },
+  {
+    status: TransactionStepStatus.UNSTARTED,
+    operation: TransactionStepOperation.SIGN,
+  },
+  {
+    status: TransactionStepStatus.UNSTARTED,
+    operation: TransactionStepOperation.WAIT_ONCHAIN,
+  },
+  {
+    status: TransactionStepStatus.UNSTARTED,
+    operation: TransactionStepOperation.INDEX,
+  },
+];
+
 export const TransactionProgressModal = ({
   open = false,
   subject = "",
@@ -64,33 +83,6 @@ export const TransactionProgressModal = ({
     handleDialogClose();
     onComplete();
   };
-
-  //   const handleEthereumSignIn = async (values?: WalletNoticeFormProps) => {
-  //     handleSignInDialogClose();
-
-  //     if (values?.dontShowNoticeAgain) {
-  //       localStorage.setItem("dontShowNewToWalletNoticeAgain", "true");
-  //     }
-
-  //     try {
-  //       await signInWithEthereum(signInCallback);
-  //     } catch (e) {
-  //       enqueueSnackbar(e?.message || e, {
-  //         variant: "error",
-  //       });
-  //     }
-  //   };
-
-  //   useEffect(() => {
-  //     if (
-  //       isSignInDialogOpen &&
-  //       localStorage.getItem("dontShowNewToWalletNoticeAgain") === "true"
-  //     ) {
-  //       handleEthereumSignIn();
-  //     } else {
-  //       _setIsSignInDialogOpen(isSignInDialogOpen);
-  //     }
-  //   }, [isSignInDialogOpen]);
 
   const getStepStatusIcon = (status: TransactionStepStatus) => {
     const iconSize = 15;
@@ -176,13 +168,8 @@ export const TransactionProgressModal = ({
               }}
             >
               {steps.map(({ status, operation, error, txHash, retry }, i) => (
-                <>
-                  <Stack
-                    key={operation}
-                    direction="row"
-                    alignItems="center"
-                    spacing={1}
-                  >
+                <Fragment key={operation}>
+                  <Stack direction="row" alignItems="center" spacing={1}>
                     {getStepStatusIcon(status)}
                     <Stack spacing={1} sx={{ alignItems: "flex-start" }}>
                       <Typography>{operation}</Typography>
@@ -219,7 +206,7 @@ export const TransactionProgressModal = ({
                     </Stack>
                   </Stack>
                   {i === steps.length - 1 ? null : (
-                    <Stack key={`${operation}-divider`}>
+                    <Stack>
                       <Box
                         sx={{
                           bgcolor: grey[200],
@@ -231,7 +218,7 @@ export const TransactionProgressModal = ({
                       />
                     </Stack>
                   )}
-                </>
+                </Fragment>
               ))}
               <Button
                 sx={{ marginTop: 4 }}

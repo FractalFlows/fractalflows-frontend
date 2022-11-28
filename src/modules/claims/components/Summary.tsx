@@ -419,7 +419,7 @@ export const ClaimSummary: FC = (props) => {
           <Typography variant="body1">
             Fractionalization Contract:&nbsp;
             <Link
-              href={`${process.env.NEXT_PUBLIC_ETH_EXPLORER_URL}/address/${claim?.nftFractionalizationContractAddress}`}
+              href={`${process.env.NEXT_PUBLIC_ETH_EXPLORER_URL}/token/${claim?.nftFractionalizationContractAddress}`}
               text
               blank
               maxWidth={120}

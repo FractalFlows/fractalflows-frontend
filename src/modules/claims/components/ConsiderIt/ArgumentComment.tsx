@@ -84,7 +84,7 @@ export const ArgumentComment: FC<ArgumentCommentComponentProps> = ({
           <Typography variant="body1">
             {get(argumentComment, "content")}
           </Typography>
-          {canManageArgumentComment(get(argumentComment, "user.id")) ? (
+          {/* {canManageArgumentComment(get(argumentComment, "user.id")) ? (
             <Stack direction="row" spacing={2}>
               <Button
                 size="small"
@@ -104,8 +104,8 @@ export const ArgumentComment: FC<ArgumentCommentComponentProps> = ({
               >
                 Remove
               </Button>
-            </Stack>
-          ) : null}
+            </Stack> 
+          ) : null}*/}
         </>
       )}
       <Dialog

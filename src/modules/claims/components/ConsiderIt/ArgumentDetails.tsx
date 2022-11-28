@@ -1,5 +1,5 @@
 import { FC, useEffect, useState } from "react";
-import { Button, Chip, Stack, Typography } from "@mui/material";
+import { Button, Chip, Divider, Stack, Typography } from "@mui/material";
 import {
   compact,
   concat,
@@ -8,6 +8,7 @@ import {
   get,
   isEmpty,
   map,
+  pick,
   sortBy,
 } from "lodash-es";
 
@@ -23,12 +24,17 @@ import { UpsertFormOperation } from "common/interfaces";
 import { ArgumentCommentProps } from "modules/argument-comments/interfaces";
 import { ArgumentComment } from "./ArgumentComment";
 import { useApp } from "modules/app/useApp";
+import { Link } from "common/components/Link";
+import { getGatewayFromIPFSURI } from "common/utils/ipfs";
 
 interface ArgumentDetailsProps {
   argumentId: string;
 }
 
-export const ArgumentDetails: FC<ArgumentDetailsProps> = ({ argumentId }) => {
+export const ArgumentDetails: FC<ArgumentDetailsProps> = ({
+  argumentId,
+  handleClose,
+}) => {
   const { session, isSignedIn } = useAuth();
   const { setIsSignInDialogOpen } = useApp();
   const [argument, setArgument] = useState({} as ArgumentProps);
@@ -81,7 +87,37 @@ export const ArgumentDetails: FC<ArgumentDetailsProps> = ({ argumentId }) => {
 
   return (
     <Stack spacing={3} sx={{ p: 3 }}>
-      <Stack spacing={1}>
+      <Stack spacing={2}>
+        <Typography variant="h4">Argument</Typography>
+        <Typography variant="body1">{argument.summary}</Typography>
+
+        <Divider />
+
+        <Stack spacing={3} direction="row">
+          <Typography variant="body2">
+            Token ID:&nbsp;
+            <Link
+              href={`${process.env.NEXT_PUBLIC_ETH_EXPLORER_URL}/token/${process.env.NEXT_PUBLIC_ARGUMENT_CONTRACT_ADDRESS}?a=${argument?.nftTokenId}`}
+              text
+              blank
+            >
+              {argument?.nftTokenId}
+            </Link>
+          </Typography>
+          <Typography variant="body2">
+            Metadata:&nbsp;
+            <Link
+              href={getGatewayFromIPFSURI(argument?.nftMetadataURI)}
+              text
+              blank
+            >
+              IPFS
+            </Link>
+          </Typography>
+        </Stack>
+
+        <Divider />
+
         <Typography variant="h6">Evidences</Typography>
 
         <Stack direction="row" spacing={1}>
@@ -90,14 +126,26 @@ export const ArgumentDetails: FC<ArgumentDetailsProps> = ({ argumentId }) => {
               No evidences
             </NoResults>
           ) : (
-            map(argument.evidences, ({ id, name, url }) => (
-              <a href={url} target="_blank" rel="noreferrer">
-                <Chip key={id} label={name} />
-              </a>
+            map(argument.evidences, ({ id, name }) => (
+              <Chip
+                key={id}
+                label={name}
+                onClick={() => {
+                  setTimeout(() => {
+                    document
+                      .getElementById(`knowledge-bit-${id}`)
+                      ?.scrollIntoView({ behavior: "smooth", block: "center" });
+                  }, 0);
+                  handleClose();
+                }}
+              />
             ))
           )}
         </Stack>
       </Stack>
+
+      <Divider />
+
       <Stack spacing={2}>
         <Typography variant="h6">Discuss this point</Typography>
         <Stack spacing={3}>
@@ -113,7 +161,9 @@ export const ArgumentDetails: FC<ArgumentDetailsProps> = ({ argumentId }) => {
             <Stack spacing={2} sx={{ width: "100%" }}>
               <AvatarWithUsername user={session.user} size={30} />
               <ArgumentCommentUpsertForm
-                argumentComment={{ argument: { id: get(argument, "id") } }}
+                argumentComment={{
+                  argument: pick(argument, ["id", "nftTokenId"]),
+                }}
                 handleSuccess={handleAddArgumentCommentSuccess}
                 operation={UpsertFormOperation.CREATE}
               />

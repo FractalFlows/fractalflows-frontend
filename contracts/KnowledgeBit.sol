@@ -3,21 +3,18 @@
 pragma solidity ^0.8.9;
 
 import "@openzeppelin/contracts/token/ERC721/extensions/ERC721URIStorage.sol";
-import "@openzeppelin/contracts/utils/Counters.sol";
 
 interface Claim {
-  function addKnowledgeBit(uint, uint) external;
+  function addKnowledgeBit(uint, uint, address) external;
 }
 
 contract KnowledgeBit is ERC721URIStorage {
-  using Counters for Counters.Counter;
-  Counters.Counter private _tokenIds;
-
   event Upvote(uint, address);
   event Downvote(uint, address);
   event Unvote(uint, address);
 
   mapping(uint => mapping(address => int)) private _votes;
+  mapping(uint => mapping(address => bool)) private _hasOnceVoted;
   mapping(uint => uint) private _downvotesCount;
   mapping(uint => uint) private _upvotesCount;
 
@@ -31,17 +28,11 @@ contract KnowledgeBit is ERC721URIStorage {
     return "ipfs://";
   }
 
-  function mintToken (string memory metadataURI, uint claimTokenId) public returns (uint) {
-    uint newTokenId = _tokenIds.current();
-
-    _safeMint(msg.sender, newTokenId);
-    _setTokenURI(newTokenId, metadataURI);
-
-    _tokenIds.increment();
+  function mintToken (string memory metadataURI, uint tokenId, uint claimTokenId) public {
+    _safeMint(msg.sender, tokenId);
+    _setTokenURI(tokenId, metadataURI);
     
-    Claim(_claimContractAddress).addKnowledgeBit(claimTokenId, newTokenId);
-
-    return newTokenId;
+    Claim(_claimContractAddress).addKnowledgeBit(claimTokenId, tokenId, msg.sender);
   }
 
   function setTokenURI(uint tokenId, string memory metadataURI) public {
@@ -49,27 +40,37 @@ contract KnowledgeBit is ERC721URIStorage {
   }
 
   function upvote (uint tokenId) public {
-    require(_votes[tokenId][msg.sender] != 1, "You have already upvoted this knowledge bit.");
+    require(_votes[tokenId][msg.sender] != 1, "You have already upvoted this knowledge bit");
 
     if (_votes[tokenId][msg.sender] == -1) {
       _downvotesCount[tokenId] -= 1;
     }
 
-    _votes[tokenId][msg.sender] = 1; 
+    _votes[tokenId][msg.sender] = 1;
     _upvotesCount[tokenId] += 1;
+
+    // if (_hasOnceVoted[tokenId][msg.sender] == false) {
+    //   Claim(_claimContractAddress).addKnowledgeBitVoteReward(claimTokenId, msg.sender);
+    //   _hasOnceVoted[tokenId][msg.sender] = true;
+    // }
 
     emit Upvote(tokenId, msg.sender);
   }
 
   function downvote (uint tokenId) public {
-    require(_votes[tokenId][msg.sender] != -1, "You have already downvoted this knowledge bit.");
+    require(_votes[tokenId][msg.sender] != -1, "You have already downvoted this knowledge bit");
 
     if (_votes[tokenId][msg.sender] == 1) {
       _upvotesCount[tokenId] -= 1;
     }
 
-    _votes[tokenId][msg.sender] = -1; 
+    _votes[tokenId][msg.sender] = -1;
     _downvotesCount[tokenId] += 1;
+
+    // if (_hasOnceVoted[tokenId][msg.sender] == false) {
+    //   Claim(_claimContractAddress).addKnowledgeBitVote(claimTokenId, msg.sender);
+    //   _hasOnceVoted[tokenId][msg.sender] = true;
+    // }
 
     emit Downvote(tokenId, msg.sender);
   }
@@ -92,5 +93,10 @@ contract KnowledgeBit is ERC721URIStorage {
 
   function downvotesCountOf(uint tokenId) public view virtual returns (uint) {
     return _downvotesCount[tokenId];
+  }
+
+  function _beforeTokenTransfer(address from, address to, uint256 tokenId) internal override virtual {
+    require(from == address(0), "Token transfer is blocked");   
+    super._beforeTokenTransfer(from, to, tokenId);  
   }
 }

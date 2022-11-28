@@ -23,7 +23,6 @@ import {
   GET_ARGUMENTS,
   GET_OPINION,
   GET_USER_OPINION,
-  GET_ARGUMENT,
   SEARCH_CLAIMS,
   GET_USER_CLAIMS,
   GET_USER_CONTRIBUTED_CLAIMS,
@@ -44,7 +43,7 @@ import type {
 } from "../interfaces";
 import type { PaginationProps } from "modules/interfaces";
 import { gql } from "@apollo/client";
-import { KNOWLEDGE_BIT_FIELDS } from "../fragments";
+import { CORE_ARGUMENT_FIELDS, KNOWLEDGE_BIT_FIELDS } from "../fragments";
 
 export const ClaimsService = {
   async getClaim({
@@ -519,6 +518,25 @@ export const ClaimsService = {
     return data.saveKnowledgeBitVote;
   },
 
+  async saveArgumentOnIPFS({
+    argument,
+  }: {
+    argument: ArgumentProps;
+  }): Promise<string> {
+    const { data } = await apolloClient.mutate({
+      mutation: gql`
+        mutation SaveArgumentOnIPFS($saveArgumentOnIPFSInput: ArgumentInput!) {
+          saveArgumentOnIPFS(saveArgumentOnIPFSInput: $saveArgumentOnIPFSInput)
+        }
+      `,
+      variables: {
+        saveArgumentOnIPFSInput: argument,
+      },
+    });
+
+    return data.saveArgumentOnIPFS;
+  },
+
   async createArgument({
     claimSlug,
     argument,
@@ -554,13 +572,61 @@ export const ClaimsService = {
 
   async getArgument({ id }: { id: string }): Promise<ArgumentProps> {
     const { data } = await apolloClient.query({
-      query: GET_ARGUMENT,
+      query: gql`
+        ${CORE_ARGUMENT_FIELDS}
+
+        query GetArgument($id: String!) {
+          argument(id: $id) {
+            ...CoreArgumentFields
+
+            evidences {
+              id
+              name
+            }
+            comments {
+              id
+              content
+              createdAt
+              user {
+                id
+                username
+                avatar
+              }
+              argument {
+                id
+                nftTokenId
+              }
+            }
+          }
+        }
+      `,
       variables: {
         id,
       },
     });
 
     return data.argument;
+  },
+
+  async saveOpinionOnIPFS({
+    opinion,
+  }: {
+    opinion: Partial<OpinionProps>;
+  }): Promise<string> {
+    const { data } = await apolloClient.mutate({
+      mutation: gql`
+        mutation SaveOpinionOnIPFS(
+          $saveOpinionOnIPFSInput: SaveOpinionOnIPFSInput!
+        ) {
+          saveOpinionOnIPFS(saveOpinionOnIPFSInput: $saveOpinionOnIPFSInput)
+        }
+      `,
+      variables: {
+        saveOpinionOnIPFSInput: opinion,
+      },
+    });
+
+    return data.saveOpinionOnIPFS;
   },
 
   async getOpinion({ id }: { id: string }): Promise<OpinionProps> {

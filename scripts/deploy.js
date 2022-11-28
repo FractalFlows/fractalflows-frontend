@@ -3,7 +3,6 @@ async function main() {
     "contracts/Claim.sol:Claim"
   );
   const ClaimContract = await ClaimContractFactory.deploy();
-
   await ClaimContract.deployed();
 
   console.log("Deployed Claim contract to:", ClaimContract.address);
@@ -14,13 +13,32 @@ async function main() {
   const KnowledgeBitContract = await KnowledgeBitContractFactory.deploy(
     ClaimContract.address
   );
-
   await KnowledgeBitContract.deployed();
 
   console.log(
     "Deployed Knowledge Bit contract to:",
     KnowledgeBitContract.address
   );
+
+  const ArgumentContractFactory = await hre.ethers.getContractFactory(
+    "contracts/Argument.sol:Argument"
+  );
+  const ArgumentContract = await ArgumentContractFactory.deploy(
+    ClaimContract.address
+  );
+  await ArgumentContract.deployed();
+
+  console.log("Deployed Argument contract to:", ArgumentContract.address);
+
+  const OpinionContractFactory = await hre.ethers.getContractFactory(
+    "contracts/Opinion.sol:Opinion"
+  );
+  const OpinionContract = await OpinionContractFactory.deploy(
+    ClaimContract.address
+  );
+  await OpinionContract.deployed();
+
+  console.log("Deployed Opinion contract to:", OpinionContract.address);
 }
 
 main()
