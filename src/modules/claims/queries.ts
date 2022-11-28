@@ -40,6 +40,7 @@ export const GET_CLAIM = gql`
             avatar
           }
         }
+        nftTokenId
       }
       followers {
         id

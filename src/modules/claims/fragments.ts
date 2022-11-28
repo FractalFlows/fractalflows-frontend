@@ -96,6 +96,8 @@ export const OPINION_FIELDS = gql`
         }
       }
     }
+    nftTokenId
+    nftMetadataURI
   }
 `;
 

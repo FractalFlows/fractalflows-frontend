@@ -158,4 +158,7 @@ export interface OpinionProps {
   arguments: ArgumentProps[];
   user: UserProps;
   claim: Partial<ClaimProps>;
+  nftTokenId: string;
+  nftTxHash: string;
+  nftMetadataURI: string;
 }

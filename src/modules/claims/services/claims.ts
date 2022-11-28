@@ -609,6 +609,27 @@ export const ClaimsService = {
     return data.argument;
   },
 
+  async saveOpinionOnIPFS({
+    opinion,
+  }: {
+    opinion: Partial<OpinionProps>;
+  }): Promise<string> {
+    const { data } = await apolloClient.mutate({
+      mutation: gql`
+        mutation SaveOpinionOnIPFS(
+          $saveOpinionOnIPFSInput: SaveOpinionOnIPFSInput!
+        ) {
+          saveOpinionOnIPFS(saveOpinionOnIPFSInput: $saveOpinionOnIPFSInput)
+        }
+      `,
+      variables: {
+        saveOpinionOnIPFSInput: opinion,
+      },
+    });
+
+    return data.saveOpinionOnIPFS;
+  },
+
   async getOpinion({ id }: { id: string }): Promise<OpinionProps> {
     const { data } = await apolloClient.query({
       query: GET_OPINION,

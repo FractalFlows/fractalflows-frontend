@@ -36,6 +36,25 @@ export interface TransactionStep {
   retry?: () => any;
 }
 
+export const DEFAULT_NFT_MINT_TRANSACTION_STEPS = [
+  {
+    status: TransactionStepStatus.STARTED,
+    operation: TransactionStepOperation.UPLOAD,
+  },
+  {
+    status: TransactionStepStatus.UNSTARTED,
+    operation: TransactionStepOperation.SIGN,
+  },
+  {
+    status: TransactionStepStatus.UNSTARTED,
+    operation: TransactionStepOperation.WAIT_ONCHAIN,
+  },
+  {
+    status: TransactionStepStatus.UNSTARTED,
+    operation: TransactionStepOperation.INDEX,
+  },
+];
+
 export const TransactionProgressModal = ({
   open = false,
   subject = "",

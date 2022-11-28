@@ -24,6 +24,7 @@ import { useArguments } from "modules/claims/hooks/useArguments";
 import { useKnowledgeBits } from "modules/claims/hooks/useKnowledgeBits";
 import { useOpinions } from "modules/claims/hooks/useOpinions";
 import {
+  DEFAULT_NFT_MINT_TRANSACTION_STEPS,
   TransactionProgressModal,
   TransactionStep,
   TransactionStepOperation,
@@ -58,25 +59,6 @@ interface ArgumentUpsertFormProps {
   operation: UpsertFormOperation;
 }
 
-const DEFAULT_KNOWLEDGE_BIT_NFT_MINT_TRANSACTION_STEPS = [
-  {
-    status: TransactionStepStatus.STARTED,
-    operation: TransactionStepOperation.UPLOAD,
-  },
-  {
-    status: TransactionStepStatus.UNSTARTED,
-    operation: TransactionStepOperation.SIGN,
-  },
-  {
-    status: TransactionStepStatus.UNSTARTED,
-    operation: TransactionStepOperation.WAIT_ONCHAIN,
-  },
-  {
-    status: TransactionStepStatus.UNSTARTED,
-    operation: TransactionStepOperation.INDEX,
-  },
-];
-
 export const ArgumentUpsertForm: FC<ArgumentUpsertFormProps> = ({
   argument,
   operation,
@@ -100,7 +82,7 @@ export const ArgumentUpsertForm: FC<ArgumentUpsertFormProps> = ({
   const [isTransactionProgressModalOpen, setIsTransactionProgressModalOpen] =
     useState(false);
   const [transactionProgressModalSteps, setTransactionProgressModalSteps] =
-    useState(DEFAULT_KNOWLEDGE_BIT_NFT_MINT_TRANSACTION_STEPS);
+    useState(DEFAULT_NFT_MINT_TRANSACTION_STEPS);
   const transactionProgressModalStepsRef = useRef<TransactionStep[]>([]);
   const {
     control,
@@ -352,9 +334,7 @@ export const ArgumentUpsertForm: FC<ArgumentUpsertFormProps> = ({
     };
 
     const handleSaveArgumentOnIPFS = async (data: KnowledgeBitProps) => {
-      setTransactionProgressModalSteps(
-        DEFAULT_KNOWLEDGE_BIT_NFT_MINT_TRANSACTION_STEPS
-      );
+      setTransactionProgressModalSteps(DEFAULT_NFT_MINT_TRANSACTION_STEPS);
       setIsTransactionProgressModalOpen(true);
 
       try {

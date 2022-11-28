@@ -1,4 +1,4 @@
-import { DragEvent, FC, SyntheticEvent, useState } from "react";
+import { DragEvent, FC, SyntheticEvent, useRef, useState } from "react";
 import { Box, Button, Paper, Stack, Typography } from "@mui/material";
 
 import { ArgumentSides } from "modules/claims/interfaces";
@@ -6,14 +6,34 @@ import { OpineColumn } from "./OpineColumn";
 import styles from "./Opine.module.css";
 import { useOpinions } from "modules/claims/hooks/useOpinions";
 import { LoadingButton } from "@mui/lab";
-import { useSnackbar } from "notistack";
+import {
+  DEFAULT_NFT_MINT_TRANSACTION_STEPS,
+  TransactionProgressModal,
+  TransactionStep,
+  TransactionStepOperation,
+  TransactionStepStatus,
+} from "common/components/TransactionProgressModal";
+import { findIndex, isEmpty } from "lodash-es";
+import { useClaims } from "modules/claims/hooks/useClaims";
 
 export const Opine: FC = () => {
-  const { setIsOpining, userOpinion, addArgumentToOpinion, saveOpinion } =
-    useOpinions();
+  const {
+    setIsOpining,
+    userOpinion,
+    addArgumentToOpinion,
+    saveOpinion,
+    saveOpinionOnIPFS,
+    mintOpinionNFT,
+    updateOpinionNFTMetadata,
+  } = useOpinions();
+  const { claim } = useClaims();
   const [isSavingOpinion, setIsSavingOpinion] = useState(false);
   const [isDraggingOver, setIsDraggingOver] = useState(false);
-  const { enqueueSnackbar } = useSnackbar();
+  const [isTransactionProgressModalOpen, setIsTransactionProgressModalOpen] =
+    useState(false);
+  const [transactionProgressModalSteps, setTransactionProgressModalSteps] =
+    useState(DEFAULT_NFT_MINT_TRANSACTION_STEPS);
+  const transactionProgressModalStepsRef = useRef<TransactionStep[]>([]);
 
   const handleDrop = (event: DragEvent) => {
     setIsDraggingOver(false);
@@ -29,22 +49,238 @@ export const Opine: FC = () => {
   const handleDragLeave = () => {
     setIsDraggingOver(false);
   };
+  // const handleSaveOpinion = async () => {
+  //   setIsSavingOpinion(true);
+
+  //   try {
+  //     await saveOpinion({ opinion: userOpinion });
+  //     enqueueSnackbar("Your opinion has been succesfully saved!", {
+  //       variant: "success",
+  //     });
+  //     setIsOpining(false);
+  //   } catch (e: any) {
+  //     enqueueSnackbar(e?.message, {
+  //       variant: "error",
+  //     });
+  //   } finally {
+  //     setIsSavingOpinion(false);
+  //   }
+  // };
+
+  const handleTransactionProgressModalClose = () => {
+    setIsTransactionProgressModalOpen(false);
+    setIsSavingOpinion(false);
+  };
+
+  const handleTransactionProgressModalComplete = () => {
+    setIsSavingOpinion(false);
+    setIsOpining(false);
+  };
+
+  transactionProgressModalStepsRef.current = transactionProgressModalSteps;
+
+  const handleTransactionProgressUpdate = (
+    updates: {
+      operation: TransactionStepOperation;
+      update: Partial<TransactionStep>;
+    }[] = []
+  ) => {
+    const updatedTransactionProgressModalSteps = [
+      ...transactionProgressModalStepsRef.current,
+    ];
+
+    updates.map(({ operation, update = {} }) => {
+      const stepIndex = findIndex(updatedTransactionProgressModalSteps, {
+        operation,
+      });
+
+      updatedTransactionProgressModalSteps[stepIndex] = {
+        ...updatedTransactionProgressModalSteps[stepIndex],
+        ...update,
+      };
+    });
+
+    setTransactionProgressModalSteps(updatedTransactionProgressModalSteps);
+  };
+
   const handleSaveOpinion = async () => {
     setIsSavingOpinion(true);
 
-    try {
-      await saveOpinion({ opinion: userOpinion });
-      enqueueSnackbar("Your opinion has been succesfully saved!", {
-        variant: "success",
-      });
-      setIsOpining(false);
-    } catch (e: any) {
-      enqueueSnackbar(e?.message, {
-        variant: "error",
-      });
-    } finally {
-      setIsSavingOpinion(false);
-    }
+    const handleIndexOpinionNFT = async (transactionData: {
+      nftMetadataURI: string;
+      nftTxHash?: string;
+      nftTokenId?: string;
+    }) => {
+      handleTransactionProgressUpdate([
+        {
+          operation: TransactionStepOperation.INDEX,
+          update: { status: TransactionStepStatus.STARTED },
+        },
+      ]);
+
+      try {
+        await saveOpinion({ opinion: { ...userOpinion, ...transactionData } });
+
+        handleTransactionProgressUpdate([
+          {
+            operation: TransactionStepOperation.INDEX,
+            update: { status: TransactionStepStatus.SUCCESS },
+          },
+        ]);
+      } catch (e: any) {
+        handleTransactionProgressUpdate([
+          {
+            operation: TransactionStepOperation.INDEX,
+            update: { status: TransactionStepStatus.ERROR, error: e.message },
+          },
+        ]);
+      }
+    };
+
+    const handleMintOpinionNFT = async ({
+      metadataURI,
+    }: {
+      metadataURI: string;
+    }) => {
+      handleTransactionProgressUpdate([
+        {
+          operation: TransactionStepOperation.SIGN,
+          update: { status: TransactionStepStatus.STARTED },
+        },
+      ]);
+
+      try {
+        if (isEmpty(userOpinion.nftTokenId)) {
+          const mintOpinionNFTTx = await mintOpinionNFT({
+            metadataURI,
+            argumentTokenIds: userOpinion.arguments.map(
+              ({ nftTokenId }) => nftTokenId
+            ),
+            claimTokenId: claim.nftTokenId,
+          });
+
+          handleTransactionProgressUpdate([
+            {
+              operation: TransactionStepOperation.SIGN,
+              update: {
+                status: TransactionStepStatus.SUCCESS,
+              },
+            },
+            {
+              operation: TransactionStepOperation.WAIT_ONCHAIN,
+              update: {
+                status: TransactionStepStatus.STARTED,
+                txHash: mintOpinionNFTTx.hash,
+              },
+            },
+          ]);
+
+          const mintOpinionNFTTxReceipt = await mintOpinionNFTTx.wait();
+
+          handleTransactionProgressUpdate([
+            {
+              operation: TransactionStepOperation.WAIT_ONCHAIN,
+              update: {
+                status: TransactionStepStatus.SUCCESS,
+              },
+            },
+          ]);
+
+          const transferEventTopics = mintOpinionNFTTxReceipt.logs[0].topics;
+          const nftTokenId = String(parseInt(transferEventTopics[3]));
+
+          await handleIndexOpinionNFT({
+            nftMetadataURI: metadataURI,
+            nftTxHash: mintOpinionNFTTx.hash,
+            nftTokenId,
+          });
+        } else {
+          const updateKnowledgeBitNFTMetadataTx =
+            await updateArgumentNFTMetadata({
+              metadataURI,
+              nftTokenId: knowledgeBit?.nftTokenId as string,
+            });
+
+          handleTransactionProgressUpdate([
+            {
+              operation: TransactionStepOperation.SIGN,
+              update: {
+                status: TransactionStepStatus.SUCCESS,
+              },
+            },
+            {
+              operation: TransactionStepOperation.WAIT_ONCHAIN,
+              update: {
+                status: TransactionStepStatus.STARTED,
+                txHash: updateKnowledgeBitNFTMetadataTx.hash,
+              },
+            },
+          ]);
+
+          await updateKnowledgeBitNFTMetadataTx.wait();
+
+          handleTransactionProgressUpdate([
+            {
+              operation: TransactionStepOperation.WAIT_ONCHAIN,
+              update: {
+                status: TransactionStepStatus.SUCCESS,
+              },
+            },
+          ]);
+
+          // await handleIndexKnowledgeBitNFT({
+          //   ...(fileURI ? { fileURI } : {}),
+          //   nftMetadataURI: metadataURI,
+          // });
+        }
+      } catch (e: any) {
+        setIsSavingOpinion(false);
+        handleTransactionProgressUpdate([
+          {
+            operation: TransactionStepOperation.SIGN,
+            update: {
+              status: TransactionStepStatus.ERROR,
+              error: e.message,
+              retry: () => handleMintOpinionNFT({ metadataURI }),
+            },
+          },
+        ]);
+      }
+    };
+
+    const handleSaveOpinionOnIPFS = async (data) => {
+      setTransactionProgressModalSteps(DEFAULT_NFT_MINT_TRANSACTION_STEPS);
+      setIsTransactionProgressModalOpen(true);
+
+      try {
+        const saveOpinionOnIPFSResult = await saveOpinionOnIPFS({
+          opinion: {
+            acceptance: userOpinion.acceptance,
+          },
+        });
+
+        handleTransactionProgressUpdate([
+          {
+            operation: TransactionStepOperation.UPLOAD,
+            update: { status: TransactionStepStatus.SUCCESS },
+          },
+        ]);
+
+        await handleMintOpinionNFT({
+          metadataURI: saveOpinionOnIPFSResult,
+        });
+      } catch (e: any) {
+        setIsSavingOpinion(false);
+        handleTransactionProgressUpdate([
+          {
+            operation: TransactionStepOperation.UPLOAD,
+            update: { status: TransactionStepStatus.ERROR, error: e.message },
+          },
+        ]);
+      }
+    };
+
+    await handleSaveOpinionOnIPFS(userOpinion);
   };
 
   return (
@@ -92,6 +328,16 @@ export const Opine: FC = () => {
           Skip to results
         </Button>
       </Stack>
+
+      <TransactionProgressModal
+        subject={`${
+          isEmpty(userOpinion?.nftTokenId) ? "Mint" : "Update"
+        } Opinion NFT`}
+        open={isTransactionProgressModalOpen}
+        steps={transactionProgressModalSteps}
+        onClose={handleTransactionProgressModalClose}
+        onComplete={handleTransactionProgressModalComplete}
+      />
     </Box>
   );
 };
