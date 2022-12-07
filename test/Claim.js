@@ -28,7 +28,12 @@ describe("Claim", function () {
     const claimTokenId = generateNFTId();
     const mintClaimTx = await ClaimContract.mintToken(
       claimMetadataCID,
-      claimTokenId
+      claimTokenId,
+      {
+        tokenURI:
+          "bafyreih36wt6w6bpfuvdabj572gjbqxbd4gb3xihc5tq7rdz6wrcmhtsgi/metadata.json",
+        fee: 1e11,
+      }
     );
     const mintClaimTxReceipt = await mintClaimTx.wait();
     const mintedClaimTokenId = parseInt(mintClaimTxReceipt.events[0].topics[3]);

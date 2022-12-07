@@ -35,25 +35,14 @@ contract Claim is ERC721URIStorage {
   function mintToken(
     string memory metadataURI,
     uint256 tokenId,
-    OceanERC721Factory.NftCreateData memory _NftCreateData,
-    OceanERC721Factory.ErcCreateData memory _ErcCreateData
+    ClaimFractionalizer.OceanListing memory _OceanListing
   ) public {
     _safeMint(msg.sender, tokenId);
     _setTokenURI(tokenId, metadataURI);
 
-    // OceanERC721Factory.NftCreateData memory _NftCreateData = OceanERC721Factory
-    //   .NftCreateData(
-    //     "Fractal Flows Claim Data",
-    //     string(abi.encodePacked("FFCD-", Strings.toString(tokenId))),
-    //     1,
-    //     "",
-    //     false,
-    //     address(0)
-    //   );
-
     ClaimFractionalizer claimFractionalizer = new ClaimFractionalizer(
-      "Fractal Flows Claim Fractionalizer",
-      string(abi.encodePacked("FFCF-", Strings.toString(tokenId)))
+      tokenId,
+      _OceanListing
     );
     _fractionalizationContracts[tokenId] = address(claimFractionalizer);
 
