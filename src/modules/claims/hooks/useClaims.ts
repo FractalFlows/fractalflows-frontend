@@ -2,6 +2,13 @@ import { gql, useQuery } from "@apollo/client";
 import { get } from "lodash-es";
 import { utils as ethersUtils } from "ethers";
 import { ContractCtrl } from "@web3modal/core";
+import {
+  DDO,
+  generateDid,
+  getHash,
+  Metadata,
+  Service,
+} from "@oceanprotocol/lib";
 
 import { getClaim, getPartialClaim, getClaims, getTrendingClaims } from "./get";
 import { updateClaim } from "./update";
@@ -15,6 +22,7 @@ import { apolloClient } from "common/services/apollo/client";
 import { AuthCache } from "modules/auth/cache";
 import ClaimContractABI from "../../../../artifacts/contracts/Claim.sol/Claim.json";
 import { generateNFTId } from "common/utils/nfts";
+import { OceanProtocolService } from "modules/oceanprotocol/services";
 
 const saveClaimOnIPFS = async ({ claim }: { claim: Partial<ClaimProps> }) => {
   return await ClaimsService.saveClaimOnIPFS({ claim });
@@ -38,6 +46,81 @@ export const mintClaimNFT = async ({
   });
 
   return mintClaimNFTTx;
+};
+
+export const constructOceanDDO = async ({
+  values,
+  datatokenAddress,
+  nftAddress,
+}: {
+  values: any;
+  datatokenAddress: string;
+  nftAddress: string;
+}) => {
+  function dateToStringNoMS(date: Date): string {
+    return date.toISOString().replace(/\.[0-9]{3}Z/, "Z");
+  }
+
+  const chainId = Number(process.env.NEXT_PUBLIC_NETWORK_ID);
+  const { metadata, services } = values;
+  const { name, description } = metadata;
+  const { access } = services[0];
+
+  const did = nftAddress ? generateDid(nftAddress, chainId) : "0x...";
+  const currentTime = dateToStringNoMS(new Date());
+
+  const newMetadata: Metadata = {
+    created: currentTime,
+    updated: currentTime,
+    type: "dataset",
+    name,
+    description,
+    tags: [],
+    author: "Fractal Flows",
+    license: "https://market.oceanprotocol.com/terms",
+    links: [],
+    additionalInformation: {
+      termsAndConditions: true,
+    },
+  };
+
+  const file = {
+    nftAddress,
+    datatokenAddress,
+    files: [
+      {
+        type: "url",
+        index: 0,
+        url: "",
+        method: "GET",
+      },
+    ],
+  };
+
+  const filesEncrypted = await OceanProtocolService.encrypt(file);
+
+  const newService: Service = {
+    id: getHash(datatokenAddress + filesEncrypted),
+    type: access,
+    files: filesEncrypted || "",
+    datatokenAddress,
+    serviceEndpoint: OceanProtocolService._providerURL as string,
+    timeout: 0, // forever
+  };
+
+  const newDdo: DDO = {
+    "@context": ["https://w3id.org/did/v1"],
+    id: did,
+    nftAddress,
+    version: "4.1.0",
+    chainId,
+    metadata: newMetadata,
+    services: [newService],
+  };
+
+  const ddoEncrypted = await OceanProtocolService.encrypt(newDdo);
+
+  return { ddo: newDdo, ddoEncrypted };
 };
 
 export const updateClaimNFTMetadata = async ({
@@ -195,6 +278,7 @@ export const useClaims = () => {
     createClaim,
     saveClaimOnIPFS,
     mintClaimNFT,
+    constructOceanDDO,
     updateClaimNFTMetadata,
     getClaimNFTFractionalizationContractOf,
     updateClaim,

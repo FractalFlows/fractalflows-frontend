@@ -26,6 +26,7 @@ export enum TransactionStepOperation {
   SIGN = "Signing transaction with wallet",
   WAIT_ONCHAIN = "Waiting for transaction to complete on-chain",
   INDEX = "Indexing transaction data",
+  OCEAN_DDO_CONSTRUCTION = "Constructing Ocean Protocol DDO",
 }
 
 export interface TransactionStep {

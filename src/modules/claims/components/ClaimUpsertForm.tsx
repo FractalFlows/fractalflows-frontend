@@ -82,6 +82,10 @@ const DEFAULT_CLAIM_NFT_MINT_TRANSACTION_STEPS = [
   },
   {
     status: TransactionStepStatus.UNSTARTED,
+    operation: TransactionStepOperation.OCEAN_DDO_CONSTRUCTION,
+  },
+  {
+    status: TransactionStepStatus.UNSTARTED,
     operation: TransactionStepOperation.INDEX,
   },
 ];
@@ -112,6 +116,7 @@ export const ClaimUpsertForm: FC<ClaimUpsertFormProps> = ({
     mintClaimNFT,
     updateClaimNFTMetadata,
     getClaimNFTFractionalizationContractOf,
+    constructOceanDDO,
   } = useClaims();
   const { searchTags } = useTags();
   const { enqueueSnackbar } = useSnackbar();
@@ -245,6 +250,55 @@ export const ClaimUpsertForm: FC<ClaimUpsertFormProps> = ({
       }
     };
 
+    const handleOceanDDOConstruction = async (metadataURI: string) => {
+      handleTransactionProgressUpdate([
+        {
+          operation: TransactionStepOperation.OCEAN_DDO_CONSTRUCTION,
+          update: { status: TransactionStepStatus.STARTED },
+        },
+      ]);
+
+      try {
+        if (operation === ClaimUpsertFormOperation.CREATE) {
+          const mintClaimNFTTx = await constructOceanDDO({
+            metadataURI,
+          });
+
+          handleTransactionProgressUpdate([
+            {
+              operation: TransactionStepOperation.OCEAN_DDO_CONSTRUCTION,
+              update: {
+                status: TransactionStepStatus.SUCCESS,
+              },
+            },
+          ]);
+
+          // await handleIndexClaimNFT({
+          // });
+        } else {
+          handleTransactionProgressUpdate([
+            {
+              operation: TransactionStepOperation.OCEAN_DDO_CONSTRUCTION,
+              update: {
+                status: TransactionStepStatus.SUCCESS,
+              },
+            },
+          ]);
+        }
+      } catch (e: any) {
+        handleTransactionProgressUpdate([
+          {
+            operation: TransactionStepOperation.OCEAN_DDO_CONSTRUCTION,
+            update: {
+              status: TransactionStepStatus.ERROR,
+              error: e.message,
+              // retry: () => handleMintClaimNFT(metadataURI),
+            },
+          },
+        ]);
+      }
+    };
+
     const handleMintClaimNFT = async (metadataURI: string) => {
       handleTransactionProgressUpdate([
         {
@@ -276,7 +330,7 @@ export const ClaimUpsertForm: FC<ClaimUpsertFormProps> = ({
           ]);
 
           const mintClaimNFTTxReceipt = await mintClaimNFTTx.wait();
-
+          console.log(mintClaimNFTTxReceipt);
           handleTransactionProgressUpdate([
             {
               operation: TransactionStepOperation.WAIT_ONCHAIN,

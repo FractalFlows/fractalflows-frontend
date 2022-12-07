@@ -23,6 +23,7 @@
     "@mui/icons-material": "^5.2.5",
     "@mui/lab": "^5.0.0-alpha.62",
     "@mui/material": "^5.2.5",
+    "@oceanprotocol/lib": "^2.5.2",
     "@openzeppelin/contracts": "^4.6.0",
     "@sentry/nextjs": "^7.16.0",
     "@web3modal/core": "^2.0.0-beta.3",
