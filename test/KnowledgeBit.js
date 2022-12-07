@@ -31,11 +31,7 @@ const deployKnowledgeBitContractAndMintNFT = async (
   const mintClaimTokenTx = await ClaimContract.mintToken(
     metadataCID,
     claimTokenId,
-    {
-      tokenURI:
-        "bafyreih36wt6w6bpfuvdabj572gjbqxbd4gb3xihc5tq7rdz6wrcmhtsgi/metadata.json",
-      fee: 1e11,
-    }
+    1e11
   );
   await mintClaimTokenTx.wait();
 

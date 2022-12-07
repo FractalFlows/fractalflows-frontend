@@ -1,5 +1,6 @@
 import { gql, useQuery } from "@apollo/client";
 import { get } from "lodash-es";
+import { utils as ethersUtils } from "ethers";
 import { ContractCtrl } from "@web3modal/core";
 
 import { getClaim, getPartialClaim, getClaims, getTrendingClaims } from "./get";
@@ -29,7 +30,11 @@ export const mintClaimNFT = async ({
     chainId: Number(process.env.NEXT_PUBLIC_NETWORK_ID),
     abi: ClaimContractABI.abi,
     functionName: "mintToken",
-    args: [metadataURI.replace(/^ipfs:\/\//, ""), generateNFTId()],
+    args: [
+      metadataURI.replace(/^ipfs:\/\//, ""),
+      generateNFTId(),
+      ethersUtils.parseEther("100.0"),
+    ],
   });
 
   return mintClaimNFTTx;

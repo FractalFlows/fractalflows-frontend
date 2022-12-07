@@ -35,14 +35,73 @@ contract Claim is ERC721URIStorage {
   function mintToken(
     string memory metadataURI,
     uint256 tokenId,
-    ClaimFractionalizer.OceanListing memory _OceanListing
+    uint256 fee
   ) public {
     _safeMint(msg.sender, tokenId);
     _setTokenURI(tokenId, metadataURI);
 
+    OceanERC721Factory.NftCreateData memory _NftCreateData = OceanERC721Factory
+      .NftCreateData(
+        "Fractal Flows Data NFT", // name
+        string(abi.encodePacked("FFDN-", Strings.toString(tokenId))), // symbol
+        1, // template
+        "", // tokenURI
+        false, // transferable
+        address(0) // owner, overwritten by ClaimFractionalizer
+      );
+
+    string[] memory _ErcCreateDataStrings = new string[](2);
+    _ErcCreateDataStrings[0] = "Fractal Flows Data Token"; // name
+    _ErcCreateDataStrings[1] = string(
+      abi.encodePacked("FFDT-", Strings.toString(tokenId))
+    ); // symbol
+
+    address[] memory _ErcCreateDataAddresses = new address[](4);
+    _ErcCreateDataAddresses[0] = address(0); // data tokens minter, overwritten by ClaimFractionalizer
+    _ErcCreateDataAddresses[1] = address(0); // payment collector, overwritten by ClaimFractionalizer
+    _ErcCreateDataAddresses[2] = 0x05585Ed45a9Db5e3d0623c2E6DCdea4aaE04EBe1; // publishing market, FF wallet
+    _ErcCreateDataAddresses[3] = 0x819b194B69bC7a56c0571C2C5520c594eFab2793; // market fee token, FFDST
+
+    uint256[] memory _ErcCreateDataUints = new uint256[](2);
+    _ErcCreateDataUints[0] = 1e27; // data tokens cap
+    _ErcCreateDataUints[1] = 1; // market fee amount percent
+
+    bytes[] memory _ErcCreateDataBytes;
+
+    OceanERC721Factory.ErcCreateData memory _ErcCreateData = OceanERC721Factory
+      .ErcCreateData(
+        2, // template (enterprise)
+        _ErcCreateDataStrings,
+        _ErcCreateDataAddresses,
+        _ErcCreateDataUints,
+        _ErcCreateDataBytes
+      );
+
+    address[] memory _FixedDataAddresses = new address[](4);
+    _FixedDataAddresses[0] = 0x819b194B69bC7a56c0571C2C5520c594eFab2793; // base token, FFDST
+    _FixedDataAddresses[1] = address(0); // owner, overwritten by ClaimFractionalizer
+    _FixedDataAddresses[2] = 0x05585Ed45a9Db5e3d0623c2E6DCdea4aaE04EBe1; // market fee collector, FF wallet
+    _FixedDataAddresses[3] = address(0); // allowed swapper, overwritten by the Ocean contract
+
+    uint256[] memory _FixedDataUints = new uint256[](5);
+    _FixedDataUints[0] = 18; // base token decimals
+    _FixedDataUints[1] = 18; // data token decimals
+    _FixedDataUints[2] = fee; // fee
+    _FixedDataUints[3] = 1e18 / 1e4; // swap fee
+    _FixedDataUints[4] = 1; // withMint
+
+    OceanERC721Factory.FixedData memory _FixedData = OceanERC721Factory
+      .FixedData(
+        0xc313e19146Fc9a04470689C9d41a4D3054693531, // fixed price contract address
+        _FixedDataAddresses,
+        _FixedDataUints
+      );
+
     ClaimFractionalizer claimFractionalizer = new ClaimFractionalizer(
-      tokenId,
-      _OceanListing
+      string(abi.encodePacked("FFCF-", Strings.toString(tokenId))),
+      _NftCreateData,
+      _ErcCreateData,
+      _FixedData
     );
     _fractionalizationContracts[tokenId] = address(claimFractionalizer);
 
