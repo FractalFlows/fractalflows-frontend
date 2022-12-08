@@ -42,22 +42,37 @@ interface OceanERC721Factory {
       address,
       bytes32
     );
-
-  function createNftWithErc20(
-    NftCreateData calldata _NftCreateData,
-    ErcCreateData calldata _ErcCreateData
-  ) external returns (address, address);
 }
 
-interface OceanERC20Template {
-  function createFixedRate(
-    address fixedPriceAddress,
-    address[] memory addresses,
-    uint256[] memory uints
-  ) external returns (bytes32);
+interface OceanERC721Template {
+  struct MetaDataProof {
+    address validatorAddress;
+    uint8 v;
+    bytes32 r;
+    bytes32 s;
+  }
+
+  struct MetaDataAndTokenURI {
+    uint8 metaDataState;
+    string metaDataDecryptorUrl;
+    string metaDataDecryptorAddress;
+    bytes flags;
+    bytes data;
+    bytes32 metaDataHash;
+    uint256 tokenId;
+    string tokenURI;
+    MetaDataProof[] metadataProofs;
+  }
+
+  function setMetaDataAndTokenURI(
+    MetaDataAndTokenURI calldata _MetaDataAndTokenURI
+  ) external;
 }
 
 contract ClaimFractionalizer is ERC20, IERC721Receiver, Ownable {
+  address oceanNFTAddress;
+  address oceanDatatokenAddress;
+
   constructor(
     string memory symbol,
     OceanERC721Factory.NftCreateData memory _NftCreateData,
@@ -69,16 +84,25 @@ contract ClaimFractionalizer is ERC20, IERC721Receiver, Ownable {
     _ErcCreateData.addresses[1] = address(this);
     _FixedData.addresses[1] = address(this);
 
-    OceanERC721Factory(0xe8c6Dc39602031A152440311e364818ba25C2Bc1)
-      .createNftWithErc20WithFixedRate(
+    (oceanNFTAddress, oceanDatatokenAddress, ) = OceanERC721Factory(
+      0xe8c6Dc39602031A152440311e364818ba25C2Bc1
+    ).createNftWithErc20WithFixedRate(
         _NftCreateData,
         _ErcCreateData,
         _FixedData
       );
   }
 
-  function mint(address account, uint256 amount) public onlyOwner {
+  function mint(address account, uint256 amount) external onlyOwner {
     _mint(account, amount * 10**uint256(decimals()));
+  }
+
+  function setOceanNFTMetadataAndTokenURI(
+    OceanERC721Template.MetaDataAndTokenURI calldata _MetaDataAndTokenURI
+  ) external onlyOwner {
+    OceanERC721Template(oceanNFTAddress).setMetaDataAndTokenURI(
+      _MetaDataAndTokenURI
+    );
   }
 
   function onERC721Received(

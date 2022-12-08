@@ -7,6 +7,7 @@ import {
   generateDid,
   getHash,
   Metadata,
+  MetadataAndTokenURI,
   Service,
 } from "@oceanprotocol/lib";
 
@@ -21,7 +22,7 @@ import { ClaimProps } from "../interfaces";
 import { apolloClient } from "common/services/apollo/client";
 import { AuthCache } from "modules/auth/cache";
 import ClaimContractABI from "../../../../artifacts/contracts/Claim.sol/Claim.json";
-import { generateNFTId } from "common/utils/nfts";
+import { generateNFTId } from "common/utils/transactions";
 import { OceanProtocolService } from "modules/oceanprotocol/services";
 
 const saveClaimOnIPFS = async ({ claim }: { claim: Partial<ClaimProps> }) => {
@@ -49,24 +50,21 @@ export const mintClaimNFT = async ({
 };
 
 export const constructOceanDDO = async ({
-  values,
+  name,
+  description,
   datatokenAddress,
   nftAddress,
 }: {
-  values: any;
+  name: string;
+  description: string;
   datatokenAddress: string;
   nftAddress: string;
 }) => {
   function dateToStringNoMS(date: Date): string {
     return date.toISOString().replace(/\.[0-9]{3}Z/, "Z");
   }
-
   const chainId = Number(process.env.NEXT_PUBLIC_NETWORK_ID);
-  const { metadata, services } = values;
-  const { name, description } = metadata;
-  const { access } = services[0];
-
-  const did = nftAddress ? generateDid(nftAddress, chainId) : "0x...";
+  const did = generateDid(nftAddress, chainId);
   const currentTime = dateToStringNoMS(new Date());
 
   const newMetadata: Metadata = {
@@ -101,7 +99,7 @@ export const constructOceanDDO = async ({
 
   const newService: Service = {
     id: getHash(datatokenAddress + filesEncrypted),
-    type: access,
+    type: "access",
     files: filesEncrypted || "",
     datatokenAddress,
     serviceEndpoint: OceanProtocolService._providerURL as string,
@@ -117,10 +115,72 @@ export const constructOceanDDO = async ({
     metadata: newMetadata,
     services: [newService],
   };
-
+  console.log(JSON.stringify(newDdo));
   const ddoEncrypted = await OceanProtocolService.encrypt(newDdo);
 
-  return { ddo: newDdo, ddoEncrypted };
+  console.log({
+    did,
+    newDdo,
+    ddoEncrypted,
+    filesEncrypted,
+    newService,
+    newMetadata,
+  });
+
+  return { did, ddo: newDdo, ddoEncrypted };
+};
+
+export const setOceanNFTMetadataAndTokenURI = async ({
+  claimTokenId,
+  ddo,
+  ddoEncrypted,
+  did,
+  nftMetadata,
+}: any) => {
+  const metadataHash = getHash(JSON.stringify(ddo));
+
+  // add final did to external_url and asset link to description in nftMetadata before encoding
+  const externalUrl = `${process.env.NEXT_PUBLIC_FRACTALFLOWS_OCEAN_MARKET_URL}/asset/${did}`;
+  const encodedMetadata = Buffer.from(
+    JSON.stringify({
+      ...nftMetadata,
+      description: `${nftMetadata.description}\n\nView on Fractal Flows Market: ${externalUrl}`,
+      external_url: externalUrl,
+    })
+  ).toString("base64");
+
+  // theoretically used by aquarius or provider, not implemented yet, will remain hardcoded
+  const flags = "0x02";
+
+  const metadataAndTokenURI: MetadataAndTokenURI = {
+    metaDataState: 0,
+    metaDataDecryptorUrl: OceanProtocolService._providerURL,
+    metaDataDecryptorAddress: "",
+    flags,
+    data: ddoEncrypted,
+    metaDataHash: "0x" + metadataHash,
+    tokenId: 1,
+    tokenURI: `data:application/json;base64,${encodedMetadata}`,
+    metadataProofs: [],
+  };
+
+  console.log(metadataAndTokenURI, nftMetadata);
+
+  const setMetadataAndTokenURITx = await ContractCtrl.write({
+    address: process.env.NEXT_PUBLIC_CLAIM_CONTRACT_ADDRESS as string,
+    chainId: Number(process.env.NEXT_PUBLIC_NETWORK_ID),
+    abi: ClaimContractABI.abi,
+    functionName: "setOceanNFTMetadataAndTokenURI",
+    args: [claimTokenId, metadataAndTokenURI],
+  });
+
+  // const setMetadataAndTokenURITx = await nft.setMetadataAndTokenURI(
+  //   ddo.nftAddress,
+  //   accountId,
+  //   metadataAndTokenURI
+  // );
+
+  return setMetadataAndTokenURITx;
 };
 
 export const updateClaimNFTMetadata = async ({
@@ -279,6 +339,7 @@ export const useClaims = () => {
     saveClaimOnIPFS,
     mintClaimNFT,
     constructOceanDDO,
+    setOceanNFTMetadataAndTokenURI,
     updateClaimNFTMetadata,
     getClaimNFTFractionalizationContractOf,
     updateClaim,

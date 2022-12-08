@@ -7,7 +7,7 @@ import { ClaimsCache } from "../cache";
 import { apolloClient } from "common/services/apollo/client";
 import ArgumentContractABI from "../../../../artifacts/contracts/Argument.sol/Argument.json";
 import { ContractCtrl } from "@web3modal/core";
-import { generateNFTId } from "common/utils/nfts";
+import { generateNFTId } from "common/utils/transactions";
 
 export const saveArgumentOnIPFS = async ({
   argument,

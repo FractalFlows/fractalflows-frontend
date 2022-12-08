@@ -7,7 +7,7 @@ import type { KnowledgeBitProps } from "../interfaces";
 import { ClaimsCache } from "../cache";
 import { apolloClient } from "common/services/apollo/client";
 import KnowledgeBitContractABI from "../../../../artifacts/contracts/KnowledgeBit.sol/KnowledgeBit.json";
-import { generateNFTId } from "common/utils/nfts";
+import { generateNFTId } from "common/utils/transactions";
 
 export const getKnowledgeBit = async ({ id }: { id: string }) =>
   await ClaimsService.getKnowledgeBit({ id });

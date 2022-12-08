@@ -112,6 +112,14 @@ contract Claim is ERC721URIStorage {
     _setTokenURI(tokenId, metadataURI);
   }
 
+  function setOceanNFTMetadataAndTokenURI(
+    uint256 tokenId,
+    OceanERC721Template.MetaDataAndTokenURI calldata _MetaDataAndTokenURI
+  ) external claimExists(tokenId) {
+    ClaimFractionalizer(_fractionalizationContracts[tokenId])
+      .setOceanNFTMetadataAndTokenURI(_MetaDataAndTokenURI);
+  }
+
   function _rewardContribution(
     uint256 tokenId,
     address account,

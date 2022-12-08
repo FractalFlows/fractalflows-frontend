@@ -27,6 +27,8 @@ export enum TransactionStepOperation {
   WAIT_ONCHAIN = "Waiting for transaction to complete on-chain",
   INDEX = "Indexing transaction data",
   OCEAN_DDO_CONSTRUCTION = "Constructing Ocean Protocol DDO",
+  OCEAN_METADATA_SIGN = "Signing Ocean Protocol transaction with wallet",
+  OCEAN_METADATA_WAIT_ONCHAIN = "Waiting for Ocean Protocol transaction to complete on-chain",
 }
 
 export interface TransactionStep {
@@ -174,8 +176,7 @@ export const TransactionProgressModal = ({
                     {getStepStatusIcon(status)}
                     <Stack spacing={1} sx={{ alignItems: "flex-start" }}>
                       <Typography>{operation}</Typography>
-                      {operation === TransactionStepOperation.WAIT_ONCHAIN &&
-                      txHash ? (
+                      {txHash ? (
                         <Typography variant="body2">
                           <Link
                             href={`${process.env.NEXT_PUBLIC_ETH_EXPLORER_URL}/tx/${txHash}`}

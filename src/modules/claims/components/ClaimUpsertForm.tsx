@@ -43,6 +43,14 @@ import {
   TransactionStepOperation,
   TransactionStepStatus,
 } from "common/components/TransactionProgressModal";
+import {
+  decodeLogParameters,
+  getTxLog,
+  getTxLogArgs,
+  getTxLogTopicAsNormalizedAddress,
+  normalizeAddressFromTxLog,
+  TxEventABIs,
+} from "common/utils/transactions";
 
 export enum ClaimUpsertFormOperation {
   CREATE,
@@ -86,6 +94,14 @@ const DEFAULT_CLAIM_NFT_MINT_TRANSACTION_STEPS = [
   },
   {
     status: TransactionStepStatus.UNSTARTED,
+    operation: TransactionStepOperation.OCEAN_METADATA_SIGN,
+  },
+  {
+    status: TransactionStepStatus.UNSTARTED,
+    operation: TransactionStepOperation.OCEAN_METADATA_WAIT_ONCHAIN,
+  },
+  {
+    status: TransactionStepStatus.UNSTARTED,
     operation: TransactionStepOperation.INDEX,
   },
 ];
@@ -117,6 +133,7 @@ export const ClaimUpsertForm: FC<ClaimUpsertFormProps> = ({
     updateClaimNFTMetadata,
     getClaimNFTFractionalizationContractOf,
     constructOceanDDO,
+    setOceanNFTMetadataAndTokenURI,
   } = useClaims();
   const { searchTags } = useTags();
   const { enqueueSnackbar } = useSnackbar();
@@ -250,7 +267,113 @@ export const ClaimUpsertForm: FC<ClaimUpsertFormProps> = ({
       }
     };
 
-    const handleOceanDDOConstruction = async (metadataURI: string) => {
+    const handleSetOceanNFTMetadataAndTokenURI = async (transactionData: {
+      nftMetadataURI: string;
+      nftTxHash: string;
+      nftTokenId: string;
+      nftFractionalizationContractAddress: string;
+      oceanNFTAddress: string;
+      oceanDatatokenAddress: string;
+      did: string;
+      ddo: any;
+      ddoEncrypted: string;
+    }) => {
+      handleTransactionProgressUpdate([
+        {
+          operation: TransactionStepOperation.OCEAN_METADATA_SIGN,
+          update: { status: TransactionStepStatus.STARTED },
+        },
+      ]);
+
+      try {
+        if (operation === ClaimUpsertFormOperation.CREATE) {
+          const setOceanNFTMetadataAndTokenURITx =
+            await setOceanNFTMetadataAndTokenURI({
+              claimTokenId: transactionData.nftTokenId,
+              ddo: transactionData.ddo,
+              ddoEncrypted: transactionData.ddoEncrypted,
+              did: transactionData.did,
+              nftMetadata: {
+                name: data.title,
+                symbol: `FFDT-${transactionData.nftTokenId}`,
+                description: data.summary,
+              },
+            });
+
+          handleTransactionProgressUpdate([
+            {
+              operation: TransactionStepOperation.OCEAN_METADATA_SIGN,
+              update: {
+                status: TransactionStepStatus.SUCCESS,
+              },
+            },
+            {
+              operation: TransactionStepOperation.OCEAN_METADATA_WAIT_ONCHAIN,
+              update: {
+                status: TransactionStepStatus.STARTED,
+                txHash: setOceanNFTMetadataAndTokenURITx.hash,
+              },
+            },
+          ]);
+
+          await setOceanNFTMetadataAndTokenURITx.wait();
+
+          handleTransactionProgressUpdate([
+            {
+              operation: TransactionStepOperation.OCEAN_METADATA_WAIT_ONCHAIN,
+              update: {
+                status: TransactionStepStatus.SUCCESS,
+              },
+            },
+          ]);
+
+          // await handleIndexClaimNFT({
+          //   nftMetadataURI: transactionData.nftMetadataURI,
+          //   nftTxHash: transactionData.nftTxHash,
+          //   nftTokenId: transactionData.nftTokenId,
+          //   nftFractionalizationContractAddress:
+          //     transactionData.nftFractionalizationContractAddress,
+          // });
+        } else {
+          handleTransactionProgressUpdate([
+            {
+              operation: TransactionStepOperation.OCEAN_METADATA_WAIT_ONCHAIN,
+              update: {
+                status: TransactionStepStatus.SUCCESS,
+              },
+            },
+          ]);
+        }
+      } catch (e: any) {
+        console.log(e);
+        handleTransactionProgressUpdate([
+          {
+            operation: TransactionStepOperation.OCEAN_METADATA_SIGN,
+            update: {
+              status: TransactionStepStatus.ERROR,
+              error: e.message,
+              retry: () =>
+                handleSetOceanNFTMetadataAndTokenURI(transactionData),
+            },
+          },
+          {
+            operation: TransactionStepOperation.OCEAN_METADATA_WAIT_ONCHAIN,
+            update: {
+              status: TransactionStepStatus.UNSTARTED,
+            },
+          },
+        ]);
+      }
+    };
+
+    const handleOceanDDOConstruction = async (transactionData: {
+      nftMetadataURI: string;
+      nftTxHash: string;
+      nftTokenId: string;
+      nftFractionalizationContractAddress: string;
+      oceanNFTAddress: string;
+      oceanDatatokenAddress: string;
+    }) => {
       handleTransactionProgressUpdate([
         {
           operation: TransactionStepOperation.OCEAN_DDO_CONSTRUCTION,
@@ -260,8 +383,11 @@ export const ClaimUpsertForm: FC<ClaimUpsertFormProps> = ({
 
       try {
         if (operation === ClaimUpsertFormOperation.CREATE) {
-          const mintClaimNFTTx = await constructOceanDDO({
-            metadataURI,
+          const { did, ddo, ddoEncrypted } = await constructOceanDDO({
+            name: data.title,
+            description: data.summary,
+            nftAddress: transactionData.oceanNFTAddress,
+            datatokenAddress: transactionData.oceanDatatokenAddress,
           });
 
           handleTransactionProgressUpdate([
@@ -273,8 +399,12 @@ export const ClaimUpsertForm: FC<ClaimUpsertFormProps> = ({
             },
           ]);
 
-          // await handleIndexClaimNFT({
-          // });
+          await handleSetOceanNFTMetadataAndTokenURI({
+            ...transactionData,
+            did,
+            ddo,
+            ddoEncrypted,
+          });
         } else {
           handleTransactionProgressUpdate([
             {
@@ -286,6 +416,7 @@ export const ClaimUpsertForm: FC<ClaimUpsertFormProps> = ({
           ]);
         }
       } catch (e: any) {
+        console.log(e);
         handleTransactionProgressUpdate([
           {
             operation: TransactionStepOperation.OCEAN_DDO_CONSTRUCTION,
@@ -330,7 +461,7 @@ export const ClaimUpsertForm: FC<ClaimUpsertFormProps> = ({
           ]);
 
           const mintClaimNFTTxReceipt = await mintClaimNFTTx.wait();
-          console.log(mintClaimNFTTxReceipt);
+
           handleTransactionProgressUpdate([
             {
               operation: TransactionStepOperation.WAIT_ONCHAIN,
@@ -340,20 +471,41 @@ export const ClaimUpsertForm: FC<ClaimUpsertFormProps> = ({
             },
           ]);
 
-          const { transactionHash } = mintClaimNFTTxReceipt;
-          const transferEventTopics = mintClaimNFTTxReceipt.logs[0].topics;
-          const nftTokenId = String(parseInt(transferEventTopics[3]));
+          const nftTransferEvent = getTxLog(
+            mintClaimNFTTxReceipt.logs,
+            "0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef"
+          );
+          const nftTokenId = String(parseInt(nftTransferEvent.topics[3]));
           const fractionalizationContractAddress =
-            await getClaimNFTFractionalizationContractOf({
-              nftTokenId,
-            });
+            await getClaimNFTFractionalizationContractOf({ nftTokenId });
 
-          await handleIndexClaimNFT({
+          const oceanNFTAddress = getTxLogArgs(
+            mintClaimNFTTxReceipt.logs,
+            "0x8125264ec1d174cb383ea0646ea1e6921ca3b0aba20370c8e18389e7c2d6a571",
+            TxEventABIs.OceanNFTCreated
+          )[0];
+
+          const oceanDatatokenAddress = getTxLogTopicAsNormalizedAddress(
+            mintClaimNFTTxReceipt.logs,
+            "0x567699dbf7c5f63a51a42fd451f5e065bca0dfc723adf2cc498bbb7cfb780b90",
+            1
+          );
+
+          console.log({
+            nftTokenId,
+            fractionalizationContractAddress,
+            oceanNFTAddress,
+            oceanDatatokenAddress,
+          });
+
+          await handleOceanDDOConstruction({
             nftMetadataURI: metadataURI,
-            nftTxHash: transactionHash,
+            nftTxHash: mintClaimNFTTx.hash,
             nftTokenId,
             nftFractionalizationContractAddress:
               fractionalizationContractAddress,
+            oceanNFTAddress,
+            oceanDatatokenAddress,
           });
         } else {
           const updateClaimNFTMetadataTx = await updateClaimNFTMetadata({

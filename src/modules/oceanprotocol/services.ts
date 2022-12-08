@@ -1,5 +1,5 @@
 export const OceanProtocolService = {
-  _providerURL: process.env.NEXT_PUBLIC_OCEAN_PROVIDER_URL,
+  _providerURL: process.env.NEXT_PUBLIC_OCEAN_PROVIDER_URL as string,
 
   _getURL(service: string) {
     return `${process.env.NEXT_PUBLIC_OCEAN_PROVIDER_URL}/api/services/${service}`;
