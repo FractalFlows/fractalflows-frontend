@@ -1,6 +1,6 @@
 import { gql, useQuery } from "@apollo/client";
 import { get } from "lodash-es";
-import { utils as ethersUtils } from "ethers";
+import { ethers, utils as ethersUtils } from "ethers";
 import { ContractCtrl } from "@web3modal/core";
 import {
   DDO,
@@ -60,6 +60,10 @@ export const constructOceanDDO = async ({
   datatokenAddress: string;
   nftAddress: string;
 }) => {
+  // gets checksummed addresses
+  datatokenAddress = ethers.utils.getAddress(datatokenAddress);
+  nftAddress = ethers.utils.getAddress(nftAddress);
+
   function dateToStringNoMS(date: Date): string {
     return date.toISOString().replace(/\.[0-9]{3}Z/, "Z");
   }
@@ -89,7 +93,7 @@ export const constructOceanDDO = async ({
       {
         type: "url",
         index: 0,
-        url: "",
+        url: "https://bafyreif7dyiihyo5ljlx4sr6jjttaaythbs6uv3m7frncj6xvserhkuope.ipfs.w3s.link/metadata.json",
         method: "GET",
       },
     ],
@@ -115,17 +119,8 @@ export const constructOceanDDO = async ({
     metadata: newMetadata,
     services: [newService],
   };
-  console.log(JSON.stringify(newDdo));
-  const ddoEncrypted = await OceanProtocolService.encrypt(newDdo);
 
-  console.log({
-    did,
-    newDdo,
-    ddoEncrypted,
-    filesEncrypted,
-    newService,
-    newMetadata,
-  });
+  const ddoEncrypted = await OceanProtocolService.encrypt(newDdo);
 
   return { did, ddo: newDdo, ddoEncrypted };
 };

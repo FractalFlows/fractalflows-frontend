@@ -31,6 +31,7 @@ export const CORE_CLAIM_FIELDS = gql`
       }
     }
     nftTokenId
+    oceanDid
   }
 `;
 
