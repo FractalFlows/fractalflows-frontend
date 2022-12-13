@@ -159,8 +159,6 @@ export const setOceanNFTMetadataAndTokenURI = async ({
     metadataProofs: [],
   };
 
-  console.log(metadataAndTokenURI, nftMetadata);
-
   const setMetadataAndTokenURITx = await ContractCtrl.write({
     address: process.env.NEXT_PUBLIC_CLAIM_CONTRACT_ADDRESS as string,
     chainId: Number(process.env.NEXT_PUBLIC_NETWORK_ID),

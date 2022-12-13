@@ -64,7 +64,7 @@ contract Claim is ERC721URIStorage {
 
     uint256[] memory _ErcCreateDataUints = new uint256[](2);
     _ErcCreateDataUints[0] = 1e27; // data tokens cap
-    _ErcCreateDataUints[1] = 1; // market fee amount percent
+    _ErcCreateDataUints[1] = 1e18 / 1e3; // market fee amount percent
 
     bytes[] memory _ErcCreateDataBytes;
 
@@ -87,7 +87,7 @@ contract Claim is ERC721URIStorage {
     _FixedDataUints[0] = 18; // base token decimals
     _FixedDataUints[1] = 18; // data token decimals
     _FixedDataUints[2] = fee; // fee
-    _FixedDataUints[3] = 1e18 / 1e4; // swap fee
+    _FixedDataUints[3] = 1e18 / 1e3; // swap fee
     _FixedDataUints[4] = 1; // withMint
 
     OceanERC721Factory.FixedData memory _FixedData = OceanERC721Factory
