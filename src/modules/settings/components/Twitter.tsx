@@ -1,5 +1,5 @@
 import { InputAdornment, Stack, TextField } from "@mui/material";
-import { Check as CheckIcon } from "@mui/icons-material";
+import CheckIcon from "@mui/icons-material/Check";
 
 import { TabPanel } from "./TabPanel";
 import { useAuth } from "modules/auth/hooks/useAuth";

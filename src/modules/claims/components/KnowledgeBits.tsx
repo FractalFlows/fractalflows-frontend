@@ -7,7 +7,7 @@ import {
   IconButton,
   Button,
 } from "@mui/material";
-import { Help as HelpIcon } from "@mui/icons-material";
+import HelpIcon from "@mui/icons-material/Help";
 
 import {
   KnowledgeBitProps,

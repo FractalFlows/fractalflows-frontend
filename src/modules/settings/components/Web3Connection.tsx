@@ -8,7 +8,7 @@ import {
   Button,
   Link as MuiLink,
 } from "@mui/material";
-import { Check as CheckIcon } from "@mui/icons-material";
+import CheckIcon from "@mui/icons-material/Check";
 import { useSnackbar } from "notistack";
 import { LoadingButton } from "@mui/lab";
 

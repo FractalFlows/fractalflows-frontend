@@ -14,13 +14,11 @@ import {
   Tooltip,
   Typography,
 } from "@mui/material";
-import {
-  ThumbUpOffAlt as ThumbUpOffAltIcon,
-  ThumbUpAlt as ThumbUpAltIcon,
-  ThumbDownOffAlt as ThumbDownOffAltIconIcon,
-  ThumbDownAlt as ThumbDownAltIcon,
-  MoreVert as MoreVertIcon,
-} from "@mui/icons-material";
+import ThumbUpOffAltIcon from "@mui/icons-material/ThumbUpOffAlt";
+import ThumbUpAltIcon from "@mui/icons-material/ThumbUpAlt";
+import ThumbDownOffAltIconIcon from "@mui/icons-material/ThumbDownOffAlt";
+import ThumbDownAltIcon from "@mui/icons-material/ThumbDownAlt";
+import MoreVertIcon from "@mui/icons-material/MoreVert";
 import { find, get } from "lodash-es";
 
 import {

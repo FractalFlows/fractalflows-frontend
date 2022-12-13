@@ -9,10 +9,8 @@ import {
   Stack,
   Typography,
 } from "@mui/material";
-import {
-  ArrowUpward as ArrowUpwardIcon,
-  ArrowDownward as ArrowDownwardIcon,
-} from "@mui/icons-material";
+import ArrowUpwardIcon from "@mui/icons-material/ArrowUpward";
+import ArrowDownwardIcon from "@mui/icons-material/ArrowDownward";
 import { isEmpty, get, filter } from "lodash-es";
 import { useSnackbar } from "notistack";
 

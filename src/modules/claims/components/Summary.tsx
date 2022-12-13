@@ -15,14 +15,13 @@ import {
   CircularProgress,
   DialogContent,
 } from "@mui/material";
-import {
-  Edit as EditIcon,
-  Delete as DeleteIcon,
-  GroupAdd as InviteFriendsIcon,
-  Notifications as NotificationsIcon,
-  NotificationsOff as NotificationsOffIcon,
-  ReportProblem as DisableIcon,
-} from "@mui/icons-material";
+import EditIcon from "@mui/icons-material/Edit";
+import DeleteIcon from "@mui/icons-material/Delete";
+import InviteFriendsIcon from "@mui/icons-material/GroupAdd";
+import NotificationsIcon from "@mui/icons-material/Notifications";
+import NotificationsOffIcon from "@mui/icons-material/NotificationsOff";
+import DisableIcon from "@mui/icons-material/ReportProblem";
+
 import { compact, concat, filter, find, get, isEmpty, map } from "lodash-es";
 
 import type { TagProps } from "modules/tags/interfaces";

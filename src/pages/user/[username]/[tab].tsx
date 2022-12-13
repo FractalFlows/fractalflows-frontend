@@ -1,5 +1,5 @@
 import { FC, SyntheticEvent } from "react";
-import { AccountCircle } from "@mui/icons-material";
+import AccountCircleIcon from "@mui/icons-material/AccountCircle";
 import { TabContext, TabList, TabPanel } from "@mui/lab";
 import { Avatar, Box, Paper, Stack, Tab, Typography } from "@mui/material";
 
@@ -66,7 +66,7 @@ const Profile: FC<ProfileComponentProps> = ({ profile, userClaims }) => {
             src={`${profile?.avatar}?s=160`}
             sx={{ width: "160px", height: "160px" }}
           >
-            <AccountCircle sx={{ fontSize: 160 }} />
+            <AccountCircleIcon sx={{ fontSize: 160 }} />
           </Avatar>
           <Stack alignItems={{ xs: "center", md: "initial" }} spacing={0.5}>
             <Typography

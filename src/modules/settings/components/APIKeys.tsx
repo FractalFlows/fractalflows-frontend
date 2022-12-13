@@ -12,10 +12,9 @@ import {
   DialogTitle,
   DialogActions,
 } from "@mui/material";
-import {
-  ContentCopy as ContentCopyIcon,
-  Launch as LaunchIcon,
-} from "@mui/icons-material";
+import ContentCopy from "@mui/icons-material/ContentCopyIcon";
+import Launch from "@mui/icons-material/LaunchIcon";
+
 import { useSnackbar } from "notistack";
 import { LoadingButton } from "@mui/lab";
 
