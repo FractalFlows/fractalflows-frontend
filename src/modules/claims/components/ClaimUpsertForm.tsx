@@ -370,6 +370,7 @@ export const ClaimUpsertForm: FC<ClaimUpsertFormProps> = ({
       nftTxHash: string;
       nftTokenId: string;
       nftFractionalizationContractAddress: string;
+      nftIpnsName: string;
       oceanNFTAddress: string;
       oceanDatatokenAddress: string;
     }) => {
@@ -386,6 +387,7 @@ export const ClaimUpsertForm: FC<ClaimUpsertFormProps> = ({
         const { did, ddo, ddoEncrypted } = await constructOceanDDO({
           name: data.title,
           description: data.summary,
+          url: `https://ipfs.io/ipns/${transactionData.nftIpnsName}`,
           nftAddress: transactionData.oceanNFTAddress,
           datatokenAddress: transactionData.oceanDatatokenAddress,
         });
@@ -419,7 +421,13 @@ export const ClaimUpsertForm: FC<ClaimUpsertFormProps> = ({
       }
     };
 
-    const handleMintClaimNFT = async (metadataURI: string) => {
+    const handleMintClaimNFT = async ({
+      metadataURI,
+      ipnsName,
+    }: {
+      metadataURI: string;
+      ipnsName: string;
+    }) => {
       handleTransactionProgressUpdate([
         {
           operation: TransactionStepOperation.SIGN,
@@ -486,6 +494,7 @@ export const ClaimUpsertForm: FC<ClaimUpsertFormProps> = ({
             nftTokenId,
             nftFractionalizationContractAddress:
               fractionalizationContractAddress,
+            nftIpnsName: ipnsName,
             oceanNFTAddress,
             oceanDatatokenAddress,
           });
@@ -547,7 +556,7 @@ export const ClaimUpsertForm: FC<ClaimUpsertFormProps> = ({
       setIsTransactionProgressModalOpen(true);
 
       try {
-        const metadataURI = await saveClaimOnIPFS({
+        const { metadataURI, ipnsName } = await saveClaimOnIPFS({
           claim: data,
         });
 
@@ -558,7 +567,7 @@ export const ClaimUpsertForm: FC<ClaimUpsertFormProps> = ({
           },
         ]);
 
-        await handleMintClaimNFT(metadataURI);
+        await handleMintClaimNFT({ metadataURI, ipnsName });
       } catch (e: any) {
         handleTransactionProgressUpdate([
           {

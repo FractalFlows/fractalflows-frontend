@@ -241,11 +241,14 @@ export const ClaimsService = {
     claim,
   }: {
     claim: Partial<ClaimProps>;
-  }): Promise<string> {
+  }): Promise<{ metadataURI: string; ipnsName: string }> {
     const { data } = await apolloClient.mutate({
       mutation: gql`
         mutation SaveClaimOnIPFS($claim: ClaimInput!) {
-          saveClaimOnIPFS(claim: $claim)
+          saveClaimOnIPFS(claim: $claim) {
+            metadataURI
+            ipnsName
+          }
         }
       `,
       variables: {

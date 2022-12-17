@@ -52,11 +52,13 @@ export const mintClaimNFT = async ({
 export const constructOceanDDO = async ({
   name,
   description,
+  url,
   datatokenAddress,
   nftAddress,
 }: {
   name: string;
   description: string;
+  url: string;
   datatokenAddress: string;
   nftAddress: string;
 }) => {
@@ -93,7 +95,7 @@ export const constructOceanDDO = async ({
       {
         type: "url",
         index: 0,
-        url: "https://bafyreif7dyiihyo5ljlx4sr6jjttaaythbs6uv3m7frncj6xvserhkuope.ipfs.w3s.link/metadata.json",
+        url,
         method: "GET",
       },
     ],
