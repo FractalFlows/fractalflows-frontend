@@ -4,6 +4,8 @@ pragma solidity ^0.8.9;
 
 import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 import "@openzeppelin/contracts/token/ERC721/IERC721Receiver.sol";
+import "@openzeppelin/contracts/token/ERC777/IERC777Recipient.sol";
+import "@openzeppelin/contracts/utils/introspection/IERC1820Registry.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "hardhat/console.sol";
 
@@ -69,7 +71,17 @@ interface OceanERC721Template {
   ) external;
 }
 
-contract ClaimFractionalizer is ERC20, IERC721Receiver, Ownable {
+contract ClaimFractionalizer is
+  ERC20,
+  IERC721Receiver,
+  IERC777Recipient,
+  Ownable
+{
+  IERC1820Registry private _erc1820 =
+    IERC1820Registry(0x1820a4B7618BdE71Dce8cdc73aAB6C95905faD24);
+  bytes32 private constant TOKENS_RECIPIENT_INTERFACE_HASH =
+    keccak256("ERC777TokensRecipient");
+
   address oceanNFTAddress;
   address oceanDatatokenAddress;
 
@@ -79,6 +91,12 @@ contract ClaimFractionalizer is ERC20, IERC721Receiver, Ownable {
     OceanERC721Factory.ErcCreateData memory _ErcCreateData,
     OceanERC721Factory.FixedData memory _FixedData
   ) ERC20("Fractal Flows Claim Fractionalizer", symbol) {
+    _erc1820.setInterfaceImplementer(
+      address(this),
+      TOKENS_RECIPIENT_INTERFACE_HASH,
+      address(this)
+    );
+
     _NftCreateData.owner = address(this);
     _ErcCreateData.addresses[0] = address(this);
     _ErcCreateData.addresses[1] = address(this);
@@ -112,5 +130,16 @@ contract ClaimFractionalizer is ERC20, IERC721Receiver, Ownable {
     bytes memory _data
   ) public pure override returns (bytes4) {
     return this.onERC721Received.selector;
+  }
+
+  function tokensReceived(
+    address operator,
+    address from,
+    address to,
+    uint256 amount,
+    bytes calldata userData,
+    bytes calldata operatorData
+  ) external {
+    console.log("tokens received!");
   }
 }

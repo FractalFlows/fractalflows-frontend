@@ -2,10 +2,16 @@
 
 pragma solidity ^0.8.9;
 
-import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
+import "@openzeppelin/contracts/token/ERC777/ERC777.sol";
 
-contract FFDST is ERC20 {
-  constructor() ERC20("Fractal Flows Decentralized Science Token", "FFDST") {
-    _mint(msg.sender, 1000000000 * 10**uint256(decimals()));
+contract FFDST is ERC777 {
+  constructor()
+    ERC777(
+      "Fractal Flows Decentralized Science Token",
+      "FFDST",
+      new address[](0)
+    )
+  {
+    _mint(msg.sender, 1000000000 * 10**uint256(decimals()), "", "");
   }
 }
