@@ -40,13 +40,14 @@ export const GET_CLAIM = gql`
             avatar
           }
         }
+        nftTokenId
       }
       followers {
         id
       }
-      nftStatus
-      nftTxId
+      nftTxHash
       nftTokenId
+      nftMetadataURI
       nftFractionalizationContractAddress
     }
     relatedClaims(slug: $slug) {
@@ -207,34 +208,6 @@ export const GET_USER_KNOWLEDGE_BITS_VOTES = gql`
       type
       knowledgeBit {
         id
-      }
-    }
-  }
-`;
-
-export const GET_ARGUMENT = gql`
-  ${CORE_ARGUMENT_FIELDS}
-
-  query GetArgument($id: String!) {
-    argument(id: $id) {
-      ...CoreArgumentFields
-      evidences {
-        id
-        name
-        url
-      }
-      comments {
-        id
-        content
-        createdAt
-        user {
-          id
-          username
-          avatar
-        }
-        argument {
-          id
-        }
       }
     }
   }

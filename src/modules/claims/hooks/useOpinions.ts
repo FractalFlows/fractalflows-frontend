@@ -1,16 +1,90 @@
 import { gql, useQuery } from "@apollo/client";
-import { filter, find, concat, findIndex, get, map, compact } from "lodash-es";
+import {
+  filter,
+  find,
+  concat,
+  findIndex,
+  get,
+  map,
+  compact,
+  pick,
+} from "lodash-es";
 
 import { ClaimsService } from "../services/claims";
 import type { ArgumentProps, OpinionProps } from "../interfaces";
 import { ClaimsCache } from "../cache";
 import { apolloClient } from "common/services/apollo/client";
+import OpinionContractABI from "../../../../artifacts/contracts/Opinion.sol/Opinion.json";
+import { generateNFTId } from "common/utils/transactions";
+import { ContractCtrl } from "@web3modal/core";
+
+export const saveOpinionOnIPFS = async ({
+  opinion,
+}: {
+  opinion: Partial<OpinionProps>;
+}) => {
+  const saveOpinionOnIPFSResult = await ClaimsService.saveOpinionOnIPFS({
+    opinion,
+  });
+
+  return saveOpinionOnIPFSResult;
+};
+
+export const mintOpinionNFT = async ({
+  metadataURI,
+  argumentTokenIds,
+  claimTokenId,
+}: {
+  metadataURI: string;
+  argumentTokenIds?: string[];
+  claimTokenId: string;
+}) => {
+  const mintKnowledgeBitNFTTx = await ContractCtrl.write({
+    address: process.env.NEXT_PUBLIC_OPINION_CONTRACT_ADDRESS as string,
+    chainId: Number(process.env.NEXT_PUBLIC_NETWORK_ID),
+    abi: OpinionContractABI.abi,
+    functionName: "mintToken",
+    args: [
+      metadataURI.replace(/^ipfs:\/\//, ""),
+      generateNFTId(),
+      argumentTokenIds,
+      claimTokenId,
+    ],
+  });
+
+  return mintKnowledgeBitNFTTx;
+};
+
+export const updateOpinionNFTMetadata = async ({
+  nftTokenId,
+  metadataURI,
+  argumentTokenIds,
+}: {
+  nftTokenId: string;
+  metadataURI: string;
+  argumentTokenIds: string[];
+}) => {
+  const updateClaimNFTMetadataTx = await ContractCtrl.write({
+    address: process.env.NEXT_PUBLIC_OPINION_CONTRACT_ADDRESS as string,
+    chainId: Number(process.env.NEXT_PUBLIC_NETWORK_ID),
+    abi: OpinionContractABI.abi,
+    functionName: "setTokenURI",
+    args: [nftTokenId, metadataURI.replace(/^ipfs:\/\//, ""), argumentTokenIds],
+  });
+
+  return updateClaimNFTMetadataTx;
+};
 
 export const saveOpinion = async ({ opinion }: { opinion: OpinionProps }) => {
   const savedOpinion = await ClaimsService.saveOpinion({
     opinion: {
-      id: opinion.id,
-      acceptance: opinion.acceptance,
+      ...pick(opinion, [
+        "id",
+        "acceptance",
+        "nftTokenId",
+        "nftTxHash",
+        "nftMetadataURI",
+      ]),
       arguments: opinion.arguments.map(({ id }) => ({ id })),
       claim: {
         id: opinion.claim.id,
@@ -121,6 +195,9 @@ export const useOpinions = () => {
   );
 
   return {
+    saveOpinionOnIPFS,
+    mintOpinionNFT,
+    updateOpinionNFTMetadata,
     saveOpinion,
     getOpinion,
     setOpinionAcceptance,

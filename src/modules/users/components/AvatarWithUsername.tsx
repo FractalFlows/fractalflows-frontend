@@ -1,5 +1,5 @@
 import AccountCircle from "@mui/icons-material/AccountCircle";
-import { Avatar, Stack, Typography } from "@mui/material";
+import { Avatar, Chip, Stack, Typography } from "@mui/material";
 import { FC } from "react";
 
 import { Link } from "common/components/Link";
@@ -26,9 +26,12 @@ export const AvatarWithUsername: FC<AvatarProps> = ({ user, size = 40 }) => (
         variant="body1"
         fontWeight="600"
         noWrap
-        sx={{ maxWidth: 200 }}
+        sx={{ maxWidth: 150 }}
       >
-        {user?.username} {user?.username === "fractalflowsbot" ? <>🤖</> : null}
+        {user?.username}{" "}
+        {user?.username === "fractalflowsbot" ? (
+          <Chip size="small" label="BOT" sx={{ fontWeight: "normal" }} />
+        ) : null}
       </Typography>
     </Stack>
   </Link>

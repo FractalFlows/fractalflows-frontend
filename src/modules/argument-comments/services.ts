@@ -1,20 +1,52 @@
+import { gql } from "@apollo/client";
 import { apolloClient } from "common/services/apollo/client";
+import { ARGUMENT_COMMENT_FIELDS } from "./fragments";
 
 import type { ArgumentCommentProps } from "./interfaces";
-import {
-  CREATE_ARGUMENT_COMMENT,
-  UPDATE_ARGUMENT_COMMENT,
-  DELETE_ARGUMENT_COMMENT,
-} from "./mutations";
 
 export const ArgumentCommentsService = {
+  async saveOnIPFS({
+    argumentComment,
+  }: {
+    argumentComment: Partial<ArgumentCommentProps>;
+  }): Promise<string> {
+    const { data } = await apolloClient.mutate({
+      mutation: gql`
+        mutation SaveArgumentCommentOnIPFS(
+          $saveArgumentCommentOnIPFSInput: ArgumentCommentInput!
+        ) {
+          saveArgumentCommentOnIPFS(
+            saveArgumentCommentOnIPFSInput: $saveArgumentCommentOnIPFSInput
+          )
+        }
+      `,
+      variables: {
+        saveArgumentCommentOnIPFSInput: argumentComment,
+      },
+    });
+
+    return data.saveArgumentCommentOnIPFS;
+  },
+
   async createArgumentComment({
     argumentComment,
   }: {
     argumentComment: Partial<ArgumentCommentProps>;
   }): Promise<ArgumentCommentProps> {
     const { data } = await apolloClient.query({
-      query: CREATE_ARGUMENT_COMMENT,
+      query: gql`
+        ${ARGUMENT_COMMENT_FIELDS}
+
+        mutation CreateArgumentComment(
+          $createArgumentCommentInput: CreateArgumentCommentInput!
+        ) {
+          createArgumentComment(
+            createArgumentCommentInput: $createArgumentCommentInput
+          ) {
+            ...ArgumentCommentFields
+          }
+        }
+      `,
       variables: {
         createArgumentCommentInput: argumentComment,
       },
@@ -29,7 +61,19 @@ export const ArgumentCommentsService = {
     argumentComment: ArgumentCommentProps;
   }): Promise<ArgumentCommentProps> {
     const { data } = await apolloClient.query({
-      query: UPDATE_ARGUMENT_COMMENT,
+      query: gql`
+        ${ARGUMENT_COMMENT_FIELDS}
+
+        mutation UpdateArgumentComment(
+          $updateArgumentCommentInput: UpdateArgumentCommentInput!
+        ) {
+          updateArgumentComment(
+            updateArgumentCommentInput: $updateArgumentCommentInput
+          ) {
+            ...ArgumentCommentFields
+          }
+        }
+      `,
       variables: {
         updateArgumentCommentInput: argumentComment,
       },
@@ -40,7 +84,11 @@ export const ArgumentCommentsService = {
 
   async deleteArgumentComment({ id }: { id: string }): Promise<Boolean> {
     const { data } = await apolloClient.query({
-      query: DELETE_ARGUMENT_COMMENT,
+      query: gql`
+        mutation DeleteArgumentComment($id: String!) {
+          deleteArgumentComment(id: $id)
+        }
+      `,
       variables: {
         id,
       },

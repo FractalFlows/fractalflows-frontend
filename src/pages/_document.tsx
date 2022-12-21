@@ -3,7 +3,7 @@ import Document, { Html, Head, Main, NextScript } from "next/document";
 import createEmotionServer from "@emotion/server/create-instance";
 
 import { muiTheme } from "common/config/muiTheme";
-import { createEmotionCache } from "common/utils/createEmotionCache";
+import { createEmotionCache } from "common/utils/emotion";
 
 export default class MyDocument extends Document {
   render() {

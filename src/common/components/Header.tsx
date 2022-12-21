@@ -28,10 +28,8 @@ import { get } from "lodash-es";
 export const Header = () => {
   const { isChangingRoutes, setIsSignInDialogOpen } = useApp();
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
-  const [
-    mobileMoreAnchorEl,
-    setMobileMoreAnchorEl,
-  ] = React.useState<null | HTMLElement>(null);
+  const [mobileMoreAnchorEl, setMobileMoreAnchorEl] =
+    React.useState<null | HTMLElement>(null);
   const isMenuOpen = Boolean(anchorEl);
   const isMobileMenuOpen = Boolean(mobileMoreAnchorEl);
 
@@ -101,6 +99,9 @@ export const Header = () => {
         : null}
       <Link href={`/user/${user?.username}/claims`}>
         <MenuItem onClick={handleMenuClose}>Profile</MenuItem>
+      </Link>
+      <Link href="/user/rewards">
+        <MenuItem onClick={handleMenuClose}>Rewards</MenuItem>
       </Link>
       <Link href="/settings/profile">
         <MenuItem onClick={handleMenuClose}>Settings</MenuItem>
@@ -205,7 +206,7 @@ export const Header = () => {
             <Box
               sx={{
                 display: { xs: "none", md: "flex" },
-                marginLeft: { md: "5rem" },
+                marginLeft: { md: "2rem" },
               }}
             >
               <Stack direction="row" alignItems="center" spacing={2}>
@@ -255,8 +256,9 @@ export const Header = () => {
                     color="primaryContrast"
                     onClick={() => setIsSignInDialogOpen(true)}
                     sx={{ flexShrink: 0 }}
+                    startIcon={<i className="fab fa-ethereum"></i>}
                   >
-                    Sign in
+                    Sign In With Ethereum
                   </Button>
                 )}
               </Stack>

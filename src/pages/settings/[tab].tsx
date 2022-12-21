@@ -1,16 +1,13 @@
 import { useEffect, useState } from "react";
 import { TabContext, TabList, TabPanel } from "@mui/lab";
-import { Box, Stack, Tab, Paper, Typography } from "@mui/material";
+import { Stack, Tab, Paper, Typography } from "@mui/material";
 import useMediaQuery from "@mui/material/useMediaQuery";
 import { useTheme } from "@mui/system";
-import { isEmpty } from "lodash-es";
 
 import { Email } from "modules/settings/components/Email";
-import { Web3Connection } from "modules/settings/components/Web3Connection";
 import { Twitter } from "modules/settings/components/Twitter";
 import { APIKeys } from "modules/settings/components/APIKeys";
 import { Profile } from "modules/settings/components/Profile";
-import { useAuth } from "modules/auth/hooks/useAuth";
 import { useRouter } from "next/router";
 import { Container } from "@mui/material";
 import { RequireSignIn } from "common/components/RequireSignIn";
@@ -18,7 +15,6 @@ import { RequireSignIn } from "common/components/RequireSignIn";
 const settingsTabs = [
   { label: "Profile", value: "profile" },
   { label: "Email", value: "email" },
-  { label: "Web3 connection", value: "web3connection" },
   { label: "Twitter", value: "twitter" },
   { label: "API Keys", value: "apiKeys" },
 ];
@@ -73,9 +69,6 @@ const Settings = RequireSignIn(() => {
             </TabPanel>
             <TabPanel value="email">
               <Email />
-            </TabPanel>
-            <TabPanel value="web3connection">
-              <Web3Connection />
             </TabPanel>
             <TabPanel value="twitter">
               <Twitter />

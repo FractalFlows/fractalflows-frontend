@@ -30,6 +30,9 @@ export const CORE_CLAIM_FIELDS = gql`
         avatar
       }
     }
+    nftTokenId
+    nftFractionalizationContractAddress
+    oceanDid
   }
 `;
 
@@ -41,10 +44,9 @@ export const KNOWLEDGE_BIT_FIELDS = gql`
     side
     type
     customType
-    location
-    customLocation
-    url
+    fileURI
     attributions {
+      id
       origin
       identifier
     }
@@ -55,6 +57,8 @@ export const KNOWLEDGE_BIT_FIELDS = gql`
     }
     upvotesCount
     downvotesCount
+    nftMetadataURI
+    nftTokenId
   }
 `;
 
@@ -70,6 +74,8 @@ export const CORE_ARGUMENT_FIELDS = gql`
     comments {
       id
     }
+    nftTokenId
+    nftMetadataURI
   }
 `;
 
@@ -92,6 +98,8 @@ export const OPINION_FIELDS = gql`
         }
       }
     }
+    nftTokenId
+    nftMetadataURI
   }
 `;
 
@@ -107,6 +115,7 @@ export const USER_OPINION_FIELDS = gql`
       comments {
         id
       }
+      nftTokenId
     }
     user {
       username
@@ -115,5 +124,7 @@ export const USER_OPINION_FIELDS = gql`
     claim {
       id
     }
+    nftTokenId
+    nftMetadataURI
   }
 `;

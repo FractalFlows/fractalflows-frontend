@@ -4,6 +4,7 @@
 
 require("@nomiclabs/hardhat-ethers");
 require("@nomiclabs/hardhat-etherscan");
+require("@nomicfoundation/hardhat-chai-matchers");
 require("hardhat-gas-reporter");
 
 module.exports = {
@@ -18,6 +19,11 @@ module.exports = {
     },
   },
   networks: {
+    hardhat: {
+      forking: {
+        url: process.env.ALCHEMY_FORK_URL,
+      },
+    },
     goerli: {
       url: process.env.STAGING_ALCHEMY_KEY,
       accounts: [process.env.PRIVATE_KEY],
@@ -36,5 +42,12 @@ module.exports = {
   },
   etherscan: {
     apiKey: process.env.ETHERSCAN_API_KEY,
+  },
+  mocha: {
+    timeout: 100000000,
+  },
+  ethernal: {
+    email: process.env.ETHERNAL_EMAIL,
+    password: process.env.ETHERNAL_PASSWORD,
   },
 };

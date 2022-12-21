@@ -1,11 +1,12 @@
 # See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
 
-artifacts
 cache
 graph
 .env
 .env.development
 .env.production
+analyze
+artifacts
 
 # dependencies
 /node_modules

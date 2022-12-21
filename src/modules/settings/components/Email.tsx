@@ -67,7 +67,7 @@ export const Email = () => {
         }
       );
       setResendCountdown(30);
-    } catch (e: any) {
+    } catch (e) {
       enqueueSnackbar(e?.message, {
         variant: "error",
       });
@@ -88,7 +88,7 @@ export const Email = () => {
       } else {
         await handleSendVerificationCode();
       }
-    } catch (e: any) {
+    } catch (e) {
       enqueueSnackbar(e?.message, {
         variant: "error",
       });
@@ -98,7 +98,7 @@ export const Email = () => {
   return (
     <TabPanel
       title="Email"
-      description="Use your email address to sign in and receive app notifications"
+      description="Use your email address to receive app notifications"
     >
       <form onSubmit={handleSubmitHook(handleSubmit)}>
         <Stack spacing={3}>

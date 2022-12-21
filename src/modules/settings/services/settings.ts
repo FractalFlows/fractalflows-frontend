@@ -4,7 +4,6 @@ import { GET_API_KEY } from "../queries";
 import {
   UPDATE_PROFILE,
   UPDATE_EMAIL,
-  CONNECT_ETHEREUM_WALLET,
   CREATE_API_KEY,
   REMOVE_API_KEY,
   SEND_UPDATE_EMAIL_VERIFICATION_CODE,
@@ -52,17 +51,6 @@ export const SettingsService = {
     });
 
     return data.sendUpdateEmailVerificationCode;
-  },
-
-  async connectEthereumWallet({ address }: any): Promise<Boolean> {
-    const { data } = await apolloClient.mutate({
-      mutation: CONNECT_ETHEREUM_WALLET,
-      variables: {
-        address,
-      },
-    });
-
-    return data.removeAPIKey;
   },
 
   async getAPIKey(): Promise<string> {

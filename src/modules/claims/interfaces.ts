@@ -18,6 +18,17 @@ export interface AttributionProps {
   identifier: string;
 }
 
+export enum AttributionOrigins {
+  TWITTER = "twitter",
+  EMAIL = "email",
+}
+
+export interface AttributionProps {
+  id?: string;
+  origin: string;
+  identifier: string;
+}
+
 export enum KnowledgeBitTypes {
   PUBLICATION_OR_ARTICLE_OR_REPORT = "PUBLICATION_OR_ARTICLE_OR_REPORT",
   SIMULATION_RESULTS = "SIMULATION_RESULTS",
@@ -35,39 +46,21 @@ export enum KnowledgeBitTypes {
   OTHER = "OTHER",
 }
 
-export enum KnowledgeBitLocations {
-  EMAIL = "EMAIL",
-  WEBSITE = "WEBSITE",
-  PDF = "PDF",
-  DATABASE = "DATABASE",
-  GIT = "GIT",
-  DROPBOX = "DROPBOX",
-  BOX = "BOX",
-  GOOGLE_DRIVE = "GOOGLE_DRIVE",
-  ONEDRIVE = "ONEDRIVE",
-  STACK_OVERFLOW = "STACK_OVERFLOW",
-  FIGSHARE = "FIGSHARE",
-  SLIDESHARE = "SLIDESHARE",
-  KAGGLE = "KAGGLE",
-  IPFS = "IPFS",
-  DAT = "DAT",
-  JUPYTER = "JUPYTER",
-  BLOG = "BLOG",
-  YOUTUBE = "YOUTUBE",
-  SCIENTIFIC_PUBLISHER = "SCIENTIFIC_PUBLISHER",
-  PUBPEER = "PUBPEER",
-  ZENODO = "ZENODO",
-  OPENAIRE = "OPENAIRE",
-  RE3DATA = "RE3DATA",
-  ETHEREUM_SWARM = "ETHEREUM_SWARM",
-  BIT_TORRENT = "BIT_TORRENT",
-  RESEARCH_GATE = "RESEARCH_GATE",
-  ACADEMIA_EDU = "ACADEMIA_EDU",
-  RESEARCH_ID = "RESEARCH_ID",
-  HAL_ARCHIVES = "HAL_ARCHIVES",
-  ARXIV = "ARXIV",
-  WIKIPEDIA = "WIKIPEDIA",
-  OTHER = "OTHER",
+export enum KnowledgeBitTypesLabels {
+  PUBLICATION_OR_ARTICLE_OR_REPORT = "Publication/Article/Report",
+  SIMULATION_RESULTS = "Simulation Results",
+  EXPERIMENTAL_RESULTS = "Experimental Results",
+  DETAILED_ANALYSIS = "Detailed Analysis",
+  DATA_SET = "Data Set",
+  DETAILED_MATHEMATICAL_FORMULATION = "Detailed Mathematical Formulations",
+  SCRIPTS = "Scripts",
+  SOURCE_CODE = "Source Code",
+  REVIEWS = "Reviews",
+  REPRODUCTION_OF_RESULTS = "Reproduction of Results",
+  STATEMENT_OF_ASSUMPTIONS = "Statement of Assumptions",
+  STATEMENT_OF_HYPOTHESIS = "Statement of Hypothesis",
+  DESCRIPTION_OF_METHODOLOGIES = "Description of Methodologies",
+  OTHER = "Other (please specify)",
 }
 
 export enum KnowledgeBitSides {
@@ -78,6 +71,7 @@ export enum KnowledgeBitSides {
 export enum KnowledgeBitVoteTypes {
   UPVOTE = "UPVOTE",
   DOWNVOTE = "DOWNVOTE",
+  UNVOTE = "UNVOTE",
 }
 
 export interface KnowledgeBitProps {
@@ -87,9 +81,11 @@ export interface KnowledgeBitProps {
   summary?: string;
   type: KnowledgeBitTypes;
   customType?: string;
-  location: KnowledgeBitLocations;
-  customLocation?: string;
-  url: string;
+  file: File;
+  fileURI?: string;
+  nftTxHash: string;
+  nftTokenId: string;
+  nftMetadataURI: string;
   attributions?: AttributionProps[];
   user: UserProps;
   upvotesCount: number;
@@ -104,12 +100,6 @@ export interface KnowledgeBitVoteProps {
 export enum ClaimOrigins {
   FRACTALFLOWS = "FRACTALFLOWS",
   TWITTER = "Twitter",
-}
-
-export enum ClaimNFTStatuses {
-  NOTMINTED = "NOTMINTED",
-  MINTING = "MINTING",
-  MINTED = "MINTED",
 }
 
 export interface ClaimProps {
@@ -129,8 +119,7 @@ export interface ClaimProps {
   tweetId?: string;
   tweetOwner?: string;
   origin?: ClaimOrigins;
-  nftStatus?: ClaimNFTStatuses;
-  nftTxId?: string;
+  nftTxHash?: string;
   nftTokenId?: string;
   nftFractionalizationContractAddress?: string;
 }
@@ -169,4 +158,7 @@ export interface OpinionProps {
   arguments: ArgumentProps[];
   user: UserProps;
   claim: Partial<ClaimProps>;
+  nftTokenId: string;
+  nftTxHash: string;
+  nftMetadataURI: string;
 }

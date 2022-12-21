@@ -1,15 +1,11 @@
 import { apolloClient } from "common/services/apollo/client";
 
 import {
-  CREATE_CLAIM,
   UPDATE_CLAIM,
   DELETE_CLAIM,
   DISABLE_CLAIM,
   INVITE_FRIENDS,
-  CREATE_KNOWLEDGE_BIT,
-  UPDATE_KNOWLEDGE_BIT,
   DELETE_KNOWLEDGE_BIT,
-  SAVE_KNOWLEDGE_BIT_VOTE,
   CREATE_ARGUMENT,
   SAVE_OPINION,
   ADD_FOLLOWER_TO_CLAIM,
@@ -27,7 +23,6 @@ import {
   GET_ARGUMENTS,
   GET_OPINION,
   GET_USER_OPINION,
-  GET_ARGUMENT,
   SEARCH_CLAIMS,
   GET_USER_CLAIMS,
   GET_USER_CONTRIBUTED_CLAIMS,
@@ -48,6 +43,7 @@ import type {
 } from "../interfaces";
 import type { PaginationProps } from "modules/interfaces";
 import { gql } from "@apollo/client";
+import { CORE_ARGUMENT_FIELDS, KNOWLEDGE_BIT_FIELDS } from "../fragments";
 
 export const ClaimsService = {
   async getClaim({
@@ -205,7 +201,14 @@ export const ClaimsService = {
 
   async createClaim({ claim }: { claim: ClaimProps }): Promise<ClaimProps> {
     const { data } = await apolloClient.mutate({
-      mutation: CREATE_CLAIM,
+      mutation: gql`
+        mutation CreateClaim($createClaimInput: CreateClaimInput!) {
+          createClaim(createClaimInput: $createClaimInput) {
+            id
+            slug
+          }
+        }
+      `,
       variables: {
         createClaimInput: claim,
       },
@@ -234,22 +237,35 @@ export const ClaimsService = {
     return data.updateClaim;
   },
 
-  async saveClaimMetadataOnIPFS({ id }: { id: string }): Promise<string> {
+  async saveClaimOnIPFS({
+    claim,
+  }: {
+    claim: Partial<ClaimProps>;
+  }): Promise<{ metadataURI: string; ipnsName: string }> {
     const { data } = await apolloClient.mutate({
       mutation: gql`
-        mutation SaveClaimMetadataOnIPFS($id: String!) {
-          saveClaimMetadataOnIPFS(id: $id)
+        mutation SaveClaimOnIPFS($claim: ClaimInput!) {
+          saveClaimOnIPFS(claim: $claim) {
+            metadataURI
+            ipnsName
+          }
         }
       `,
       variables: {
-        id,
+        claim,
       },
     });
 
-    return data.saveClaimMetadataOnIPFS;
+    return data.saveClaimOnIPFS;
   },
 
-  async saveClaimTxId({ id, txId }: { id: string, txId: string }): Promise<void> {
+  async saveClaimTxId({
+    id,
+    txId,
+  }: {
+    id: string;
+    txId: string;
+  }): Promise<void> {
     const { data } = await apolloClient.mutate({
       mutation: gql`
         mutation SaveClaimTxId($id: String!, $txId: String!) {
@@ -258,7 +274,7 @@ export const ClaimsService = {
       `,
       variables: {
         id,
-        txId
+        txId,
       },
     });
 
@@ -376,6 +392,32 @@ export const ClaimsService = {
     return data.userKnowledgeBitVotes;
   },
 
+  async saveKnowledgeBitOnIPFS({
+    knowledgeBit,
+  }: {
+    knowledgeBit: KnowledgeBitProps;
+  }): Promise<{ metadataURI: string; fileURI: string }> {
+    const { data } = await apolloClient.mutate({
+      mutation: gql`
+        mutation SaveKnowledgeBitOnIPFS(
+          $saveKnowledgeBitOnIPFSInput: SaveKnowledgeBitOnIPFSInput!
+        ) {
+          saveKnowledgeBitOnIPFS(
+            saveKnowledgeBitOnIPFSInput: $saveKnowledgeBitOnIPFSInput
+          ) {
+            metadataURI
+            fileURI
+          }
+        }
+      `,
+      variables: {
+        saveKnowledgeBitOnIPFSInput: knowledgeBit,
+      },
+    });
+
+    return data.saveKnowledgeBitOnIPFS;
+  },
+
   async createKnowledgeBit({
     claimSlug,
     knowledgeBit,
@@ -384,7 +426,21 @@ export const ClaimsService = {
     knowledgeBit: KnowledgeBitProps;
   }): Promise<KnowledgeBitProps> {
     const { data } = await apolloClient.mutate({
-      mutation: CREATE_KNOWLEDGE_BIT,
+      mutation: gql`
+        ${KNOWLEDGE_BIT_FIELDS}
+
+        mutation CreateKnowledgeBit(
+          $claimSlug: String!
+          $createKnowledgeBitInput: CreateKnowledgeBitInput!
+        ) {
+          createKnowledgeBit(
+            claimSlug: $claimSlug
+            createKnowledgeBitInput: $createKnowledgeBitInput
+          ) {
+            ...KnowledgeBitFields
+          }
+        }
+      `,
       variables: {
         claimSlug,
         createKnowledgeBitInput: knowledgeBit,
@@ -402,7 +458,19 @@ export const ClaimsService = {
     knowledgeBit: KnowledgeBitProps;
   }): Promise<KnowledgeBitProps> {
     const { data } = await apolloClient.mutate({
-      mutation: UPDATE_KNOWLEDGE_BIT,
+      mutation: gql`
+        ${KNOWLEDGE_BIT_FIELDS}
+
+        mutation UpdateKnowledgeBit(
+          $updateKnowledgeBitInput: UpdateKnowledgeBitInput!
+        ) {
+          updateKnowledgeBit(
+            updateKnowledgeBitInput: $updateKnowledgeBitInput
+          ) {
+            ...KnowledgeBitFields
+          }
+        }
+      `,
       variables: {
         updateKnowledgeBitInput: {
           ...knowledgeBit,
@@ -427,20 +495,49 @@ export const ClaimsService = {
 
   async saveKnowledgeBitVote({
     knowledgeBitId,
-    type,
+    voteType,
   }: {
     knowledgeBitId: string;
-    type: KnowledgeBitVoteTypes;
+    voteType: KnowledgeBitVoteTypes;
   }): Promise<boolean> {
     const { data } = await apolloClient.mutate({
-      mutation: SAVE_KNOWLEDGE_BIT_VOTE,
+      mutation: gql`
+        mutation SaveKnowledgeBitVote(
+          $knowledgeBitId: String!
+          $voteType: KnowledgeBitVoteTypes!
+        ) {
+          saveKnowledgeBitVote(
+            knowledgeBitId: $knowledgeBitId
+            voteType: $voteType
+          )
+        }
+      `,
       variables: {
         knowledgeBitId,
-        type,
+        voteType,
       },
     });
 
     return data.saveKnowledgeBitVote;
+  },
+
+  async saveArgumentOnIPFS({
+    argument,
+  }: {
+    argument: ArgumentProps;
+  }): Promise<string> {
+    const { data } = await apolloClient.mutate({
+      mutation: gql`
+        mutation SaveArgumentOnIPFS($saveArgumentOnIPFSInput: ArgumentInput!) {
+          saveArgumentOnIPFS(saveArgumentOnIPFSInput: $saveArgumentOnIPFSInput)
+        }
+      `,
+      variables: {
+        saveArgumentOnIPFSInput: argument,
+      },
+    });
+
+    return data.saveArgumentOnIPFS;
   },
 
   async createArgument({
@@ -478,13 +575,61 @@ export const ClaimsService = {
 
   async getArgument({ id }: { id: string }): Promise<ArgumentProps> {
     const { data } = await apolloClient.query({
-      query: GET_ARGUMENT,
+      query: gql`
+        ${CORE_ARGUMENT_FIELDS}
+
+        query GetArgument($id: String!) {
+          argument(id: $id) {
+            ...CoreArgumentFields
+
+            evidences {
+              id
+              name
+            }
+            comments {
+              id
+              content
+              createdAt
+              user {
+                id
+                username
+                avatar
+              }
+              argument {
+                id
+                nftTokenId
+              }
+            }
+          }
+        }
+      `,
       variables: {
         id,
       },
     });
 
     return data.argument;
+  },
+
+  async saveOpinionOnIPFS({
+    opinion,
+  }: {
+    opinion: Partial<OpinionProps>;
+  }): Promise<string> {
+    const { data } = await apolloClient.mutate({
+      mutation: gql`
+        mutation SaveOpinionOnIPFS(
+          $saveOpinionOnIPFSInput: SaveOpinionOnIPFSInput!
+        ) {
+          saveOpinionOnIPFS(saveOpinionOnIPFSInput: $saveOpinionOnIPFSInput)
+        }
+      `,
+      variables: {
+        saveOpinionOnIPFSInput: opinion,
+      },
+    });
+
+    return data.saveOpinionOnIPFS;
   },
 
   async getOpinion({ id }: { id: string }): Promise<OpinionProps> {
