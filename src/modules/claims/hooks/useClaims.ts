@@ -22,6 +22,7 @@ import { ClaimProps } from "../interfaces";
 import { apolloClient } from "common/services/apollo/client";
 import { AuthCache } from "modules/auth/cache";
 import ClaimContractABI from "../../../../artifacts/contracts/Claim.sol/Claim.json";
+import ClaimFractionalizerContractABI from "../../../../artifacts/contracts/ClaimFractionalizer.sol/ClaimFractionalizer.json";
 import { generateNFTId } from "common/utils/transactions";
 import { OceanProtocolService } from "modules/oceanprotocol/services";
 
@@ -212,6 +213,46 @@ export const getClaimNFTFractionalizationContractOf = async ({
   return fractionalizationContract;
 };
 
+export const getReleasableRewards = async ({
+  fractionalizationContract,
+  token,
+  owner,
+}: {
+  fractionalizationContract: string;
+  token: string;
+  owner: string;
+}): Promise<string> => {
+  const releasable = await ContractCtrl.read({
+    address: fractionalizationContract,
+    chainId: Number(process.env.NEXT_PUBLIC_NETWORK_ID),
+    abi: ClaimFractionalizerContractABI.abi,
+    functionName: "releasable",
+    args: [token, owner],
+  });
+
+  return releasable;
+};
+
+export const releaseRewards = async ({
+  fractionalizationContract,
+  token,
+  owner,
+}: {
+  fractionalizationContract: string;
+  token: string;
+  owner: string;
+}): Promise<string> => {
+  const releaseTx = await ContractCtrl.write({
+    address: fractionalizationContract,
+    chainId: Number(process.env.NEXT_PUBLIC_NETWORK_ID),
+    abi: ClaimFractionalizerContractABI.abi,
+    functionName: "release",
+    args: [token, owner],
+  });
+
+  return releaseTx;
+};
+
 export const createClaim = async ({ claim }: { claim: ClaimProps }) =>
   await ClaimsService.createClaim({ claim });
 
@@ -337,6 +378,8 @@ export const useClaims = () => {
     setOceanNFTMetadataAndTokenURI,
     updateClaimNFTMetadata,
     getClaimNFTFractionalizationContractOf,
+    getReleasableRewards,
+    releaseRewards,
     updateClaim,
     deleteClaim,
     disableClaim,
