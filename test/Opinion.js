@@ -56,7 +56,8 @@ const deployOpinionContractAndMintNFT = async (
   const claimTokenId = generateNFTId();
   const mintClaimTokenTx = await ClaimContract.mintToken(
     metadataCID,
-    claimTokenId
+    claimTokenId,
+    1e11
   );
   await mintClaimTokenTx.wait();
 
@@ -111,7 +112,6 @@ describe("Opinion", function () {
       ClaimContract,
       OpinionContract,
       claimTokenId,
-      knowledgeBitTokenId,
       argumentTokenId,
       opinionTokenId,
     } = await deployOpinionContractAndMintNFT(metadataCID);

@@ -37,7 +37,6 @@ import { UserRole } from "modules/auth/interfaces";
 import { ConnectTwitter } from "common/components/ConnectTwitter";
 import styles from "./Summary.module.css";
 import { LoadingButton } from "@mui/lab";
-import { ClaimNFTStatusBar } from "./ClaimNFTStatusBar";
 import { getGatewayFromIPFSURI } from "common/utils/ipfs";
 import { getAttributionLink } from "common/utils/attributions";
 
@@ -290,6 +289,16 @@ export const ClaimSummary: FC = (props) => {
               </IconButton>
             </Tooltip>
           ) : null}
+
+          <a
+            href={`${process.env.NEXT_PUBLIC_FRACTALFLOWS_OCEAN_MARKET_URL}/asset/${claim?.oceanDid}`}
+            target="_blank"
+            rel="noreferrer noopener"
+          >
+            <Button variant="contained" sx={{ marginLeft: 2 }}>
+              Buy data
+            </Button>
+          </a>
 
           {get(claim, "user.username") ===
           process.env.NEXT_PUBLIC_FRACTALFLOWS_BOT_USERNAME ? (

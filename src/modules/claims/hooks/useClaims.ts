@@ -1,6 +1,15 @@
 import { gql, useQuery } from "@apollo/client";
 import { get } from "lodash-es";
+import { ethers, utils as ethersUtils } from "ethers";
 import { ContractCtrl } from "@web3modal/core";
+import {
+  DDO,
+  generateDid,
+  getHash,
+  Metadata,
+  MetadataAndTokenURI,
+  Service,
+} from "@oceanprotocol/lib";
 
 import { getClaim, getPartialClaim, getClaims, getTrendingClaims } from "./get";
 import { updateClaim } from "./update";
@@ -13,7 +22,9 @@ import { ClaimProps } from "../interfaces";
 import { apolloClient } from "common/services/apollo/client";
 import { AuthCache } from "modules/auth/cache";
 import ClaimContractABI from "../../../../artifacts/contracts/Claim.sol/Claim.json";
-import { generateNFTId } from "common/utils/nfts";
+import ClaimFractionalizerContractABI from "../../../../artifacts/contracts/ClaimFractionalizer.sol/ClaimFractionalizer.json";
+import { generateNFTId } from "common/utils/transactions";
+import { OceanProtocolService } from "modules/oceanprotocol/services";
 
 const saveClaimOnIPFS = async ({ claim }: { claim: Partial<ClaimProps> }) => {
   return await ClaimsService.saveClaimOnIPFS({ claim });
@@ -29,10 +40,143 @@ export const mintClaimNFT = async ({
     chainId: Number(process.env.NEXT_PUBLIC_NETWORK_ID),
     abi: ClaimContractABI.abi,
     functionName: "mintToken",
-    args: [metadataURI.replace(/^ipfs:\/\//, ""), generateNFTId()],
+    args: [
+      metadataURI.replace(/^ipfs:\/\//, ""),
+      generateNFTId(),
+      ethersUtils.parseEther("100.0"),
+    ],
   });
 
   return mintClaimNFTTx;
+};
+
+export const constructOceanDDO = async ({
+  name,
+  description,
+  url,
+  datatokenAddress,
+  nftAddress,
+}: {
+  name: string;
+  description: string;
+  url: string;
+  datatokenAddress: string;
+  nftAddress: string;
+}) => {
+  // gets checksummed addresses
+  datatokenAddress = ethers.utils.getAddress(datatokenAddress);
+  nftAddress = ethers.utils.getAddress(nftAddress);
+
+  function dateToStringNoMS(date: Date): string {
+    return date.toISOString().replace(/\.[0-9]{3}Z/, "Z");
+  }
+  const chainId = Number(process.env.NEXT_PUBLIC_NETWORK_ID);
+  const did = generateDid(nftAddress, chainId);
+  const currentTime = dateToStringNoMS(new Date());
+
+  const newMetadata: Metadata = {
+    created: currentTime,
+    updated: currentTime,
+    type: "dataset",
+    name,
+    description,
+    tags: [],
+    author: "Fractal Flows",
+    license: "https://market.oceanprotocol.com/terms",
+    links: [],
+    additionalInformation: {
+      termsAndConditions: true,
+    },
+  };
+
+  const file = {
+    nftAddress,
+    datatokenAddress,
+    files: [
+      {
+        type: "url",
+        index: 0,
+        url,
+        method: "GET",
+      },
+    ],
+  };
+
+  const filesEncrypted = await OceanProtocolService.encrypt(file);
+
+  const newService: Service = {
+    id: getHash(datatokenAddress + filesEncrypted),
+    type: "access",
+    files: filesEncrypted || "",
+    datatokenAddress,
+    serviceEndpoint: OceanProtocolService._providerURL as string,
+    timeout: 0, // forever
+  };
+
+  const newDdo: DDO = {
+    "@context": ["https://w3id.org/did/v1"],
+    id: did,
+    nftAddress,
+    version: "4.1.0",
+    chainId,
+    metadata: newMetadata,
+    services: [newService],
+  };
+
+  const ddoEncrypted = await OceanProtocolService.encrypt(newDdo);
+
+  return { did, ddo: newDdo, ddoEncrypted };
+};
+
+export const setOceanNFTMetadataAndTokenURI = async ({
+  claimTokenId,
+  ddo,
+  ddoEncrypted,
+  did,
+  nftMetadata,
+}: any) => {
+  const metadataHash = getHash(JSON.stringify(ddo));
+
+  // add final did to external_url and asset link to description in nftMetadata before encoding
+  const externalUrl = `${process.env.NEXT_PUBLIC_FRACTALFLOWS_OCEAN_MARKET_URL}/asset/${did}`;
+  const encodedMetadata = Buffer.from(
+    JSON.stringify({
+      ...nftMetadata,
+      description: `${nftMetadata.description}\n\nView on Fractal Flows Market: ${externalUrl}`,
+      external_url: externalUrl,
+    })
+  ).toString("base64");
+
+  // theoretically used by aquarius or provider, not implemented yet, will remain hardcoded
+  const flags = "0x02";
+
+  const metadataAndTokenURI: MetadataAndTokenURI = {
+    metaDataState: 0,
+    metaDataDecryptorUrl: OceanProtocolService._providerURL,
+    metaDataDecryptorAddress: "",
+    flags,
+    data: ddoEncrypted,
+    metaDataHash: "0x" + metadataHash,
+    tokenId: 1,
+    tokenURI: `data:application/json;base64,${encodedMetadata}`,
+    metadataProofs: [],
+  };
+
+  const setMetadataAndTokenURITx = await ContractCtrl.write({
+    address: process.env.NEXT_PUBLIC_CLAIM_CONTRACT_ADDRESS as string,
+    chainId: Number(process.env.NEXT_PUBLIC_NETWORK_ID),
+    abi: ClaimContractABI.abi,
+    functionName: "setOceanNFTMetadataAndTokenURI",
+    args: [claimTokenId, metadataAndTokenURI],
+  });
+
+  // const setMetadataAndTokenURITx = await nft.setMetadataAndTokenURI(
+  //   ddo.nftAddress,
+  //   accountId,
+  //   metadataAndTokenURI
+  // );
+
+  return setMetadataAndTokenURITx;
 };
 
 export const updateClaimNFTMetadata = async ({
@@ -67,6 +211,46 @@ export const getClaimNFTFractionalizationContractOf = async ({
   });
 
   return fractionalizationContract;
+};
+
+export const getReleasableRewards = async ({
+  fractionalizationContract,
+  token,
+  owner,
+}: {
+  fractionalizationContract: string;
+  token: string;
+  owner: string;
+}): Promise<string> => {
+  const releasable = await ContractCtrl.read({
+    address: fractionalizationContract,
+    chainId: Number(process.env.NEXT_PUBLIC_NETWORK_ID),
+    abi: ClaimFractionalizerContractABI.abi,
+    functionName: "releasable",
+    args: [token, owner],
+  });
+
+  return releasable;
+};
+
+export const releaseRewards = async ({
+  fractionalizationContract,
+  token,
+  owner,
+}: {
+  fractionalizationContract: string;
+  token: string;
+  owner: string;
+}): Promise<string> => {
+  const releaseTx = await ContractCtrl.write({
+    address: fractionalizationContract,
+    chainId: Number(process.env.NEXT_PUBLIC_NETWORK_ID),
+    abi: ClaimFractionalizerContractABI.abi,
+    functionName: "release",
+    args: [token, owner],
+  });
+
+  return releaseTx;
 };
 
 export const createClaim = async ({ claim }: { claim: ClaimProps }) =>
@@ -190,8 +374,12 @@ export const useClaims = () => {
     createClaim,
     saveClaimOnIPFS,
     mintClaimNFT,
+    constructOceanDDO,
+    setOceanNFTMetadataAndTokenURI,
     updateClaimNFTMetadata,
     getClaimNFTFractionalizationContractOf,
+    getReleasableRewards,
+    releaseRewards,
     updateClaim,
     deleteClaim,
     disableClaim,

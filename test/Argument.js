@@ -39,7 +39,8 @@ const deployArgumentContractAndMintNFT = async (
   const claimTokenId = generateNFTId();
   const mintClaimTokenTx = await ClaimContract.mintToken(
     metadataCID,
-    claimTokenId
+    claimTokenId,
+    1e11
   );
   await mintClaimTokenTx.wait();
 

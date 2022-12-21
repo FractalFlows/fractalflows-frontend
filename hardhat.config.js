@@ -19,6 +19,11 @@ module.exports = {
     },
   },
   networks: {
+    hardhat: {
+      forking: {
+        url: process.env.ALCHEMY_FORK_URL,
+      },
+    },
     goerli: {
       url: process.env.STAGING_ALCHEMY_KEY,
       accounts: [process.env.PRIVATE_KEY],
@@ -40,5 +45,9 @@ module.exports = {
   },
   mocha: {
     timeout: 100000000,
+  },
+  ethernal: {
+    email: process.env.ETHERNAL_EMAIL,
+    password: process.env.ETHERNAL_PASSWORD,
   },
 };

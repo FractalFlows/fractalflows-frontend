@@ -15,7 +15,7 @@ import type { ArgumentProps, OpinionProps } from "../interfaces";
 import { ClaimsCache } from "../cache";
 import { apolloClient } from "common/services/apollo/client";
 import OpinionContractABI from "../../../../artifacts/contracts/Opinion.sol/Opinion.json";
-import { generateNFTId } from "common/utils/nfts";
+import { generateNFTId } from "common/utils/transactions";
 import { ContractCtrl } from "@web3modal/core";
 
 export const saveOpinionOnIPFS = async ({
