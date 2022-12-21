@@ -5,6 +5,7 @@ pragma solidity ^0.8.9;
 import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 import "@openzeppelin/contracts/token/ERC721/IERC721Receiver.sol";
 import "@openzeppelin/contracts/token/ERC777/IERC777Recipient.sol";
+import "@openzeppelin/contracts/token/ERC777/IERC777.sol";
 import "@openzeppelin/contracts/utils/introspection/IERC1820Registry.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "hardhat/console.sol";
@@ -85,6 +86,11 @@ contract ClaimFractionalizer is
   address oceanNFTAddress;
   address oceanDatatokenAddress;
 
+  address[] private _owners;
+  mapping(address => uint256) private _ownersIndexes;
+
+  mapping(address => mapping(address => uint256)) private _releasable;
+
   constructor(
     string memory symbol,
     OceanERC721Factory.NftCreateData memory _NftCreateData,
@@ -123,6 +129,28 @@ contract ClaimFractionalizer is
     );
   }
 
+  function owners() public view returns (address[] memory) {
+    return _owners;
+  }
+
+  function releasable(address token, address owner)
+    public
+    view
+    returns (uint256)
+  {
+    return _releasable[token][owner];
+  }
+
+  function release(address token, address payable account) public virtual {
+    uint256 payment = releasable(token, account);
+
+    require(payment != 0, "Account is not due payment");
+
+    _releasable[token][account] = 0;
+
+    IERC777(token).send(account, payment, "");
+  }
+
   function onERC721Received(
     address _operator,
     address _from,
@@ -140,6 +168,31 @@ contract ClaimFractionalizer is
     bytes calldata userData,
     bytes calldata operatorData
   ) external {
-    console.log("tokens received!");
+    for (uint256 i = 0; i < _owners.length; ) {
+      _releasable[msg.sender][_owners[i]] +=
+        (amount * balanceOf(_owners[i])) /
+        totalSupply();
+      unchecked {
+        i++;
+      }
+    }
+  }
+
+  function _beforeTokenTransfer(
+    address from,
+    address to,
+    uint256 amount
+  ) internal virtual override {
+    if (balanceOf(to) == 0 && amount > 0) {
+      _owners.push(to);
+      _ownersIndexes[to] = _owners.length;
+    }
+
+    unchecked {
+      if (balanceOf(from) - amount == 0) {
+        delete _owners[_ownersIndexes[from] - 1];
+        delete _ownersIndexes[from];
+      }
+    }
   }
 }
